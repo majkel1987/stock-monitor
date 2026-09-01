@@ -1,0 +1,9 @@
+.next
+AGENTS.md
+coverage
+docs/PRD-Stock-Monitor-GPW-USA.md
+docs/Technology-Stack-Recommendation.md
+node_modules
+playwright-report
+pnpm-lock.yaml
+test-results
