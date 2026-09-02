@@ -26,11 +26,34 @@ Before implementing any non-trivial feature, inspect the relevant project docume
 
 Primary sources of truth:
 
-1. `docs/PRD-Stock-Monitor-GPW-USA.md`
-2. `docs/Technology-Stack-Recommendation.md`
-3. Visual Architecture documentation / reference
-4. Entity Architecture documentation / reference
-5. Existing ADRs under `docs/architecture/`
+1. `docs/PRD-Stock-Monitor-GPW-USA.md` — functional/product requirements.
+2. `docs/Technology-Stack-Recommendation.md` — approved technology and runtime architecture.
+3. Entity Architecture documentation / reference — domain/data model.
+4. Visual Architecture documentation / reference — intended screen structure and product concepts.
+5. Pencil / Pen.dev design — approved final visual implementation; see Section 3.
+6. Existing ADRs under `docs/architecture/` — recorded architectural decisions.
+
+Use the following authority model:
+
+```text
+FUNCTIONAL REQUIREMENTS
+→ PRD
+
+DOMAIN / DATA MODEL
+→ Entity Architecture + PRD
+
+TECHNICAL ARCHITECTURE
+→ Technology Stack Recommendation + AGENTS.md + ADRs
+
+SCREEN STRUCTURE / PRODUCT CONCEPTS
+→ Visual Architecture
+
+FINAL VISUAL UI / UX
+→ Pencil / Pen.dev design
+
+IMPLEMENTATION
+→ Next.js repository
+```
 
 Do not invent requirements that are absent from the project documentation.
 
@@ -38,7 +61,267 @@ Do not implement V1/V2 functionality as part of MVP unless explicitly requested.
 
 ---
 
-## 3. Product context
+## 3. Pencil / Pen.dev — Visual Source of Truth
+
+The authoritative approved UI/UX design for this application is stored in:
+
+```text
+C:\Users\Michał\Documents\ChatGPT\Stock_Monitor\StockMonitor.pen
+```
+
+The Pencil / Pen.dev MCP integration is installed for Codex and MUST be used for UI implementation work.
+
+The `.pen` file is the **Visual Source of Truth**.
+
+The earlier Visual Architecture remains authoritative for intended screen structure, user flows and product concepts, but the `.pen` design defines the approved final visual implementation.
+
+### Design authority
+
+For visual decisions, the direction of authority is:
+
+```text
+StockMonitor.pen
+        ↓
+React / Next.js implementation
+```
+
+NOT:
+
+```text
+existing React implementation
+        ↓
+reinterpretation of the approved design
+```
+
+The application must adapt to the approved Pencil design, not the other way around.
+
+### Mandatory Pencil inspection for UI work
+
+Before starting any task that creates, modifies, refactors or visually affects:
+
+- pages,
+- layouts,
+- application shell,
+- navigation,
+- tables,
+- forms,
+- dialogs,
+- sheets,
+- buttons,
+- inputs,
+- badges,
+- typography,
+- spacing,
+- colors,
+- borders,
+- radii,
+- icons,
+- responsive behavior,
+- reusable UI components,
+
+the agent MUST first inspect the relevant frame/component in:
+
+```text
+C:\Users\Michał\Documents\ChatGPT\Stock_Monitor\StockMonitor.pen
+```
+
+through the Pencil / Pen.dev MCP tools.
+
+Do not rely on memory, old screenshots, generic UI conventions, shadcn defaults or guessed dimensions when the approved design can be inspected through Pencil MCP.
+
+If Pencil MCP is unavailable, the `.pen` file cannot be opened, or the relevant design frame cannot be identified, STOP the UI implementation and report the problem instead of approximating the approved design.
+
+### Required UI implementation workflow
+
+For every substantial UI implementation task:
+
+1. Read `AGENTS.md`.
+2. Identify the relevant route, screen, frame or component.
+3. Inspect the corresponding Pencil frame/component through MCP.
+4. Inspect relevant child hierarchy, reusable components and component instances.
+5. Inspect relevant Pencil variables/design tokens.
+6. Capture or inspect a Pencil reference screenshot when useful.
+7. Inspect the existing React/Next.js implementation.
+8. Implement the smallest required change.
+9. Render the application at the corresponding viewport.
+10. Capture the rendered implementation when tooling permits.
+11. Compare the rendered result with the Pencil reference.
+12. Correct meaningful visual discrepancies.
+13. Run the relevant quality checks.
+
+Expected direction:
+
+```text
+Pencil MCP
+    ↓
+inspect structure + exact values + variables
+    ↓
+implement in Next.js
+    ↓
+render application
+    ↓
+compare with Pencil
+    ↓
+correct discrepancies
+```
+
+Do not consider a substantial UI task complete after only the first implementation pass when obvious visual differences remain.
+
+### Fidelity rules
+
+Do NOT:
+
+- redesign approved screens,
+- "improve" the visual design without being asked,
+- modernize or simplify the approved layout,
+- replace Pencil layouts with generic shadcn patterns,
+- change typography because another font or scale seems preferable,
+- change spacing because another value looks cleaner,
+- change component proportions,
+- change colors without a design requirement,
+- change border radius without a design requirement,
+- replace tables with cards,
+- reduce information density,
+- introduce generic SaaS dashboard patterns,
+- add decorative gradients, glass effects or visual noise,
+- invent a different interaction pattern when one is already defined in Pencil.
+
+If exact values can be read from Pencil MCP, use measured values instead of guessing.
+
+Visual fidelity should be as close to 1:1 as technically reasonable while preserving semantic HTML, accessibility and the approved technical architecture.
+
+### Pencil components → React components
+
+Reusable Pencil components should normally map to reusable React components where the conceptual boundary is meaningful.
+
+Preferred relationship:
+
+```text
+Pencil reusable component
+        ↓
+React reusable component
+```
+
+Typical examples:
+
+```text
+App Sidebar
+→ AppSidebar
+
+Navigation Item
+→ NavigationItem
+
+Status Badge
+→ StatusBadge
+
+Price Display
+→ PriceDisplay
+
+Financial Table
+→ reusable table primitives
+
+Monitoring Dialog / Sheet
+→ reusable monitoring UI component
+```
+
+Do not independently recreate the same Pencil component on multiple pages.
+
+Do not over-componentize trivial wrappers, labels or one-off layout frames.
+
+### Pencil variables → application design tokens
+
+Pencil variables are the preferred source for visual design tokens.
+
+Where practical, map them to shared CSS custom properties and consume them through Tailwind/component styling.
+
+Conceptual mapping:
+
+```text
+Pencil variable
+        ↓
+CSS custom property
+        ↓
+Tailwind / component styling
+```
+
+Prefer shared semantic tokens such as:
+
+```text
+--background
+--surface
+--surface-muted
+--border
+--foreground
+--muted-foreground
+--accent
+--positive
+--negative
+--warning
+--focus
+```
+
+over duplicated hard-coded values scattered through React components.
+
+When an approved Pencil token changes, update the shared token/component first where appropriate instead of patching individual screens independently.
+
+### Visual verification
+
+For substantial UI changes, verify at minimum:
+
+- overall frame geometry,
+- sidebar width,
+- top-bar height,
+- page/content padding,
+- section positions,
+- component widths and heights,
+- table column widths,
+- table row heights,
+- gaps,
+- alignment,
+- typography,
+- font weight,
+- line height,
+- colors,
+- borders,
+- border radius,
+- icon size,
+- button dimensions,
+- input dimensions,
+- dialog/sheet dimensions,
+- numeric alignment and formatting.
+
+Prefer Pencil values over inferred or approximate values.
+
+### Conflict handling
+
+If the Pencil design conflicts with another project source:
+
+- visual appearance is governed by Pencil;
+- business behavior is governed by the PRD/domain model;
+- data shape and relationships are governed by Entity Architecture/PRD;
+- technical boundaries are governed by `AGENTS.md`, Technology Stack Recommendation and ADRs.
+
+Do not silently choose one interpretation when the sources materially conflict.
+
+Report the conflict before implementing the conflicting behavior.
+
+### Pencil source is read-only by default
+
+For ordinary implementation tasks, treat:
+
+```text
+C:\Users\Michał\Documents\ChatGPT\Stock_Monitor\StockMonitor.pen
+```
+
+as read-only.
+
+Do not modify the Pencil design merely to make implementation easier.
+
+Only modify the `.pen` file when the user explicitly requests a design change.
+
+---
+
+## 4. Product context
 
 Stock Monitor is a private, single-user investment research application for monitoring GPW and US-listed companies.
 
@@ -72,7 +355,7 @@ This is NOT:
 
 ---
 
-## 4. Architecture contract
+## 5. Architecture contract
 
 Use a **modular monolith**.
 
@@ -101,7 +384,7 @@ UI
 
 ---
 
-## 5. Approved technology stack
+## 6. Approved technology stack
 
 ### Frontend / application
 
@@ -149,7 +432,7 @@ Do NOT introduce an ORM.
 
 ---
 
-## 6. Runtime rules
+## 7. Runtime rules
 
 The MVP uses ONE application runtime:
 
@@ -181,7 +464,7 @@ Do NOT use Vercel Cron for the required 30-minute MVP synchronization.
 
 ---
 
-## 7. Authentication and authorization
+## 8. Authentication and authorization
 
 Use:
 
@@ -220,7 +503,7 @@ Do not implement:
 
 ---
 
-## 8. External integrations
+## 9. External integrations
 
 ### Market data
 
@@ -271,7 +554,7 @@ Do not treat NBP fixing as an intraday tradable FX rate.
 
 ---
 
-## 9. Data rules
+## 10. Data rules
 
 Use:
 
@@ -291,7 +574,7 @@ Historical market price used in a monitoring record must never change when the l
 
 ---
 
-## 10. Validation rules
+## 11. Validation rules
 
 Use Zod for:
 
@@ -319,9 +602,17 @@ Sanitize Markdown before rendering.
 
 ---
 
-## 11. UI implementation rules
+## 12. UI implementation rules
 
-The visual architecture is authoritative.
+The approved Pencil design stored at:
+
+```text
+C:\Users\Michał\Documents\ChatGPT\Stock_Monitor\StockMonitor.pen
+```
+
+is authoritative for the final implemented visual UI/UX.
+
+The earlier Visual Architecture defines intended screen structure and product concepts. It must not be used to visually override a more specific approved Pencil design.
 
 The application should feel like a dense professional research terminal, not a generic SaaS dashboard.
 
@@ -349,7 +640,7 @@ Do not import a ready-made dashboard theme and force the product into it.
 
 ---
 
-## 12. Server Components and Client Components
+## 13. Server Components and Client Components
 
 Default to Server Components.
 
@@ -370,7 +661,7 @@ Do not fetch protected server data from the browser when a Server Component can 
 
 ---
 
-## 13. State management
+## 14. State management
 
 For MVP use:
 
@@ -391,7 +682,7 @@ unless a later documented requirement proves they are necessary.
 
 ---
 
-## 14. Forms
+## 15. Forms
 
 Use native forms + Server Actions for simple operations:
 
@@ -410,7 +701,7 @@ Do not use React Hook Form mechanically for every form.
 
 ---
 
-## 15. Database access conventions
+## 16. Database access conventions
 
 Use:
 
@@ -431,7 +722,7 @@ Keep Supabase imports inside infrastructure/server-focused modules whenever prac
 
 ---
 
-## 16. Repository structure
+## 17. Repository structure
 
 Preferred structure:
 
@@ -522,7 +813,7 @@ Do not create empty abstraction folders purely for appearance.
 
 ---
 
-## 17. Environment variables
+## 18. Environment variables
 
 Expected baseline:
 
@@ -548,7 +839,7 @@ Rules:
 
 ---
 
-## 18. Testing contract
+## 19. Testing contract
 
 Use a risk-focused testing strategy.
 
@@ -605,7 +896,7 @@ Do not pursue arbitrary code-coverage percentages.
 
 ---
 
-## 19. Logging and observability
+## 20. Logging and observability
 
 For MVP use:
 
@@ -628,7 +919,7 @@ Do not add Sentry until real diagnostic limitations justify it.
 
 ---
 
-## 20. Backup expectations
+## 21. Backup expectations
 
 Before the application becomes the only copy of important investment research:
 
@@ -648,7 +939,7 @@ docs/runbooks/
 
 ---
 
-## 21. MVP scope discipline
+## 22. MVP scope discipline
 
 Implement ONLY what is required for MVP unless the user explicitly requests otherwise.
 
@@ -675,7 +966,7 @@ Design should remain evolvable, but unused future infrastructure must not be bui
 
 ---
 
-## 22. Prohibited technologies in MVP
+## 23. Prohibited technologies in MVP
 
 Do NOT introduce without explicit architectural approval:
 
@@ -707,18 +998,19 @@ Do NOT introduce without explicit architectural approval:
 
 ---
 
-## 23. Implementation workflow for every task
+## 24. Implementation workflow for every task
 
 Before writing code:
 
 1. Read `AGENTS.md`.
 2. Read the relevant PRD section.
-3. Inspect existing code before changing architecture.
-4. Identify the smallest feature boundary.
-5. State any meaningful architectural conflict before implementing.
-6. Reuse existing patterns when they remain valid.
-7. Avoid unrelated refactors.
-8. Do not silently expand scope.
+3. For any UI-affecting task, inspect the corresponding frame/component in `C:\Users\Michał\Documents\ChatGPT\Stock_Monitor\StockMonitor.pen` through Pencil MCP before modifying UI code.
+4. Inspect existing code before changing architecture or implementation patterns.
+5. Identify the smallest feature boundary.
+6. State any meaningful conflict between PRD, Entity Architecture, technical architecture and Pencil before implementing.
+7. Reuse existing code patterns only when they remain valid and consistent with the approved Pencil design.
+8. Avoid unrelated refactors.
+9. Do not silently expand scope.
 
 During implementation:
 
@@ -729,20 +1021,23 @@ During implementation:
 5. Handle empty/error/loading states where relevant.
 6. Keep provider failures from breaking historical-data reads.
 7. Do not expose secrets.
-8. Add tests proportionate to risk.
+8. For UI work, preserve Pencil geometry, tokens, typography and reusable component patterns rather than substituting generic library defaults.
+9. Add tests proportionate to risk.
 
 After implementation:
 
-1. Run relevant lint/typecheck/tests.
-2. Fix regressions caused by the change.
-3. Summarize files changed.
-4. Explain architecture decisions only if non-obvious.
-5. Report remaining limitations honestly.
-6. Do not claim a test passed unless it was actually executed.
+1. For substantial UI work, render the affected route and visually compare it with the corresponding Pencil frame before declaring completion.
+2. Correct meaningful visual discrepancies that are within scope.
+3. Run relevant lint/typecheck/tests.
+4. Fix regressions caused by the change.
+5. Summarize files changed.
+6. Explain architecture decisions only if non-obvious.
+7. Report remaining limitations and any known Pencil-to-code visual deviations honestly.
+8. Do not claim a visual comparison or test passed unless it was actually performed.
 
 ---
 
-## 24. Debugging rule
+## 25. Debugging rule
 
 When asked to fix a bug:
 
@@ -760,7 +1055,7 @@ Add a regression test when practical.
 
 ---
 
-## 25. Dependency rule
+## 26. Dependency rule
 
 Before installing a dependency, ask:
 
@@ -779,7 +1074,7 @@ Do not add libraries merely because they are common in starter templates.
 
 ---
 
-## 26. Definition of a good implementation
+## 27. Definition of a good implementation
 
 A good change:
 
@@ -792,7 +1087,8 @@ A good change:
 - preserves authentication and RLS protections,
 - remains testable,
 - does not create speculative infrastructure,
-- matches the visual architecture rather than a generic template.
+- uses Pencil MCP before substantial UI changes,
+- matches the approved Pencil design rather than a generic template or a visual reinterpretation.
 
 When several approaches are valid, choose the simplest boring solution that fits these rules.
 
