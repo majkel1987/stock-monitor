@@ -657,7 +657,8 @@
                       "fill": "$text-primary",
                       "content": "Subsection",
                       "fontFamily": "$font-ui",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -693,7 +694,8 @@
                       "fill": "$text-primary",
                       "content": "Body",
                       "fontFamily": "$font-ui",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -729,7 +731,8 @@
                       "fill": "$text-primary",
                       "content": "Secondary Body",
                       "fontFamily": "$font-ui",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -765,7 +768,8 @@
                       "fill": "$text-primary",
                       "content": "Label & Table Header",
                       "fontFamily": "$font-ui",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -801,7 +805,8 @@
                       "fill": "$text-primary",
                       "content": "Caption",
                       "fontFamily": "$font-ui",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -837,7 +842,8 @@
                       "fill": "$text-primary",
                       "content": "Numeric Value",
                       "fontFamily": "$font-data",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
@@ -2921,7 +2927,8 @@
                       "fill": "$text-primary",
                       "content": "460.00 USD",
                       "fontFamily": "$font-data",
-                      "fontSize": 11
+                      "fontSize": 11,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2945,7 +2952,8 @@
                       "fill": "$text-primary",
                       "content": "475.00 USD",
                       "fontFamily": "$font-data",
-                      "fontSize": 11
+                      "fontSize": 11,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2969,7 +2977,8 @@
                       "fill": "$warning",
                       "content": "3.2% above",
                       "fontFamily": "$font-data",
-                      "fontSize": 11
+                      "fontSize": 11,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2993,7 +3002,8 @@
                       "fill": "$text-secondary",
                       "content": "NOT REACHED",
                       "fontFamily": "$font-ui",
-                      "fontSize": 11
+                      "fontSize": 11,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -3390,7 +3400,8 @@
                           "width": "fill_container",
                           "content": "EMCOR Group",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3415,7 +3426,8 @@
                           "width": "fill_container",
                           "content": "USA",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3442,7 +3454,8 @@
                           "content": "475.00",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3469,7 +3482,8 @@
                           "content": "+2.4%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3494,7 +3508,8 @@
                           "width": "fill_container",
                           "content": "DEEP DIVE",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3521,7 +3536,8 @@
                           "content": "78",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3548,7 +3564,8 @@
                           "content": "460.00",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3575,7 +3592,8 @@
                           "content": "3.2% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3600,7 +3618,8 @@
                           "width": "fill_container",
                           "content": "28 Aug 2026",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -3667,7 +3686,8 @@
                           "width": "fill_container",
                           "content": "EMCOR Group",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3692,7 +3712,8 @@
                           "width": "fill_container",
                           "content": "USA",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3719,7 +3740,8 @@
                           "content": "475.00",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3746,7 +3768,8 @@
                           "content": "+2.4%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3771,7 +3794,8 @@
                           "width": "fill_container",
                           "content": "DEEP DIVE",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3798,7 +3822,8 @@
                           "content": "78",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3825,7 +3850,8 @@
                           "content": "460.00",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3852,7 +3878,8 @@
                           "content": "3.2% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3877,7 +3904,8 @@
                           "width": "fill_container",
                           "content": "28 Aug 2026",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -3944,7 +3972,8 @@
                           "width": "fill_container",
                           "content": "EMCOR Group",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3969,7 +3998,8 @@
                           "width": "fill_container",
                           "content": "USA",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3996,7 +4026,8 @@
                           "content": "475.00",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4023,7 +4054,8 @@
                           "content": "+2.4%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4048,7 +4080,8 @@
                           "width": "fill_container",
                           "content": "DEEP DIVE",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4075,7 +4108,8 @@
                           "content": "78",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4102,7 +4136,8 @@
                           "content": "460.00",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4129,7 +4164,8 @@
                           "content": "3.2% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4154,7 +4190,8 @@
                           "width": "fill_container",
                           "content": "28 Aug 2026",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -6062,7 +6099,8 @@
                                   "width": "fill_container",
                                   "content": "XTB S.A.",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6087,7 +6125,8 @@
                                   "width": "fill_container",
                                   "content": "GPW",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6114,7 +6153,8 @@
                                   "content": "74.62 PLN",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6141,7 +6181,8 @@
                                   "content": "+1.6%",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6166,7 +6207,8 @@
                                   "width": "fill_container",
                                   "content": "BUY CANDIDATE",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6193,7 +6235,8 @@
                                   "content": "82",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6220,7 +6263,8 @@
                                   "content": "72.00",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6247,7 +6291,8 @@
                                   "content": "3.6% above",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6272,7 +6317,8 @@
                                   "width": "fill_container",
                                   "content": "30 Aug 2026",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             }
@@ -6337,7 +6383,8 @@
                                   "width": "fill_container",
                                   "content": "EMCOR Group",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6362,7 +6409,8 @@
                                   "width": "fill_container",
                                   "content": "USA",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6389,7 +6437,8 @@
                                   "content": "475.00 USD",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6416,7 +6465,8 @@
                                   "content": "+2.4%",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6441,7 +6491,8 @@
                                   "width": "fill_container",
                                   "content": "DEEP DIVE",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6468,7 +6519,8 @@
                                   "content": "78",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6495,7 +6547,8 @@
                                   "content": "460.00",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6522,7 +6575,8 @@
                                   "content": "3.2% above",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6547,7 +6601,8 @@
                                   "width": "fill_container",
                                   "content": "28 Aug 2026",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             }
@@ -6612,7 +6667,8 @@
                                   "width": "fill_container",
                                   "content": "PZU S.A.",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6637,7 +6693,8 @@
                                   "width": "fill_container",
                                   "content": "GPW",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6664,7 +6721,8 @@
                                   "content": "57.84 PLN",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6691,7 +6749,8 @@
                                   "content": "−0.7%",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6716,7 +6775,8 @@
                                   "width": "fill_container",
                                   "content": "WATCH",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6743,7 +6803,8 @@
                                   "content": "76",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6770,7 +6831,8 @@
                                   "content": "56.00",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6797,7 +6859,8 @@
                                   "content": "3.3% above",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6822,7 +6885,8 @@
                                   "width": "fill_container",
                                   "content": "26 Aug 2026",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             }
@@ -6887,7 +6951,8 @@
                                   "width": "fill_container",
                                   "content": "Microsoft",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6912,7 +6977,8 @@
                                   "width": "fill_container",
                                   "content": "USA",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6939,7 +7005,8 @@
                                   "content": "517.40 USD",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6966,7 +7033,8 @@
                                   "content": "+0.3%",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -6991,7 +7059,8 @@
                                   "width": "fill_container",
                                   "content": "WAIT",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7018,7 +7087,8 @@
                                   "content": "74",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7045,7 +7115,8 @@
                                   "content": "495.00",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7072,7 +7143,8 @@
                                   "content": "4.5% above",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7097,7 +7169,8 @@
                                   "width": "fill_container",
                                   "content": "22 Aug 2026",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             }
@@ -7162,7 +7235,8 @@
                                   "width": "fill_container",
                                   "content": "Visa",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7187,7 +7261,8 @@
                                   "width": "fill_container",
                                   "content": "USA",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7214,7 +7289,8 @@
                                   "content": "349.12 USD",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7241,7 +7317,8 @@
                                   "content": "−0.4%",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7266,7 +7343,8 @@
                                   "width": "fill_container",
                                   "content": "PORTFOLIO",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7293,7 +7371,8 @@
                                   "content": "81",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7320,7 +7399,8 @@
                                   "content": "330.00",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7347,7 +7427,8 @@
                                   "content": "5.8% above",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7372,7 +7453,8 @@
                                   "width": "fill_container",
                                   "content": "31 Aug 2026",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             }
@@ -7437,7 +7519,8 @@
                                   "width": "fill_container",
                                   "content": "Develia S.A.",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7462,7 +7545,8 @@
                                   "width": "fill_container",
                                   "content": "GPW",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7489,7 +7573,8 @@
                                   "content": "7.36 PLN",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7516,7 +7601,8 @@
                                   "content": "+0.0%",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7541,7 +7627,8 @@
                                   "width": "fill_container",
                                   "content": "WATCH",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7568,7 +7655,8 @@
                                   "content": "69",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7595,7 +7683,8 @@
                                   "content": "7.10",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7622,7 +7711,8 @@
                                   "content": "3.7% above",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7647,7 +7737,8 @@
                                   "width": "fill_container",
                                   "content": "14 Aug 2026",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             }
@@ -7712,7 +7803,8 @@
                                   "width": "fill_container",
                                   "content": "Comfort Systems",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7737,7 +7829,8 @@
                                   "width": "fill_container",
                                   "content": "USA",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7764,7 +7857,8 @@
                                   "content": "708.25 USD",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7791,7 +7885,8 @@
                                   "content": "−1.2%",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7816,7 +7911,8 @@
                                   "width": "fill_container",
                                   "content": "STALE REVIEW",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7843,7 +7939,8 @@
                                   "content": "73",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7870,7 +7967,8 @@
                                   "content": "650.00",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7897,7 +7995,8 @@
                                   "content": "9.0% above",
                                   "textAlign": "right",
                                   "fontFamily": "$font-data",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             },
@@ -7922,7 +8021,8 @@
                                   "width": "fill_container",
                                   "content": "02 Aug 2026",
                                   "fontFamily": "$font-ui",
-                                  "fontSize": 11
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
                                 }
                               ]
                             }
@@ -9982,7 +10082,8 @@
                               "width": "fill_container",
                               "content": "XTB S.A.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10007,7 +10108,8 @@
                               "width": "fill_container",
                               "content": "GPW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10034,7 +10136,8 @@
                               "content": "74.62 PLN",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10061,7 +10164,8 @@
                               "content": "+1.6%",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10086,7 +10190,8 @@
                               "width": "fill_container",
                               "content": "BUY CANDIDATE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10113,7 +10218,8 @@
                               "content": "82",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10140,7 +10246,8 @@
                               "content": "72.00",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10167,7 +10274,8 @@
                               "content": "3.6% above",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10192,7 +10300,8 @@
                               "width": "fill_container",
                               "content": "30 Aug",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10217,7 +10326,8 @@
                               "width": "fill_container",
                               "content": "DELAYED 15m",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10306,7 +10416,8 @@
                               "width": "fill_container",
                               "content": "Visa",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10331,7 +10442,8 @@
                               "width": "fill_container",
                               "content": "USA",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10358,7 +10470,8 @@
                               "content": "349.12 USD",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10385,7 +10498,8 @@
                               "content": "−0.4%",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10410,7 +10524,8 @@
                               "width": "fill_container",
                               "content": "PORTFOLIO",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10437,7 +10552,8 @@
                               "content": "81",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10464,7 +10580,8 @@
                               "content": "330.00",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10491,7 +10608,8 @@
                               "content": "5.8% above",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10516,7 +10634,8 @@
                               "width": "fill_container",
                               "content": "31 Aug",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10541,7 +10660,8 @@
                               "width": "fill_container",
                               "content": "DELAYED 15m",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10630,7 +10750,8 @@
                               "width": "fill_container",
                               "content": "EMCOR Group",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10655,7 +10776,8 @@
                               "width": "fill_container",
                               "content": "USA",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10682,7 +10804,8 @@
                               "content": "475.00 USD",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10709,7 +10832,8 @@
                               "content": "+2.4%",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10734,7 +10858,8 @@
                               "width": "fill_container",
                               "content": "DEEP DIVE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10761,7 +10886,8 @@
                               "content": "78",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10788,7 +10914,8 @@
                               "content": "460.00",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10815,7 +10942,8 @@
                               "content": "3.2% above",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10840,7 +10968,8 @@
                               "width": "fill_container",
                               "content": "28 Aug",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10865,7 +10994,8 @@
                               "width": "fill_container",
                               "content": "DELAYED 15m",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10954,7 +11084,8 @@
                               "width": "fill_container",
                               "content": "PZU S.A.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -10979,7 +11110,8 @@
                               "width": "fill_container",
                               "content": "GPW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11006,7 +11138,8 @@
                               "content": "57.84 PLN",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11033,7 +11166,8 @@
                               "content": "−0.7%",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11058,7 +11192,8 @@
                               "width": "fill_container",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11085,7 +11220,8 @@
                               "content": "76",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11112,7 +11248,8 @@
                               "content": "56.00",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11139,7 +11276,8 @@
                               "content": "3.3% above",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11164,7 +11302,8 @@
                               "width": "fill_container",
                               "content": "26 Aug",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11189,7 +11328,8 @@
                               "width": "fill_container",
                               "content": "DELAYED 15m",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11278,7 +11418,8 @@
                               "width": "fill_container",
                               "content": "Microsoft",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11303,7 +11444,8 @@
                               "width": "fill_container",
                               "content": "USA",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11330,7 +11472,8 @@
                               "content": "517.40 USD",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11357,7 +11500,8 @@
                               "content": "+0.3%",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11382,7 +11526,8 @@
                               "width": "fill_container",
                               "content": "WAIT",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11409,7 +11554,8 @@
                               "content": "74",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11436,7 +11582,8 @@
                               "content": "495.00",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11463,7 +11610,8 @@
                               "content": "4.5% above",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11488,7 +11636,8 @@
                               "width": "fill_container",
                               "content": "22 Aug",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11513,7 +11662,8 @@
                               "width": "fill_container",
                               "content": "DELAYED 15m",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11602,7 +11752,8 @@
                               "width": "fill_container",
                               "content": "Comfort Systems",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11627,7 +11778,8 @@
                               "width": "fill_container",
                               "content": "USA",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11654,7 +11806,8 @@
                               "content": "708.25 USD",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11681,7 +11834,8 @@
                               "content": "−1.2%",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11706,7 +11860,8 @@
                               "width": "fill_container",
                               "content": "STALE REVIEW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11733,7 +11888,8 @@
                               "content": "73",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11760,7 +11916,8 @@
                               "content": "650.00",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11787,7 +11944,8 @@
                               "content": "9.0% above",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11812,7 +11970,8 @@
                               "width": "fill_container",
                               "content": "02 Aug",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11837,7 +11996,8 @@
                               "width": "fill_container",
                               "content": "STALE · 2h",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11926,7 +12086,8 @@
                               "width": "fill_container",
                               "content": "Develia S.A.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11951,7 +12112,8 @@
                               "width": "fill_container",
                               "content": "GPW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -11978,7 +12140,8 @@
                               "content": "7.36 PLN",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12005,7 +12168,8 @@
                               "content": "0.0%",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12030,7 +12194,8 @@
                               "width": "fill_container",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12057,7 +12222,8 @@
                               "content": "69",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12084,7 +12250,8 @@
                               "content": "7.10",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12111,7 +12278,8 @@
                               "content": "3.7% above",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12136,7 +12304,8 @@
                               "width": "fill_container",
                               "content": "14 Aug",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12161,7 +12330,8 @@
                               "width": "fill_container",
                               "content": "MANUAL",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12250,7 +12420,8 @@
                               "width": "fill_container",
                               "content": "AB S.A.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12275,7 +12446,8 @@
                               "width": "fill_container",
                               "content": "GPW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12302,7 +12474,8 @@
                               "content": "—",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12329,7 +12502,8 @@
                               "content": "—",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12354,7 +12528,8 @@
                               "width": "fill_container",
                               "content": "WAIT",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12381,7 +12556,8 @@
                               "content": "—",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12408,7 +12584,8 @@
                               "content": "95.00",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12435,7 +12612,8 @@
                               "content": "—",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12460,7 +12638,8 @@
                               "width": "fill_container",
                               "content": "Not analyzed",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12485,7 +12664,8 @@
                               "width": "fill_container",
                               "content": "UNAVAILABLE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12574,7 +12754,8 @@
                               "width": "fill_container",
                               "content": "PepsiCo",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12599,7 +12780,8 @@
                               "width": "fill_container",
                               "content": "USA",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12626,7 +12808,8 @@
                               "content": "146.88 USD",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12653,7 +12836,8 @@
                               "content": "+0.5%",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12678,7 +12862,8 @@
                               "width": "fill_container",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12705,7 +12890,8 @@
                               "content": "71",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12732,7 +12918,8 @@
                               "content": "140.00",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12759,7 +12946,8 @@
                               "content": "4.9% above",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12784,7 +12972,8 @@
                               "width": "fill_container",
                               "content": "20 Aug",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12809,7 +12998,8 @@
                               "width": "fill_container",
                               "content": "DELAYED 15m",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12898,7 +13088,8 @@
                               "width": "fill_container",
                               "content": "CD Projekt",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12923,7 +13114,8 @@
                               "width": "fill_container",
                               "content": "GPW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12950,7 +13142,8 @@
                               "content": "258.40 PLN",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -12977,7 +13170,8 @@
                               "content": "+0.8%",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -13002,7 +13196,8 @@
                               "width": "fill_container",
                               "content": "WAIT",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -13029,7 +13224,8 @@
                               "content": "67",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -13056,7 +13252,8 @@
                               "content": "235.00",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -13083,7 +13280,8 @@
                               "content": "10.0% above",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -13108,7 +13306,8 @@
                               "width": "fill_container",
                               "content": "18 Aug",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -13133,7 +13332,8 @@
                               "width": "fill_container",
                               "content": "DELAYED 15m",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -17722,7 +17922,8 @@
                               "width": "fill_container",
                               "content": "01 Sep · 20:30",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -17773,7 +17974,8 @@
                               "width": "fill_container",
                               "content": "EMCOR Group",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -17798,7 +18000,8 @@
                               "width": "fill_container",
                               "content": "USA",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -17825,7 +18028,8 @@
                               "content": "475.00",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -17850,7 +18054,8 @@
                               "width": "fill_container",
                               "content": "DEEP DIVE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -17877,7 +18082,8 @@
                               "content": "78",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -17902,7 +18108,8 @@
                               "width": "fill_container",
                               "content": "ACCUMULATE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -17927,7 +18134,8 @@
                               "width": "fill_container",
                               "content": "Backlog quality merits refreshed downside case.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -17990,7 +18198,8 @@
                               "width": "fill_container",
                               "content": "31 Aug · 18:20",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18041,7 +18250,8 @@
                               "width": "fill_container",
                               "content": "Visa",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18066,7 +18276,8 @@
                               "width": "fill_container",
                               "content": "USA",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18093,7 +18304,8 @@
                               "content": "349.12",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18118,7 +18330,8 @@
                               "width": "fill_container",
                               "content": "PORTFOLIO",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18145,7 +18358,8 @@
                               "content": "81",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18170,7 +18384,8 @@
                               "width": "fill_container",
                               "content": "HOLD",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18195,7 +18410,8 @@
                               "width": "fill_container",
                               "content": "Payments resilience confirmed after Q3 update.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18258,7 +18474,8 @@
                               "width": "fill_container",
                               "content": "30 Aug · 09:10",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18309,7 +18526,8 @@
                               "width": "fill_container",
                               "content": "XTB S.A.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18334,7 +18552,8 @@
                               "width": "fill_container",
                               "content": "GPW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18361,7 +18580,8 @@
                               "content": "74.62",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18386,7 +18606,8 @@
                               "width": "fill_container",
                               "content": "BUY CANDIDATE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18413,7 +18634,8 @@
                               "content": "82",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18438,7 +18660,8 @@
                               "width": "fill_container",
                               "content": "ACCUMULATE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18463,7 +18686,8 @@
                               "width": "fill_container",
                               "content": "Valuation entered planned accumulation range.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18526,7 +18750,8 @@
                               "width": "fill_container",
                               "content": "28 Aug · 21:05",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18577,7 +18802,8 @@
                               "width": "fill_container",
                               "content": "PZU S.A.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18602,7 +18828,8 @@
                               "width": "fill_container",
                               "content": "GPW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18629,7 +18856,8 @@
                               "content": "57.84",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18654,7 +18882,8 @@
                               "width": "fill_container",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18681,7 +18910,8 @@
                               "content": "76",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18706,7 +18936,8 @@
                               "width": "fill_container",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18731,7 +18962,8 @@
                               "width": "fill_container",
                               "content": "Capital return remains attractive; wait for entry.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18794,7 +19026,8 @@
                               "width": "fill_container",
                               "content": "22 Aug · 19:40",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18845,7 +19078,8 @@
                               "width": "fill_container",
                               "content": "Microsoft",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18870,7 +19104,8 @@
                               "width": "fill_container",
                               "content": "USA",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18897,7 +19132,8 @@
                               "content": "517.40",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18922,7 +19158,8 @@
                               "width": "fill_container",
                               "content": "WAIT",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18949,7 +19186,8 @@
                               "content": "74",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18974,7 +19212,8 @@
                               "width": "fill_container",
                               "content": "WAIT",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -18999,7 +19238,8 @@
                               "width": "fill_container",
                               "content": "Quality intact; valuation above planned level.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19062,7 +19302,8 @@
                               "width": "fill_container",
                               "content": "18 Aug · 08:15",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19113,7 +19354,8 @@
                               "width": "fill_container",
                               "content": "CD Projekt",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19138,7 +19380,8 @@
                               "width": "fill_container",
                               "content": "GPW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19165,7 +19408,8 @@
                               "content": "258.40",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19190,7 +19434,8 @@
                               "width": "fill_container",
                               "content": "WAIT",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19217,7 +19462,8 @@
                               "content": "67",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19242,7 +19488,8 @@
                               "width": "fill_container",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19267,7 +19514,8 @@
                               "width": "fill_container",
                               "content": "Pipeline visibility improved but valuation is full.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19330,7 +19578,8 @@
                               "width": "fill_container",
                               "content": "14 Aug · 20:55",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19381,7 +19630,8 @@
                               "width": "fill_container",
                               "content": "Develia S.A.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19406,7 +19656,8 @@
                               "width": "fill_container",
                               "content": "GPW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19433,7 +19684,8 @@
                               "content": "7.36",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19458,7 +19710,8 @@
                               "width": "fill_container",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19485,7 +19738,8 @@
                               "content": "69",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19510,7 +19764,8 @@
                               "width": "fill_container",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19535,7 +19790,8 @@
                               "width": "fill_container",
                               "content": "Manual price verified; thesis unchanged.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19598,7 +19854,8 @@
                               "width": "fill_container",
                               "content": "02 Aug · 17:10",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19649,7 +19906,8 @@
                               "width": "fill_container",
                               "content": "Comfort Systems",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19674,7 +19932,8 @@
                               "width": "fill_container",
                               "content": "USA",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19701,7 +19960,8 @@
                               "content": "708.25",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19726,7 +19986,8 @@
                               "width": "fill_container",
                               "content": "STALE REVIEW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19753,7 +20014,8 @@
                               "content": "73",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19778,7 +20040,8 @@
                               "width": "fill_container",
                               "content": "REVIEW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19803,7 +20066,8 @@
                               "width": "fill_container",
                               "content": "Analysis due after provider discrepancy.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19866,7 +20130,8 @@
                               "width": "fill_container",
                               "content": "20 Jul · 22:05",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19917,7 +20182,8 @@
                               "width": "fill_container",
                               "content": "PepsiCo",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19942,7 +20208,8 @@
                               "width": "fill_container",
                               "content": "USA",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19969,7 +20236,8 @@
                               "content": "146.88",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -19994,7 +20262,8 @@
                               "width": "fill_container",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20021,7 +20290,8 @@
                               "content": "71",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20046,7 +20316,8 @@
                               "width": "fill_container",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20071,7 +20342,8 @@
                               "width": "fill_container",
                               "content": "Margin recovery offsets weak organic volume.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20134,7 +20406,8 @@
                               "width": "fill_container",
                               "content": "12 Jul · 19:35",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20185,7 +20458,8 @@
                               "width": "fill_container",
                               "content": "EMCOR Group",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20210,7 +20484,8 @@
                               "width": "fill_container",
                               "content": "USA",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20237,7 +20512,8 @@
                               "content": "438.20",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20262,7 +20538,8 @@
                               "width": "fill_container",
                               "content": "WAIT",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20289,7 +20566,8 @@
                               "content": "74",
                               "textAlign": "right",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20314,7 +20592,8 @@
                               "width": "fill_container",
                               "content": "WAIT",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20339,7 +20618,8 @@
                               "width": "fill_container",
                               "content": "Valuation moved beyond initial entry range.",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -20946,7 +21226,8 @@
                           "fill": "$text-muted",
                           "content": "Data",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -23311,7 +23592,8 @@
                           "fill": "$text-muted",
                           "content": "Statuses",
                           "fontFamily": "$font-ui",
-                          "fontSize": 11
+                          "fontSize": 11,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -23612,7 +23894,8 @@
                           "width": 180,
                           "content": "GPW",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -23624,7 +23907,8 @@
                           "content": "34 / 34",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -23648,7 +23932,8 @@
                           "width": "fill_container",
                           "content": "Last update 01 Sep · 16:42",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -23660,7 +23945,8 @@
                           "content": "0 failed",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -23689,7 +23975,8 @@
                           "width": 180,
                           "content": "USA",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -23701,7 +23988,8 @@
                           "content": "40 / 44",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -23725,7 +24013,8 @@
                           "width": "fill_container",
                           "content": "Last update 01 Sep · 16:42",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -23737,7 +24026,8 @@
                           "content": "4 failed",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -23766,7 +24056,8 @@
                           "width": 180,
                           "content": "FX · USD/PLN",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -23778,7 +24069,8 @@
                           "content": "1 / 1",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -23802,7 +24094,8 @@
                           "width": "fill_container",
                           "content": "Last update 01 Sep · 16:00",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -23814,7 +24107,8 @@
                           "content": "0 failed",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -25846,7 +26140,8 @@
                           "content": "475.00 USD",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -25858,7 +26153,8 @@
                           "content": "+2.4%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -25869,7 +26165,8 @@
                           "width": "fill_container",
                           "content": "DEEP DIVE",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -25881,7 +26178,8 @@
                           "content": "78",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -25893,7 +26191,8 @@
                           "content": "3.2% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -25937,7 +26236,8 @@
                           "content": "57.84 PLN",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -25949,7 +26249,8 @@
                           "content": "−0.7%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -25960,7 +26261,8 @@
                           "width": "fill_container",
                           "content": "WATCH",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -25972,7 +26274,8 @@
                           "content": "76",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -25984,7 +26287,8 @@
                           "content": "3.3% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -26028,7 +26332,8 @@
                           "content": "517.40 USD",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26040,7 +26345,8 @@
                           "content": "+0.3%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26051,7 +26357,8 @@
                           "width": "fill_container",
                           "content": "WAIT",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26063,7 +26370,8 @@
                           "content": "74",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26075,7 +26383,8 @@
                           "content": "4.5% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -26119,7 +26428,8 @@
                           "content": "349.12 USD",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26131,7 +26441,8 @@
                           "content": "−0.4%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26142,7 +26453,8 @@
                           "width": "fill_container",
                           "content": "PORTFOLIO",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26154,7 +26466,8 @@
                           "content": "81",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26166,7 +26479,8 @@
                           "content": "5.8% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -26210,7 +26524,8 @@
                           "content": "708.25 USD",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26222,7 +26537,8 @@
                           "content": "−1.2%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26233,7 +26549,8 @@
                           "width": "fill_container",
                           "content": "STALE REVIEW",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26245,7 +26562,8 @@
                           "content": "73",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26257,7 +26575,8 @@
                           "content": "9.0% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -26898,7 +27217,8 @@
                           "content": "74.62",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26910,7 +27230,8 @@
                           "content": "+1.6%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26921,7 +27242,8 @@
                           "width": "fill_container",
                           "content": "BUY CANDIDATE",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26933,7 +27255,8 @@
                           "content": "82",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26945,7 +27268,8 @@
                           "content": "3.6% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -26956,7 +27280,8 @@
                           "width": 100,
                           "content": "DELAYED",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -26999,7 +27324,8 @@
                           "content": "475.00",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27011,7 +27337,8 @@
                           "content": "+2.4%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27022,7 +27349,8 @@
                           "width": "fill_container",
                           "content": "DEEP DIVE",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27034,7 +27362,8 @@
                           "content": "78",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27046,7 +27375,8 @@
                           "content": "3.2% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27057,7 +27387,8 @@
                           "width": 100,
                           "content": "DELAYED",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -27100,7 +27431,8 @@
                           "content": "57.84",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27112,7 +27444,8 @@
                           "content": "−0.7%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27123,7 +27456,8 @@
                           "width": "fill_container",
                           "content": "WATCH",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27135,7 +27469,8 @@
                           "content": "76",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27147,7 +27482,8 @@
                           "content": "3.3% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27158,7 +27494,8 @@
                           "width": 100,
                           "content": "DELAYED",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -27201,7 +27538,8 @@
                           "content": "517.40",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27213,7 +27551,8 @@
                           "content": "+0.3%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27224,7 +27563,8 @@
                           "width": "fill_container",
                           "content": "WAIT",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27236,7 +27576,8 @@
                           "content": "74",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27248,7 +27589,8 @@
                           "content": "4.5% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27259,7 +27601,8 @@
                           "width": 100,
                           "content": "DELAYED",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -27302,7 +27645,8 @@
                           "content": "708.25",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27314,7 +27658,8 @@
                           "content": "−1.2%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27325,7 +27670,8 @@
                           "width": "fill_container",
                           "content": "STALE REVIEW",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27337,7 +27683,8 @@
                           "content": "73",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27349,7 +27696,8 @@
                           "content": "9.0% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27360,7 +27708,8 @@
                           "width": 100,
                           "content": "STALE",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -27403,7 +27752,8 @@
                           "content": "7.36",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27415,7 +27765,8 @@
                           "content": "0.0%",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27426,7 +27777,8 @@
                           "width": "fill_container",
                           "content": "WATCH",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27438,7 +27790,8 @@
                           "content": "69",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27450,7 +27803,8 @@
                           "content": "3.7% above",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27461,7 +27815,8 @@
                           "width": 100,
                           "content": "MANUAL",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -27504,7 +27859,8 @@
                           "content": "—",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27516,7 +27872,8 @@
                           "content": "—",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27527,7 +27884,8 @@
                           "width": "fill_container",
                           "content": "WAIT",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27539,7 +27897,8 @@
                           "content": "—",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27551,7 +27910,8 @@
                           "content": "—",
                           "textAlign": "right",
                           "fontFamily": "$font-data",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -27562,7 +27922,8 @@
                           "width": 100,
                           "content": "UNAVAILABLE",
                           "fontFamily": "$font-ui",
-                          "fontSize": 10
+                          "fontSize": 10,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -29243,7 +29604,8 @@
                               "fill": "$text-primary",
                               "content": "74.62",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29267,7 +29629,8 @@
                               "fill": "$positive",
                               "content": "+1.6%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29290,7 +29653,8 @@
                               "fill": "$text-primary",
                               "content": "BUY CANDIDATE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29314,7 +29678,8 @@
                               "fill": "$accent-primary",
                               "content": "82",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29338,7 +29703,8 @@
                               "fill": "$warning",
                               "content": "3.6% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -29400,7 +29766,8 @@
                               "fill": "$text-primary",
                               "content": "475.00",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29424,7 +29791,8 @@
                               "fill": "$positive",
                               "content": "+2.4%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29447,7 +29815,8 @@
                               "fill": "$text-primary",
                               "content": "DEEP DIVE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29471,7 +29840,8 @@
                               "fill": "$accent-primary",
                               "content": "78",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29495,7 +29865,8 @@
                               "fill": "$warning",
                               "content": "3.2% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -29557,7 +29928,8 @@
                               "fill": "$text-primary",
                               "content": "57.84",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29581,7 +29953,8 @@
                               "fill": "$negative",
                               "content": "−0.7%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29604,7 +29977,8 @@
                               "fill": "$text-primary",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29628,7 +30002,8 @@
                               "fill": "$accent-primary",
                               "content": "76",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29652,7 +30027,8 @@
                               "fill": "$warning",
                               "content": "3.3% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -29714,7 +30090,8 @@
                               "fill": "$text-primary",
                               "content": "517.40",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29738,7 +30115,8 @@
                               "fill": "$positive",
                               "content": "+0.3%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29761,7 +30139,8 @@
                               "fill": "$text-primary",
                               "content": "WAIT",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29785,7 +30164,8 @@
                               "fill": "$accent-primary",
                               "content": "74",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29809,7 +30189,8 @@
                               "fill": "$warning",
                               "content": "4.5% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -29871,7 +30252,8 @@
                               "fill": "$text-primary",
                               "content": "349.12",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29895,7 +30277,8 @@
                               "fill": "$negative",
                               "content": "−0.4%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29918,7 +30301,8 @@
                               "fill": "$text-primary",
                               "content": "PORTFOLIO",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29942,7 +30326,8 @@
                               "fill": "$accent-primary",
                               "content": "81",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -29966,7 +30351,8 @@
                               "fill": "$warning",
                               "content": "5.8% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -30028,7 +30414,8 @@
                               "fill": "$text-primary",
                               "content": "708.25",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30052,7 +30439,8 @@
                               "fill": "$negative",
                               "content": "−1.2%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30075,7 +30463,8 @@
                               "fill": "$text-primary",
                               "content": "STALE REVIEW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30099,7 +30488,8 @@
                               "fill": "$accent-primary",
                               "content": "73",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30123,7 +30513,8 @@
                               "fill": "$warning",
                               "content": "9.0% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -30630,7 +31021,8 @@
                               "fill": "$text-primary",
                               "content": "74.62",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30654,7 +31046,8 @@
                               "fill": "$positive",
                               "content": "+1.6%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30677,7 +31070,8 @@
                               "fill": "$text-primary",
                               "content": "BUY CANDIDATE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30701,7 +31095,8 @@
                               "fill": "$accent-primary",
                               "content": "82",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30725,7 +31120,8 @@
                               "fill": "$warning",
                               "content": "3.6% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30748,7 +31144,8 @@
                               "fill": "$text-primary",
                               "content": "DELAYED",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -30810,7 +31207,8 @@
                               "fill": "$text-primary",
                               "content": "475.00",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30834,7 +31232,8 @@
                               "fill": "$positive",
                               "content": "+2.4%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30857,7 +31256,8 @@
                               "fill": "$text-primary",
                               "content": "DEEP DIVE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30881,7 +31281,8 @@
                               "fill": "$accent-primary",
                               "content": "78",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30905,7 +31306,8 @@
                               "fill": "$warning",
                               "content": "3.2% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -30928,7 +31330,8 @@
                               "fill": "$text-primary",
                               "content": "DELAYED",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -30990,7 +31393,8 @@
                               "fill": "$text-primary",
                               "content": "57.84",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31014,7 +31418,8 @@
                               "fill": "$negative",
                               "content": "−0.7%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31037,7 +31442,8 @@
                               "fill": "$text-primary",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31061,7 +31467,8 @@
                               "fill": "$accent-primary",
                               "content": "76",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31085,7 +31492,8 @@
                               "fill": "$warning",
                               "content": "3.3% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31108,7 +31516,8 @@
                               "fill": "$text-primary",
                               "content": "DELAYED",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -31170,7 +31579,8 @@
                               "fill": "$text-primary",
                               "content": "517.40",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31194,7 +31604,8 @@
                               "fill": "$positive",
                               "content": "+0.3%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31217,7 +31628,8 @@
                               "fill": "$text-primary",
                               "content": "WAIT",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31241,7 +31653,8 @@
                               "fill": "$accent-primary",
                               "content": "74",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31265,7 +31678,8 @@
                               "fill": "$warning",
                               "content": "4.5% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31288,7 +31702,8 @@
                               "fill": "$text-primary",
                               "content": "DELAYED",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -31350,7 +31765,8 @@
                               "fill": "$text-primary",
                               "content": "708.25",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31374,7 +31790,8 @@
                               "fill": "$negative",
                               "content": "−1.2%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31397,7 +31814,8 @@
                               "fill": "$text-primary",
                               "content": "STALE REVIEW",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31421,7 +31839,8 @@
                               "fill": "$accent-primary",
                               "content": "73",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31445,7 +31864,8 @@
                               "fill": "$warning",
                               "content": "9.0% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31468,7 +31888,8 @@
                               "fill": "$negative",
                               "content": "STALE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -31530,7 +31951,8 @@
                               "fill": "$text-primary",
                               "content": "7.36",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31554,7 +31976,8 @@
                               "fill": "$text-secondary",
                               "content": "0.0%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31577,7 +32000,8 @@
                               "fill": "$text-primary",
                               "content": "WATCH",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31601,7 +32025,8 @@
                               "fill": "$accent-primary",
                               "content": "69",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31625,7 +32050,8 @@
                               "fill": "$warning",
                               "content": "3.7% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31648,7 +32074,8 @@
                               "fill": "$text-primary",
                               "content": "MANUAL",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -31710,7 +32137,8 @@
                               "fill": "$text-primary",
                               "content": "—",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31734,7 +32162,8 @@
                               "fill": "$text-secondary",
                               "content": "—",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31757,7 +32186,8 @@
                               "fill": "$text-primary",
                               "content": "WAIT",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31781,7 +32211,8 @@
                               "fill": "$accent-primary",
                               "content": "—",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31805,7 +32236,8 @@
                               "fill": "$warning",
                               "content": "—",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31828,7 +32260,8 @@
                               "fill": "$text-primary",
                               "content": "UNAVAILABLE",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }
@@ -31890,7 +32323,8 @@
                               "fill": "$text-primary",
                               "content": "349.12",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31914,7 +32348,8 @@
                               "fill": "$negative",
                               "content": "−0.4%",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31937,7 +32372,8 @@
                               "fill": "$text-primary",
                               "content": "PORTFOLIO",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31961,7 +32397,8 @@
                               "fill": "$accent-primary",
                               "content": "81",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -31985,7 +32422,8 @@
                               "fill": "$warning",
                               "content": "5.8% above",
                               "fontFamily": "$font-data",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         },
@@ -32008,7 +32446,8 @@
                               "fill": "$text-primary",
                               "content": "DELAYED",
                               "fontFamily": "$font-ui",
-                              "fontSize": 10
+                              "fontSize": 10,
+                              "fontWeight": "normal"
                             }
                           ]
                         }

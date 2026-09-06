@@ -2,6 +2,7 @@ import { RefreshCw, Search } from "lucide-react";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
+import { logout } from "@/app/(auth)/login/actions";
 import { AppSidebar, AppSidebarFallback } from "./app-sidebar";
 
 function TopBar() {
@@ -38,13 +39,16 @@ function TopBar() {
         >
           <RefreshCw aria-hidden="true" className="size-[14px]" />
         </button>
-        <button
-          aria-label="Open account menu"
-          className="grid size-7 place-items-center rounded-[5px] border border-[var(--border-default)] bg-[var(--surface-elevated)] font-mono text-[9px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]"
-          type="button"
-        >
-          MK
-        </button>
+        <form action={logout}>
+          <button
+            aria-label="Sign out"
+            className="grid size-7 place-items-center rounded-[5px] border border-[var(--border-default)] bg-[var(--surface-elevated)] font-mono text-[9px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]"
+            title="Sign out"
+            type="submit"
+          >
+            MK
+          </button>
+        </form>
       </div>
     </header>
   );

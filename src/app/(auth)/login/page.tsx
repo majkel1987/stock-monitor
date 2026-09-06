@@ -1,8 +1,25 @@
 import type { Metadata } from "next";
 
+import { login } from "./actions";
+
 export const metadata: Metadata = { title: "Sign in" };
 
-export default function LoginPage() {
+const messages = {
+  invalid_credentials: "Invalid email or password.",
+  access_denied: "Access is not authorized for this account.",
+} as const;
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+  const message =
+    error && error in messages
+      ? messages[error as keyof typeof messages]
+      : null;
+
   return (
     <main className="grid min-h-screen place-items-center bg-[var(--bg-primary)]">
       <section
@@ -14,7 +31,7 @@ export default function LoginPage() {
             <span className="font-mono text-[11px] font-bold">SM</span>
           </div>
           <h1
-            className="mt-2 h-[23px] text-[17px] leading-[23px] font-semibold"
+            className="mt-2 h-[23px] text-[18px] leading-[23px] font-semibold"
             id="login-title"
           >
             Stock Monitor
@@ -24,26 +41,32 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form className="flex h-[162px] flex-col gap-3">
+        <form action={login} className="flex h-[162px] flex-col gap-3">
           <label className="flex flex-col gap-[5px]">
-            <span className="text-[11px] font-semibold text-[var(--text-secondary)]">
+            <span className="text-[11px] leading-[14px] font-semibold text-[var(--text-secondary)]">
               Email
             </span>
             <input
               autoComplete="email"
-              className="h-[34px] rounded-[5px] border border-[var(--border-default)] bg-[var(--bg-secondary)] px-[10px] text-xs outline-none placeholder:text-[var(--text-disabled)] focus:border-[var(--focus)]"
+              aria-invalid={message ? true : undefined}
+              className="h-[34px] rounded-[5px] border border-[var(--border-default)] bg-[var(--surface-default)] px-[10px] text-xs outline-none placeholder:text-[var(--text-disabled)] focus:border-[var(--focus)]"
               placeholder="investor@example.com"
+              name="email"
+              required
               type="email"
             />
           </label>
           <label className="flex flex-col gap-[5px]">
-            <span className="text-[11px] font-semibold text-[var(--text-secondary)]">
+            <span className="text-[11px] leading-[14px] font-semibold text-[var(--text-secondary)]">
               Password
             </span>
             <input
               autoComplete="current-password"
-              className="h-[34px] rounded-[5px] border border-[var(--border-default)] bg-[var(--bg-secondary)] px-[10px] text-xs outline-none placeholder:text-[var(--text-disabled)] focus:border-[var(--focus)]"
+              aria-invalid={message ? true : undefined}
+              className="h-[34px] rounded-[5px] border border-[var(--border-default)] bg-[var(--surface-default)] px-[10px] text-xs outline-none placeholder:text-[var(--text-disabled)] focus:border-[var(--focus)]"
               placeholder="••••••••••••"
+              name="password"
+              required
               type="password"
             />
           </label>
@@ -55,8 +78,11 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-[9px] leading-3 text-[var(--text-muted)]">
-          Authorized single-user access only
+        <p
+          aria-live="polite"
+          className={`text-center text-[9px] leading-3 ${message ? "text-[var(--negative)]" : "text-[var(--text-muted)]"}`}
+        >
+          {message ?? "Authorized single-user access only"}
         </p>
       </section>
     </main>

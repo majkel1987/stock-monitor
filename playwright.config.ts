@@ -21,5 +21,13 @@ export default defineConfig({
     url: "http://localhost:3000/dashboard",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    env: {
+      NEXT_PUBLIC_SUPABASE_URL:
+        process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://project.supabase.co",
+      NEXT_PUBLIC_SUPABASE_ANON_KEY:
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "public-test-key",
+      ALLOWED_USER_EMAIL:
+        process.env.ALLOWED_USER_EMAIL ?? "owner@example.test",
+    },
   },
 });
