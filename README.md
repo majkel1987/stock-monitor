@@ -172,23 +172,24 @@ user-owned default status records have been created by M1.
 
 ## Scripts
 
-| Script              | Purpose                                    |
-| ------------------- | ------------------------------------------ |
-| `pnpm dev`          | Start the local Next.js development server |
-| `pnpm build`        | Create a production build                  |
-| `pnpm start`        | Run the production build                   |
-| `pnpm lint`         | Run ESLint                                 |
-| `pnpm typecheck`    | Run TypeScript without emitting files      |
-| `pnpm test`         | Run Vitest once                            |
-| `pnpm test:watch`   | Run Vitest in watch mode                   |
-| `pnpm test:e2e`     | Run the Playwright smoke test              |
-| `pnpm db:start`     | Start local Supabase                       |
-| `pnpm db:stop`      | Stop local Supabase                        |
-| `pnpm db:reset`     | Recreate, migrate, and seed the local DB   |
-| `pnpm db:test`      | Run PostgreSQL/pgTAP tests                 |
-| `pnpm db:types`     | Regenerate Supabase TypeScript DB types    |
-| `pnpm format`       | Format supported files with Prettier       |
-| `pnpm format:check` | Check formatting without changing files    |
+| Script                | Purpose                                    |
+| --------------------- | ------------------------------------------ |
+| `pnpm dev`            | Start the local Next.js development server |
+| `pnpm build`          | Create a production build                  |
+| `pnpm start`          | Run the production build                   |
+| `pnpm lint`           | Run ESLint                                 |
+| `pnpm typecheck`      | Run TypeScript without emitting files      |
+| `pnpm test`           | Run Vitest once                            |
+| `pnpm test:watch`     | Run Vitest in watch mode                   |
+| `pnpm test:e2e`       | Run the Playwright smoke test              |
+| `pnpm provider:spike` | Verify required EODHD ticker coverage      |
+| `pnpm db:start`       | Start local Supabase                       |
+| `pnpm db:stop`        | Stop local Supabase                        |
+| `pnpm db:reset`       | Recreate, migrate, and seed the local DB   |
+| `pnpm db:test`        | Run PostgreSQL/pgTAP tests                 |
+| `pnpm db:types`       | Regenerate Supabase TypeScript DB types    |
+| `pnpm format`         | Format supported files with Prettier       |
+| `pnpm format:check`   | Check formatting without changing files    |
 
 ## Architecture
 
@@ -213,16 +214,24 @@ Read [AGENTS.md](AGENTS.md), the
 
 ## Current implementation status
 
-> M3 Stocks & Watchlist is implemented on top of the M1 database foundation and M2 Auth/RLS
-> boundary.
+> M6 Market Data Integration is implemented on top of the M1–M5 application.
 
-`/watchlist` now uses authenticated PostgreSQL reads and RLS-protected mutations. It supports
-manual GPW/USA stock creation, canonical ticker reuse, duplicate prevention, archive/restore,
-user-owned initial statuses, URL-backed search/filter/sort state, and database-backed empty/error
-states.
+`/dashboard` now reads authenticated PostgreSQL data through a bounded dashboard query model. It
+shows market/status counts, deterministically ranked opportunities, stocks near an active buy
+level, combined attention reasons, and the five latest non-superseded monitoring entries. The
+dashboard never calls market-data providers and explicitly presents missing or stale stored data.
 
-M4 connects Stock Detail to real price levels, monitoring snapshots, thesis revisions and notes.
-Price levels support create/edit/deactivate with calculated distance and trigger state; monitoring
-captures manual price and optional USD/PLN FX snapshots; notes support create/edit/pin/archive.
-Provider search, automatic quotes, NBP FX, synchronization and dashboard aggregation remain later
-milestones.
+The dashboard monitoring summary is a `security_invoker` PostgreSQL view, so underlying RLS remains
+authoritative. The application obtains the remaining dashboard inputs in bounded bulk queries and
+uses the shared domain price-level calculations rather than duplicating trigger logic.
+
+M6 adds server-side EODHD search and delayed/current quote normalization, verified provider-symbol
+mapping, bounded quote batches, two-minute manual-refresh cooldown, partial-result `sync_runs`, and
+atomic latest-quote persistence. Manual stock and manual quote fallbacks remain available when
+EODHD is not configured or unavailable. Dashboard, Watchlist and Stock Detail read only the latest
+stored quote and compute market-aware freshness centrally; page rendering never waits on EODHD.
+
+The NBP adapter stores the latest official USD/PLN table A reference rate and prefills it for new
+USD monitoring records. The field remains editable, and saved monitoring FX values stay immutable.
+See [the provider coverage spike](docs/provider-spike.md) for the reproducible eight-symbol check.
+Until M7 enables scheduling, quotes and FX change only after an authenticated manual refresh.

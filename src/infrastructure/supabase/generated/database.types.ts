@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      fx_rates: {
+        Row: {
+          as_of: string
+          effective_date: string
+          pair: string
+          provider: string
+          rate: number
+          received_at: string
+        }
+        Insert: {
+          as_of: string
+          effective_date: string
+          pair: string
+          provider: string
+          rate: number
+          received_at?: string
+        }
+        Update: {
+          as_of?: string
+          effective_date?: string
+          pair?: string
+          provider?: string
+          rate?: number
+          received_at?: string
+        }
+        Relationships: []
+      }
       audit_events: {
         Row: {
           action: string
@@ -680,9 +707,72 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      dashboard_monitoring_summary: {
+        Row: {
+          analyzed_at: string | null
+          created_at: string | null
+          currency: string | null
+          id: string | null
+          investment_score: number | null
+          previous_investment_score: number | null
+          previous_status_color_token: string | null
+          previous_status_dashboard_group: string | null
+          previous_status_definition_id: string | null
+          previous_status_label: string | null
+          previous_status_slug: string | null
+          previous_status_sort_order: number | null
+          price: number | null
+          recent_rank: number | null
+          recommendation: string | null
+          status_color_token: string | null
+          status_dashboard_group: string | null
+          status_definition_id: string | null
+          status_label: string | null
+          status_slug: string | null
+          status_sort_order: number | null
+          stock_id: string | null
+          stock_rank: number | null
+          summary: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitoring_results_status_owner_fkey"
+            columns: ["status_definition_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "status_definitions"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "monitoring_results_stock_id_fkey"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      add_provider_stock_to_watchlist: {
+        Args: {
+          p_currency: string
+          p_exchange: string
+          p_isin: string | null
+          p_market_code: string
+          p_metadata?: Json
+          p_name: string
+          p_provider: string
+          p_provider_symbol: string
+          p_status_id: string
+          p_ticker: string
+        }
+        Returns: {
+          outcome: string
+          stock_id: string
+          watchlist_item_id: string
+        }[]
+      }
       add_manual_stock_to_watchlist: {
         Args: {
           p_market_code: string
@@ -733,22 +823,42 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: number
       }
+      submit_manual_market_quote: {
+        Args: {
+          p_as_of: string
+          p_currency: string
+          p_price: number
+          p_stock_id: string
+        }
+        Returns: string
+      }
+      upsert_fx_rate: {
+        Args: {
+          p_as_of: string
+          p_effective_date: string
+          p_pair: string
+          p_provider: string
+          p_rate: number
+          p_received_at: string
+        }
+        Returns: boolean
+      }
       upsert_market_quote: {
         Args: {
           p_as_of: string
           p_currency: string
-          p_day_change_pct: number
-          p_fifty_two_week_high: number
-          p_fifty_two_week_low: number
-          p_market_cap: number
-          p_previous_close: number
+          p_day_change_pct: number | null
+          p_fifty_two_week_high: number | null
+          p_fifty_two_week_low: number | null
+          p_market_cap: number | null
+          p_previous_close: number | null
           p_price: number
           p_provider: string
           p_quality_status: string
-          p_raw_hash: string
+          p_raw_hash: string | null
           p_received_at: string
           p_stock_id: string
-          p_volume: number
+          p_volume: number | null
         }
         Returns: boolean
       }
@@ -797,8 +907,7 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
@@ -822,8 +931,7 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
@@ -847,8 +955,7 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
   EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }

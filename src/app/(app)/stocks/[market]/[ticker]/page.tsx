@@ -9,6 +9,7 @@ import type {
   ResearchStatus,
 } from "@/application/stocks/research-types";
 import { NotesPanel, NoteDialog } from "@/components/stocks/notes-panel";
+import { ManualQuoteDialog } from "@/components/stocks/manual-quote-dialog";
 import { PriceLevelsEditor } from "@/components/stocks/price-levels-panel";
 import { SectionHeader, StatusBadge, Surface } from "@/components/ui/terminal";
 import { isMarketCode } from "@/domain/markets/market";
@@ -225,9 +226,13 @@ export default async function StockPage({ params }: StockPageProps) {
             <StatusBadge
               tone={
                 quote
-                  ? quote.qualityStatus.toLowerCase() === "stale"
-                    ? "negative"
-                    : "warning"
+                  ? quote.qualityStatus === "fresh"
+                    ? "positive"
+                    : quote.qualityStatus === "stale"
+                      ? "negative"
+                      : quote.qualityStatus === "closed"
+                        ? "info"
+                        : "warning"
                   : "negative"
               }
             >
@@ -242,12 +247,23 @@ export default async function StockPage({ params }: StockPageProps) {
                 ? `As of ${dateTimeFormatter.format(new Date(quote.asOf))}`
                 : "No current quote"}
             </span>
-            <span>{quote ? `Provider: ${quote.provider}` : "Provider: —"}</span>
+            <span>
+              {quote
+                ? `Provider: ${quote.provider === "manual" ? "Manual" : quote.provider}`
+                : "Provider: —"}
+            </span>
             <StatusBadge tone={statusTone(detail.currentStatus)}>
               {detail.currentStatus.label.toUpperCase()}
             </StatusBadge>
           </div>
           <div className="flex items-center gap-2">
+            <ManualQuoteDialog
+              currency={detail.stock.currency}
+              currentPrice={quote?.price ?? null}
+              marketCode={detail.stock.marketCode}
+              stockId={detail.stock.id}
+              ticker={detail.stock.ticker}
+            />
             <PriceLevelsEditor
               currency={detail.stock.currency}
               levels={detail.priceLevels}

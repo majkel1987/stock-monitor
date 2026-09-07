@@ -13,6 +13,8 @@ export type InstrumentCandidate = {
 export type ProviderInstrument = {
   stockId: string;
   providerSymbol: string;
+  market: MarketCode;
+  currency: CurrencyCode;
 };
 
 export type NormalizedQuote = {
@@ -21,6 +23,10 @@ export type NormalizedQuote = {
   currency: CurrencyCode;
   previousClose: string | null;
   dayChangePct: string | null;
+  volume: string | null;
+  fiftyTwoWeekHigh: string | null;
+  fiftyTwoWeekLow: string | null;
+  marketCap: string | null;
   asOf: string;
   receivedAt: string;
   provider: string;

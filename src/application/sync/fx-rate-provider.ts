@@ -2,8 +2,9 @@ export type FxRate = {
   baseCurrency: "USD";
   quoteCurrency: "PLN";
   rate: string;
+  effectiveDate: string;
   asOf: string;
-  provider: string;
+  provider: "NBP";
 };
 
 export interface FxRateProvider {

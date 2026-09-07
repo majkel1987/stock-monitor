@@ -11,6 +11,7 @@ import type {
   ResearchStatus,
   ThesisSummary,
 } from "@/application/stocks/research-types";
+import type { LatestUsdPlnRate } from "@/application/sync/get-latest-fx-rate";
 import {
   controlClass,
   Field,
@@ -120,6 +121,7 @@ export function MonitoringForm({
   stock,
   statuses,
   currentStatus,
+  fxRate,
   quote,
   previous,
   thesis,
@@ -135,6 +137,7 @@ export function MonitoringForm({
   };
   statuses: ResearchStatus[];
   currentStatus: ResearchStatus;
+  fxRate: LatestUsdPlnRate | null;
   quote: { price: string; asOf: string } | null;
   previous: MonitoringHistoryItem | null;
   thesis: ThesisSummary | null;
@@ -256,12 +259,18 @@ export function MonitoringForm({
                 <Field label="USD / PLN">
                   <input
                     className={controlClass}
+                    defaultValue={fxRate?.rate ?? ""}
                     min="0.000001"
                     name="fxUsdPln"
-                    placeholder="Manual"
+                    placeholder="Manual fallback"
                     step="0.000001"
                     type="number"
                   />
+                  <span className="text-[9px] leading-3 text-[var(--text-muted)]">
+                    {fxRate
+                      ? `NBP reference · effective ${fxRate.effectiveDate}`
+                      : "No stored NBP reference · enter manually"}
+                  </span>
                 </Field>
               ) : (
                 <input name="fxUsdPln" type="hidden" value="" />

@@ -46,12 +46,14 @@ export function ActionButton({
   className,
   type = "button",
   form,
+  disabled = false,
 }: {
   children: ReactNode;
   variant?: "primary" | "secondary" | "ghost";
   className?: string;
   type?: "button" | "submit";
   form?: string;
+  disabled?: boolean;
 }) {
   const variants = {
     primary:
@@ -65,8 +67,11 @@ export function ActionButton({
       className={cn(
         "flex h-8 items-center justify-center rounded-[5px] px-3 text-xs font-semibold",
         variants[variant],
+        disabled &&
+          "cursor-not-allowed border-[var(--border-subtle)] bg-[var(--surface-default)] text-[var(--text-disabled)] opacity-70 hover:bg-[var(--surface-default)]",
         className,
       )}
+      disabled={disabled}
       form={form}
       type={type}
     >

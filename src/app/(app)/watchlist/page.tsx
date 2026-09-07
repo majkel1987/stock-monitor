@@ -20,6 +20,7 @@ import {
 } from "@/infrastructure/supabase/queries/watchlist";
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
 import { createClient } from "@/infrastructure/supabase/server/create-client";
+import { getServerEnv } from "@/lib/env/server";
 
 type WatchlistPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -79,8 +80,7 @@ function freshness(row: WatchlistRow) {
     };
   }
 
-  const quality = row.price.qualityStatus.trim().toUpperCase();
-  const normalized = quality.toLowerCase();
+  const quality = row.price.qualityStatus.toUpperCase();
   const asOf = new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -88,14 +88,16 @@ function freshness(row: WatchlistRow) {
   }).format(new Date(row.price.asOf));
 
   return {
-    label: `${quality} · ${row.price.provider}`,
+    label: `${quality} · ${row.price.provider === "manual" ? "Manual" : row.price.provider}`,
     className:
-      normalized === "stale" || normalized === "unavailable"
-        ? "text-[var(--negative)]"
-        : normalized === "manual"
-          ? "text-[var(--text-secondary)]"
-          : "text-[var(--warning)]",
-    title: `As of ${asOf} · ${row.price.provider}`,
+      row.price.qualityStatus === "fresh"
+        ? "text-[var(--positive)]"
+        : row.price.qualityStatus === "stale"
+          ? "text-[var(--negative)]"
+          : row.price.qualityStatus === "closed"
+            ? "text-[var(--text-secondary)]"
+            : "text-[var(--warning)]",
+    title: `As of ${asOf} · ${row.price.provider === "manual" ? "Manual" : row.price.provider}`,
   };
 }
 
@@ -224,10 +226,12 @@ function EmptyState({
   isUnfilteredEmpty,
   statuses,
   markets,
+  providerConfigured,
 }: {
   isUnfilteredEmpty: boolean;
   statuses: StatusDefinition[];
   markets: MarketDefinition[];
+  providerConfigured: boolean;
 }) {
   return (
     <section className="flex w-[335px] flex-col gap-1.5 rounded-[7px] border border-[var(--border-default)] bg-[var(--surface-default)] p-4">
@@ -240,7 +244,12 @@ function EmptyState({
           : "Adjust the filters or search phrase to see more instruments."}
       </p>
       {isUnfilteredEmpty ? (
-        <AddStockDialog compactTrigger markets={markets} statuses={statuses} />
+        <AddStockDialog
+          compactTrigger
+          markets={markets}
+          providerConfigured={providerConfigured}
+          statuses={statuses}
+        />
       ) : (
         <Link
           className="text-[11px] font-semibold text-[var(--accent-primary)] hover:text-[var(--accent-hover)]"
@@ -300,6 +309,7 @@ export default async function WatchlistPage({
     : undefined;
   const isUnfilteredEmpty =
     data.summary.active === 0 && data.query.view === "active";
+  const providerConfigured = Boolean(getServerEnv().EODHD_API_TOKEN);
 
   return (
     <div className="flex min-h-[1028px] flex-col gap-[18px] p-6">
@@ -307,7 +317,11 @@ export default async function WatchlistPage({
         description={`${data.summary.active} active instruments · ${data.summary.gpw} GPW · ${data.summary.usa} USA`}
         title="Watchlist"
       >
-        <AddStockDialog markets={data.markets} statuses={data.statuses} />
+        <AddStockDialog
+          markets={data.markets}
+          providerConfigured={providerConfigured}
+          statuses={data.statuses}
+        />
       </PageHeader>
 
       {mutationError ? (
@@ -331,6 +345,7 @@ export default async function WatchlistPage({
         <EmptyState
           isUnfilteredEmpty={isUnfilteredEmpty}
           markets={data.markets}
+          providerConfigured={providerConfigured}
           statuses={data.statuses}
         />
       )}

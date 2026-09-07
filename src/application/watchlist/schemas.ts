@@ -13,6 +13,17 @@ export const addStockSchema = z.object({
   initialStatusId: z.uuid("Choose a valid status."),
 });
 
+export const providerSearchSchema = z.object({
+  marketCode: z.enum(MARKET_CODES),
+  query: z.string().trim().min(1, "Enter a ticker or company.").max(80),
+});
+
+export const addProviderStockSchema = z.object({
+  marketCode: z.enum(MARKET_CODES),
+  providerSymbol: z.string().trim().min(1).max(80),
+  initialStatusId: z.uuid("Choose a valid status."),
+});
+
 export const watchlistItemIdSchema = z.uuid();
 
 export const watchlistQuerySchema = z.object({

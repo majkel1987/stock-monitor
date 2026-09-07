@@ -239,6 +239,9 @@ export function createSupabaseStockResearchReader(
       if (!currentStatus) throw new ResearchInfrastructureError();
 
       const history = monitoringHistory(monitoringResult.data, statusById);
+      const activeHistory = history.filter(
+        (monitoring) => !monitoring.isSuperseded,
+      );
       const thesisByMonitoring = new Map(
         thesesResult.data.map((thesis) => [
           thesis.monitoring_result_id,
@@ -246,7 +249,7 @@ export function createSupabaseStockResearchReader(
         ]),
       );
       const latestThesis =
-        history
+        activeHistory
           .map((monitoring) => thesisByMonitoring.get(monitoring.id) ?? null)
           .find((thesis): thesis is ThesisSummary => thesis !== null) ?? null;
       const quote = quoteResult.data;
@@ -282,10 +285,10 @@ export function createSupabaseStockResearchReader(
                   : String(quote.day_change_pct),
               asOf: quote.as_of,
               provider: quote.provider,
-              qualityStatus: quote.quality_status,
+              qualityStatus: "unknown",
             }
           : null,
-        latestMonitoring: history[0] ?? null,
+        latestMonitoring: activeHistory[0] ?? null,
         latestThesis,
         priceLevels: levelsResult.data.map((level) => ({
           id: level.id,

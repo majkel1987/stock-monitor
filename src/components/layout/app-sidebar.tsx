@@ -37,7 +37,13 @@ const navigation: ReadonlyArray<{
   },
 ];
 
-function SidebarContents({ pathname }: { pathname?: string }) {
+function SidebarContents({
+  pathname,
+  providerConfigured = false,
+}: {
+  pathname?: string;
+  providerConfigured?: boolean;
+}) {
   return (
     <aside className="flex w-[208px] shrink-0 flex-col gap-5 border-r border-[var(--border-default)] bg-[var(--bg-secondary)] p-4">
       <Link className="flex h-9 items-center gap-[9px]" href="/dashboard">
@@ -84,24 +90,39 @@ function SidebarContents({ pathname }: { pathname?: string }) {
         <div className="flex items-center gap-[7px]">
           <span
             aria-hidden="true"
-            className="size-1.5 rounded-full bg-[var(--positive)]"
+            className={`size-1.5 rounded-full ${providerConfigured ? "bg-[var(--positive)]" : "bg-[var(--warning)]"}`}
           />
           <span className="text-[9px] leading-3 font-semibold text-[var(--text-secondary)]">
-            DATA PROVIDER ONLINE
+            {providerConfigured ? "MARKET DATA CONFIGURED" : "MANUAL DATA MODE"}
           </span>
         </div>
         <span className="text-[9px] leading-3 text-[var(--text-muted)]">
-          Delayed quotes · 15 min
+          {providerConfigured
+            ? "EODHD + NBP · manual refresh"
+            : "EODHD token not configured"}
         </span>
       </div>
     </aside>
   );
 }
 
-export function AppSidebar() {
-  return <SidebarContents pathname={usePathname()} />;
+export function AppSidebar({
+  providerConfigured,
+}: {
+  providerConfigured: boolean;
+}) {
+  return (
+    <SidebarContents
+      pathname={usePathname()}
+      providerConfigured={providerConfigured}
+    />
+  );
 }
 
-export function AppSidebarFallback() {
-  return <SidebarContents />;
+export function AppSidebarFallback({
+  providerConfigured,
+}: {
+  providerConfigured: boolean;
+}) {
+  return <SidebarContents providerConfigured={providerConfigured} />;
 }

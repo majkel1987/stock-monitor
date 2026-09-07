@@ -1,4 +1,5 @@
 import type { MarketCode } from "@/domain/markets/market";
+import type { MarketDataFreshness } from "@/domain/markets/freshness";
 import type {
   MonitoringScoreDeltas,
   MonitoringScores,
@@ -99,7 +100,7 @@ export type StockResearchDetail = {
     dayChangePct: string | null;
     asOf: string;
     provider: string;
-    qualityStatus: string;
+    qualityStatus: MarketDataFreshness;
   } | null;
   latestMonitoring: MonitoringHistoryItem | null;
   latestThesis: ThesisSummary | null;

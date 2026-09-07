@@ -1,11 +1,25 @@
-import { RefreshCw, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
 import { logout } from "@/app/(auth)/login/actions";
+import { RefreshMarketDataButton } from "./refresh-market-data-button";
 import { AppSidebar, AppSidebarFallback } from "./app-sidebar";
 
-function TopBar() {
+const syncFormatter = new Intl.DateTimeFormat("en-GB", {
+  day: "2-digit",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+  timeZone: "Europe/Warsaw",
+});
+
+function TopBar({
+  lastSuccessfulSyncAt,
+}: {
+  lastSuccessfulSyncAt: string | null;
+}) {
   return (
     <header className="sticky top-0 z-20 flex h-[52px] items-center justify-between border-b border-[var(--border-default)] bg-[var(--bg-secondary)] px-6">
       <label className="flex h-[30px] w-[360px] items-center gap-2 rounded-[5px] border border-[var(--border-default)] bg-[var(--surface-default)] px-[10px]">
@@ -29,16 +43,12 @@ function TopBar() {
             MARKET DATA
           </span>
           <span className="font-mono text-[10px] leading-[13px] text-[var(--text-secondary)]">
-            Synced 16:42 CET
+            {lastSuccessfulSyncAt
+              ? `Synced ${syncFormatter.format(new Date(lastSuccessfulSyncAt))} CET`
+              : "Never synced"}
           </span>
         </div>
-        <button
-          aria-label="Refresh market data"
-          className="grid size-8 place-items-center rounded-[5px] border border-[var(--border-default)] bg-[var(--surface-default)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]"
-          type="button"
-        >
-          <RefreshCw aria-hidden="true" className="size-[14px]" />
-        </button>
+        <RefreshMarketDataButton />
         <form action={logout}>
           <button
             aria-label="Sign out"
@@ -54,14 +64,26 @@ function TopBar() {
   );
 }
 
-export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
+export function AppShell({
+  children,
+  lastSuccessfulSyncAt,
+  providerConfigured,
+}: Readonly<{
+  children: ReactNode;
+  lastSuccessfulSyncAt: string | null;
+  providerConfigured: boolean;
+}>) {
   return (
     <div className="flex min-h-screen min-w-[1180px] bg-[var(--bg-primary)]">
-      <Suspense fallback={<AppSidebarFallback />}>
-        <AppSidebar />
+      <Suspense
+        fallback={
+          <AppSidebarFallback providerConfigured={providerConfigured} />
+        }
+      >
+        <AppSidebar providerConfigured={providerConfigured} />
       </Suspense>
       <div className="min-w-0 flex-1">
-        <TopBar />
+        <TopBar lastSuccessfulSyncAt={lastSuccessfulSyncAt} />
         <main>{children}</main>
       </div>
     </div>

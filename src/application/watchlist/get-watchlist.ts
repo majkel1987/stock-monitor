@@ -4,6 +4,7 @@ import type {
   WatchlistReader,
   WatchlistRow,
 } from "./types";
+import { classifyMarketDataFreshness } from "@/domain/markets/freshness";
 import { parseWatchlistQuery, type RawWatchlistQuery } from "./schemas";
 
 function nullableCompare<T>(
@@ -95,13 +96,30 @@ export async function getWatchlist(
   reader: WatchlistReader,
   userId: string,
   rawQuery: RawWatchlistQuery,
+  now = new Date(),
 ): Promise<WatchlistData & { query: WatchlistQuery }> {
   const query = parseWatchlistQuery(rawQuery);
   const data = await reader.read(userId, query);
 
+  const rows = data.rows
+    .map((row) => ({
+      ...row,
+      price: row.price
+        ? {
+            ...row.price,
+            qualityStatus: classifyMarketDataFreshness({
+              market: row.market.code,
+              asOf: row.price.asOf,
+              now,
+            }),
+          }
+        : null,
+    }))
+    .filter((row) => !query.staleOnly || row.price?.qualityStatus === "stale");
+
   return {
     ...data,
-    rows: [...data.rows].sort((left, right) => compareRows(left, right, query)),
+    rows: rows.sort((left, right) => compareRows(left, right, query)),
     query,
   };
 }

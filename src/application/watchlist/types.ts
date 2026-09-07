@@ -1,4 +1,6 @@
 import type { MarketCode } from "@/domain/markets/market";
+import type { MarketDataFreshness } from "@/domain/markets/freshness";
+import type { InstrumentCandidate } from "@/application/sync/market-data-provider";
 
 export const WATCHLIST_SORT_KEYS = [
   "priority",
@@ -56,7 +58,7 @@ export type WatchlistRow = {
     dayChangePct: string | null;
     asOf: string;
     provider: string;
-    qualityStatus: string;
+    qualityStatus: MarketDataFreshness;
   } | null;
   lastMonitoring: {
     analyzedAt: string;
@@ -92,10 +94,22 @@ export type AddStockInput = {
 
 export type AddStockResult =
   | { status: "created" | "restored" | "already_active" }
-  | { status: "invalid_market" | "invalid_status" | "conflict" };
+  | {
+      status:
+        | "invalid_market"
+        | "invalid_status"
+        | "invalid_candidate"
+        | "mapping_conflict"
+        | "conflict";
+    };
 
 export interface WatchlistWriter {
   addManualStock(userId: string, input: AddStockInput): Promise<AddStockResult>;
+  addProviderStock(
+    userId: string,
+    candidate: InstrumentCandidate,
+    initialStatusId: string,
+  ): Promise<AddStockResult>;
   archive(userId: string, watchlistItemId: string): Promise<boolean>;
   restore(userId: string, watchlistItemId: string): Promise<boolean>;
 }

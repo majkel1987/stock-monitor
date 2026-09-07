@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 
 import { getStockResearchDetail } from "@/application/stocks/get-stock-research-detail";
+import { getLatestUsdPlnRate } from "@/application/sync/get-latest-fx-rate";
 import { MonitoringForm } from "@/components/monitoring/monitoring-form";
 import { isMarketCode } from "@/domain/markets/market";
 import {
@@ -9,6 +10,10 @@ import {
 } from "@/infrastructure/supabase/queries/research";
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
 import { createClient } from "@/infrastructure/supabase/server/create-client";
+import {
+  createSupabaseFxRateReader,
+  FxRateInfrastructureError,
+} from "@/infrastructure/supabase/queries/fx-rates";
 
 type NewMonitoringPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -46,6 +51,15 @@ export default async function NewMonitoringPage({
     notFound();
   }
 
+  let fxRate = null;
+  if (detail.stock.currency === "USD") {
+    try {
+      fxRate = await getLatestUsdPlnRate(createSupabaseFxRateReader(client));
+    } catch (error) {
+      if (!(error instanceof FxRateInfrastructureError)) throw error;
+    }
+  }
+
   const requestedSupersedes =
     typeof query.supersedes === "string" ? query.supersedes : null;
   const supersedes = requestedSupersedes
@@ -57,6 +71,7 @@ export default async function NewMonitoringPage({
   return (
     <MonitoringForm
       currentStatus={detail.currentStatus}
+      fxRate={fxRate}
       initialNow={new Date().toISOString()}
       previous={supersedes ?? detail.latestMonitoring}
       quote={detail.quote}

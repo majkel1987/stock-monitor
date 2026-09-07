@@ -1,9 +1,14 @@
 "use client";
 
-import { X } from "lucide-react";
-import { useActionState, useEffect, useRef } from "react";
+import { Search, X } from "lucide-react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
-import { addStockAction } from "@/app/(app)/watchlist/actions";
+import {
+  addProviderStockAction,
+  addStockAction,
+  searchInstrumentsAction,
+  type ProviderSearchActionState,
+} from "@/app/(app)/watchlist/actions";
 import type { AddStockActionState } from "@/application/watchlist/action-state";
 import type {
   MarketDefinition,
@@ -12,34 +17,55 @@ import type {
 import { Field, controlClass } from "@/components/ui/terminal";
 import { cn } from "@/lib/utils/cn";
 
-const initialState: AddStockActionState = { status: "idle" };
+const initialAddState: AddStockActionState = { status: "idle" };
+const initialSearchState: ProviderSearchActionState = {
+  status: "idle",
+  candidates: [],
+};
 
 export function AddStockDialog({
   markets,
   statuses,
+  providerConfigured,
   compactTrigger = false,
 }: {
   markets: MarketDefinition[];
   statuses: StatusDefinition[];
+  providerConfigured: boolean;
   compactTrigger?: boolean;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
-  const [state, formAction, pending] = useActionState(
-    addStockAction,
-    initialState,
-  );
+  const manualFormRef = useRef<HTMLFormElement>(null);
   const activeStatuses = statuses.filter((status) => status.isActive);
+  const [initialStatusId, setInitialStatusId] = useState(
+    activeStatuses[0]?.id ?? "",
+  );
+  const [searchState, searchAction, searchPending] = useActionState(
+    searchInstrumentsAction,
+    initialSearchState,
+  );
+  const [providerState, providerAction, providerPending] = useActionState(
+    addProviderStockAction,
+    initialAddState,
+  );
+  const [manualState, manualAction, manualPending] = useActionState(
+    addStockAction,
+    initialAddState,
+  );
 
   useEffect(() => {
-    if (state.status === "success") {
-      formRef.current?.reset();
+    if (
+      providerState.status === "success" ||
+      manualState.status === "success"
+    ) {
+      manualFormRef.current?.reset();
       dialogRef.current?.close();
     }
-  }, [state]);
+  }, [manualState.status, providerState.status]);
 
-  const fieldError = (field: keyof NonNullable<typeof state.fieldErrors>) =>
-    state.fieldErrors?.[field]?.[0];
+  const fieldError = (
+    field: keyof NonNullable<typeof manualState.fieldErrors>,
+  ) => manualState.fieldErrors?.[field]?.[0];
 
   return (
     <>
@@ -57,13 +83,18 @@ export function AddStockDialog({
 
       <dialog
         aria-labelledby="add-stock-title"
-        className="m-auto w-[460px] rounded-[10px] border border-[var(--border-strong)] bg-[var(--surface-elevated)] p-0 text-[var(--text-primary)] shadow-2xl backdrop:bg-black/65"
+        className="m-auto max-h-[min(760px,90vh)] w-[520px] overflow-y-auto rounded-[10px] border border-[var(--border-strong)] bg-[var(--surface-elevated)] p-0 text-[var(--text-primary)] shadow-2xl backdrop:bg-black/65"
         ref={dialogRef}
       >
-        <div className="flex items-center justify-between px-4 pt-4">
-          <h2 id="add-stock-title" className="text-base font-semibold">
-            Add stock
-          </h2>
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--surface-elevated)] px-4 py-4">
+          <div>
+            <h2 id="add-stock-title" className="text-base font-semibold">
+              Add stock
+            </h2>
+            <p className="pt-1 text-[11px] text-[var(--text-secondary)]">
+              Search EODHD first, or use manual entry as a fallback.
+            </p>
+          </div>
           <button
             aria-label="Close Add Stock"
             className="grid size-7 place-items-center rounded-[5px] text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]"
@@ -73,67 +104,14 @@ export function AddStockDialog({
             <X aria-hidden="true" className="size-4" />
           </button>
         </div>
-        <p className="px-4 pt-2 text-[11px] leading-[14px] text-[var(--text-secondary)]">
-          Add a GPW or US instrument manually. Provider search is not enabled
-          yet.
-        </p>
 
-        <form
-          action={formAction}
-          className="flex flex-col gap-3 p-4"
-          ref={formRef}
-        >
-          <div className="grid grid-cols-[120px_1fr] gap-3">
-            <Field label="Market">
-              <select className={controlClass} name="marketCode" required>
-                {markets.map((market) => (
-                  <option key={market.code} value={market.code}>
-                    {market.code} · {market.currency}
-                  </option>
-                ))}
-              </select>
-              {fieldError("marketCode") ? (
-                <span className="text-[10px] text-[var(--negative)]">
-                  {fieldError("marketCode")}
-                </span>
-              ) : null}
-            </Field>
-            <Field label="Ticker">
-              <input
-                autoCapitalize="characters"
-                className={controlClass}
-                maxLength={24}
-                name="ticker"
-                placeholder="PZU or MSFT"
-                required
-              />
-              {fieldError("ticker") ? (
-                <span className="text-[10px] text-[var(--negative)]">
-                  {fieldError("ticker")}
-                </span>
-              ) : null}
-            </Field>
-          </div>
-          <Field label="Company name">
-            <input
-              className={controlClass}
-              maxLength={160}
-              name="name"
-              placeholder="Company legal or common name"
-              required
-            />
-            {fieldError("name") ? (
-              <span className="text-[10px] text-[var(--negative)]">
-                {fieldError("name")}
-              </span>
-            ) : null}
-          </Field>
+        <div className="flex flex-col gap-4 p-4">
           <Field label="Initial status">
             <select
               className={controlClass}
               disabled={activeStatuses.length === 0}
-              name="initialStatusId"
-              required
+              onChange={(event) => setInitialStatusId(event.target.value)}
+              value={initialStatusId}
             >
               {activeStatuses.map((status) => (
                 <option key={status.id} value={status.id}>
@@ -141,44 +119,209 @@ export function AddStockDialog({
                 </option>
               ))}
             </select>
-            {fieldError("initialStatusId") ? (
-              <span className="text-[10px] text-[var(--negative)]">
-                {fieldError("initialStatusId")}
-              </span>
-            ) : null}
           </Field>
 
-          {activeStatuses.length === 0 ? (
-            <p className="rounded-[5px] border border-[var(--warning)] bg-[var(--warning-subtle)] p-2 text-[11px] text-[var(--warning)]">
-              Create or initialize an active status before adding a stock.
-            </p>
-          ) : null}
-          {state.status === "error" && state.message ? (
-            <p
-              aria-live="polite"
-              className="rounded-[5px] border border-[var(--negative)] bg-[var(--negative-subtle)] p-2 text-[11px] text-[var(--negative)]"
+          <section className="flex flex-col gap-3 rounded-[7px] border border-[var(--border-default)] bg-[var(--surface-default)] p-3">
+            <div>
+              <h3 className="text-xs font-semibold">Provider search</h3>
+              <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
+                The exact provider symbol is stored separately from the internal
+                ticker.
+              </p>
+            </div>
+            <form
+              action={searchAction}
+              className="grid grid-cols-[110px_1fr_86px] gap-2"
             >
-              {state.message}
-            </p>
-          ) : null}
+              <select className={controlClass} name="marketCode" required>
+                {markets.map((market) => (
+                  <option key={market.code} value={market.code}>
+                    {market.code}
+                  </option>
+                ))}
+              </select>
+              <input
+                className={controlClass}
+                disabled={!providerConfigured}
+                maxLength={80}
+                name="query"
+                placeholder="Ticker or company"
+                required
+              />
+              <button
+                className="flex h-8 items-center justify-center gap-1.5 rounded-[5px] border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-2 text-[11px] font-semibold hover:bg-[var(--surface-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={
+                  !providerConfigured || searchPending || !initialStatusId
+                }
+                type="submit"
+              >
+                <Search aria-hidden="true" className="size-3" />
+                {searchPending ? "Searching" : "Search"}
+              </button>
+            </form>
 
-          <div className="flex justify-end gap-2 pt-1">
-            <button
-              className="flex h-8 items-center justify-center rounded-[5px] px-3 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]"
-              onClick={() => dialogRef.current?.close()}
-              type="button"
+            {!providerConfigured ? (
+              <p className="rounded-[5px] border border-[var(--warning)] bg-[var(--warning-subtle)] p-2 text-[10px] text-[var(--warning)]">
+                EODHD is not configured. Manual entry remains available.
+              </p>
+            ) : null}
+            {searchState.message ? (
+              <p
+                aria-live="polite"
+                className={cn(
+                  "text-[10px]",
+                  searchState.status === "error"
+                    ? "text-[var(--negative)]"
+                    : "text-[var(--text-secondary)]",
+                )}
+              >
+                {searchState.message}
+              </p>
+            ) : null}
+            {searchState.candidates.length ? (
+              <div className="max-h-52 overflow-auto rounded-[5px] border border-[var(--border-subtle)]">
+                {searchState.candidates.map((candidate) => (
+                  <form
+                    action={providerAction}
+                    className="flex min-h-12 items-center gap-3 border-b border-[var(--border-subtle)] px-3 py-2 last:border-b-0 hover:bg-[var(--surface-hover)]"
+                    key={candidate.providerSymbol}
+                  >
+                    <input
+                      name="marketCode"
+                      type="hidden"
+                      value={candidate.market}
+                    />
+                    <input
+                      name="providerSymbol"
+                      type="hidden"
+                      value={candidate.providerSymbol}
+                    />
+                    <input
+                      name="initialStatusId"
+                      type="hidden"
+                      value={initialStatusId}
+                    />
+                    <span className="min-w-0 flex-1">
+                      <strong className="block truncate font-mono text-[11px]">
+                        {candidate.ticker}
+                        <span className="ml-2 font-sans font-normal text-[var(--text-muted)]">
+                          {candidate.market} · {candidate.currency}
+                        </span>
+                      </strong>
+                      <span className="block truncate text-[10px] text-[var(--text-secondary)]">
+                        {candidate.name} · {candidate.providerSymbol}
+                      </span>
+                    </span>
+                    <button
+                      className="h-7 rounded-[5px] bg-[var(--accent-primary)] px-2.5 text-[10px] font-semibold text-[var(--bg-primary)] disabled:opacity-50"
+                      disabled={providerPending || !initialStatusId}
+                      type="submit"
+                    >
+                      Add
+                    </button>
+                  </form>
+                ))}
+              </div>
+            ) : null}
+            {providerState.status === "error" && providerState.message ? (
+              <p
+                aria-live="polite"
+                className="text-[10px] text-[var(--negative)]"
+              >
+                {providerState.message}
+              </p>
+            ) : null}
+          </section>
+
+          <section className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-4">
+            <div>
+              <h3 className="text-xs font-semibold">Manual fallback</h3>
+              <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
+                Use when the provider is unavailable or has no suitable listing.
+              </p>
+            </div>
+            <form
+              action={manualAction}
+              className="flex flex-col gap-3"
+              ref={manualFormRef}
             >
-              Cancel
-            </button>
-            <button
-              className="flex h-8 items-center justify-center rounded-[5px] bg-[var(--accent-primary)] px-3 text-xs font-semibold text-[var(--bg-primary)] hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={pending || activeStatuses.length === 0}
-              type="submit"
-            >
-              {pending ? "Adding…" : "Add stock"}
-            </button>
-          </div>
-        </form>
+              <div className="grid grid-cols-[120px_1fr] gap-3">
+                <Field label="Market">
+                  <select className={controlClass} name="marketCode" required>
+                    {markets.map((market) => (
+                      <option key={market.code} value={market.code}>
+                        {market.code} · {market.currency}
+                      </option>
+                    ))}
+                  </select>
+                  {fieldError("marketCode") ? (
+                    <span className="text-[10px] text-[var(--negative)]">
+                      {fieldError("marketCode")}
+                    </span>
+                  ) : null}
+                </Field>
+                <Field label="Ticker">
+                  <input
+                    autoCapitalize="characters"
+                    className={controlClass}
+                    maxLength={24}
+                    name="ticker"
+                    placeholder="PZU or MSFT"
+                    required
+                  />
+                  {fieldError("ticker") ? (
+                    <span className="text-[10px] text-[var(--negative)]">
+                      {fieldError("ticker")}
+                    </span>
+                  ) : null}
+                </Field>
+              </div>
+              <Field label="Company name">
+                <input
+                  className={controlClass}
+                  maxLength={160}
+                  name="name"
+                  placeholder="Company legal or common name"
+                  required
+                />
+                {fieldError("name") ? (
+                  <span className="text-[10px] text-[var(--negative)]">
+                    {fieldError("name")}
+                  </span>
+                ) : null}
+              </Field>
+              <input
+                name="initialStatusId"
+                type="hidden"
+                value={initialStatusId}
+              />
+              {manualState.status === "error" && manualState.message ? (
+                <p
+                  aria-live="polite"
+                  className="rounded-[5px] border border-[var(--negative)] bg-[var(--negative-subtle)] p-2 text-[11px] text-[var(--negative)]"
+                >
+                  {manualState.message}
+                </p>
+              ) : null}
+              <div className="flex justify-end gap-2">
+                <button
+                  className="flex h-8 items-center justify-center rounded-[5px] px-3 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]"
+                  onClick={() => dialogRef.current?.close()}
+                  type="button"
+                >
+                  Cancel
+                </button>
+                <button
+                  className="flex h-8 items-center justify-center rounded-[5px] bg-[var(--accent-primary)] px-3 text-xs font-semibold text-[var(--bg-primary)] hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={manualPending || !initialStatusId}
+                  type="submit"
+                >
+                  {manualPending ? "Adding…" : "Add manually"}
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
       </dialog>
     </>
   );

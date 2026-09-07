@@ -139,9 +139,6 @@ function mapRows({
 
     const quote = quoteByStock.get(stock.id) ?? null;
     const latestMonitoring = monitoringByStock.get(stock.id) ?? null;
-    if (query.staleOnly && quote?.quality_status.toLowerCase() !== "stale") {
-      continue;
-    }
     if (query.unmonitoredOnly && latestMonitoring) continue;
 
     rows.push({
@@ -162,7 +159,7 @@ function mapRows({
                 : String(quote.day_change_pct),
             asOf: quote.as_of,
             provider: quote.provider,
-            qualityStatus: quote.quality_status,
+            qualityStatus: "unknown",
           }
         : null,
       lastMonitoring: latestMonitoring
@@ -279,6 +276,8 @@ function isAddStockResult(value: string): value is AddStockResult["status"] {
     "already_active",
     "invalid_market",
     "invalid_status",
+    "invalid_candidate",
+    "mapping_conflict",
     "conflict",
   ].includes(value);
 }
@@ -302,6 +301,32 @@ export function createSupabaseWatchlistWriter(
         throw new WatchlistInfrastructureError();
       }
 
+      return { status: data[0].outcome };
+    },
+
+    async addProviderStock(_userId, candidate, initialStatusId) {
+      const { data, error } = await client.rpc(
+        "add_provider_stock_to_watchlist",
+        {
+          p_market_code: candidate.market,
+          p_ticker: candidate.ticker,
+          p_name: candidate.name,
+          p_exchange: candidate.exchange,
+          p_currency: candidate.currency,
+          p_isin: candidate.isin,
+          p_provider: "EODHD",
+          p_provider_symbol: candidate.providerSymbol,
+          p_status_id: initialStatusId,
+          p_metadata: {
+            exchange: candidate.exchange,
+            isin: candidate.isin,
+          },
+        },
+      );
+
+      if (error || !data?.[0] || !isAddStockResult(data[0].outcome)) {
+        throw new WatchlistInfrastructureError();
+      }
       return { status: data[0].outcome };
     },
 

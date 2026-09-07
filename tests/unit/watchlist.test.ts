@@ -16,6 +16,7 @@ import type {
 function writerWith(result: AddStockResult): WatchlistWriter {
   return {
     addManualStock: vi.fn().mockResolvedValue(result),
+    addProviderStock: vi.fn(),
     archive: vi.fn(),
     restore: vi.fn(),
   };
@@ -130,7 +131,7 @@ describe("watchlist query", () => {
             dayChangePct: "1.5",
             asOf: "2026-09-05T10:00:00Z",
             provider: "manual",
-            qualityStatus: "manual",
+            qualityStatus: "unknown",
           },
           lastMonitoring: null,
           displayOrder: 1,
