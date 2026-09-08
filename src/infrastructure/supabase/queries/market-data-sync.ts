@@ -33,7 +33,39 @@ export function createSupabaseMarketDataSyncRepository(
       return data?.started_at ?? null;
     },
 
-    async loadActiveInstruments(userId) {
+    async latestFxEffectiveDate() {
+      const { data, error } = await client
+        .from("fx_rates")
+        .select("effective_date")
+        .eq("pair", "USDPLN")
+        .eq("provider", "NBP")
+        .order("effective_date", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw new MarketDataSyncInfrastructureError();
+      return data?.effective_date ?? null;
+    },
+
+    async claimSyncLease(input) {
+      const { data, error } = await client
+        .rpc("claim_market_sync", {
+          p_job_type: input.jobType,
+          p_user_id: input.userId,
+          p_owner_email: input.ownerEmail,
+          p_stale_after_seconds: input.staleAfterSeconds,
+          p_metadata: input.metadata as Json,
+        })
+        .single();
+      if (error || !data) throw new MarketDataSyncInfrastructureError();
+      return {
+        runId: data.run_id,
+        userId: data.user_id,
+        acquired: data.acquired,
+        reason: data.reason,
+      };
+    },
+
+    async loadActiveInstruments(userId, markets) {
       const itemsResult = await client
         .from("watchlist_items")
         .select("stock_id")
@@ -75,6 +107,7 @@ export function createSupabaseMarketDataSyncRepository(
           !stock ||
           !market ||
           !isMarketCode(market) ||
+          (markets && !markets.includes(market)) ||
           (stock.currency !== "PLN" && stock.currency !== "USD")
         ) {
           return [];
@@ -111,6 +144,9 @@ export function createSupabaseMarketDataSyncRepository(
         .update({
           finished_at: new Date().toISOString(),
           status: input.status,
+          ...(input.requestedCount === undefined
+            ? {}
+            : { requested_count: input.requestedCount }),
           success_count: input.successCount,
           failure_count: input.failureCount,
           error_summary: input.errorSummary,

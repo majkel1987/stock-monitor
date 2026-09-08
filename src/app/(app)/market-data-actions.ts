@@ -2,8 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { syncMarketQuotes } from "@/application/sync/sync-market-quotes";
-import { syncUsdPlnRate } from "@/application/sync/sync-usd-pln-rate";
+import { runManualMarketSync } from "@/application/sync/run-manual-market-sync";
 import { createNbpProvider } from "@/infrastructure/fx/nbp/nbp-provider";
 import { createEodhdProvider } from "@/infrastructure/market-data/eodhd/eodhd-provider";
 import { createSupabaseMarketDataSyncRepository } from "@/infrastructure/supabase/queries/market-data-sync";
@@ -31,17 +30,33 @@ export async function refreshMarketDataAction(
 
   const repository = createSupabaseMarketDataSyncRepository(serviceClient);
   const env = getServerEnv();
+  const deadlineAtMs = Date.now() + 240_000;
 
   try {
-    const quoteResult = await syncMarketQuotes({
+    const result = await runManualMarketSync({
       repository,
-      provider: env.EODHD_API_TOKEN
-        ? createEodhdProvider(env.EODHD_API_TOKEN)
+      marketDataProvider: env.EODHD_API_TOKEN
+        ? createEodhdProvider(env.EODHD_API_TOKEN, { deadlineAtMs })
         : null,
+      fxRateProvider: createNbpProvider({ deadlineAtMs }),
       userId: user.id,
-      trigger: "manual",
+      deadlineAtMs,
     });
-    if (quoteResult.status === "manual_cooldown") {
+    if (result.status === "locked") {
+      return {
+        status: "cooldown",
+        message: "A synchronization is already running. Try again shortly.",
+      };
+    }
+    if (result.status === "failed") {
+      return {
+        status: "error",
+        message:
+          "Synchronization could not be completed. Stored data was kept.",
+      };
+    }
+    const quoteResult = result.quotes;
+    if (result.status === "cooldown" && quoteResult) {
       const retryTime = quoteResult.retryAt
         ? new Intl.DateTimeFormat("en-GB", {
             hour: "2-digit",
@@ -55,11 +70,20 @@ export async function refreshMarketDataAction(
         message: `Refresh cooldown active. Try again after ${retryTime}.`,
       };
     }
-
-    const fxResult = await syncUsdPlnRate({
-      provider: createNbpProvider(),
-      repository,
-    });
+    if (!quoteResult) {
+      return {
+        status: "error",
+        message:
+          "Synchronization could not be completed. Stored data was kept.",
+      };
+    }
+    if (!result.fx) {
+      return {
+        status: quoteResult.successCount > 0 ? "partial" : "error",
+        message: `${quoteResult.successCount} of ${quoteResult.requestedCount} quotes updated; USD/PLN skipped because the synchronization deadline was reached.`,
+      };
+    }
+    const fxResult = result.fx;
     revalidatePath("/dashboard");
     revalidatePath("/watchlist");
     revalidatePath("/settings/data");

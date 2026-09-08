@@ -2,7 +2,8 @@ export type SyncRunSummary = {
   id: string;
   jobType: string;
   provider: string;
-  status: "running" | "success" | "partial" | "failed" | "skipped";
+  status:
+    "running" | "success" | "partial" | "failed" | "skipped" | "abandoned";
   startedAt: string;
   finishedAt: string | null;
   requestedCount: number;
@@ -13,8 +14,13 @@ export type SyncRunSummary = {
 
 export type MarketDataStatus = {
   lastSuccessfulSyncAt: string | null;
+  lastSuccessfulMarketSyncAt: string | null;
+  lastSuccessfulFxSyncAt: string | null;
   lastAttemptAt: string | null;
   lastFailureAt: string | null;
+  latestStatus: SyncRunSummary["status"] | null;
+  failureRunCount: number;
+  lastErrorSummary: string | null;
   providerCoverageCount: number;
   latestFx: {
     rate: string;

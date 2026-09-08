@@ -24,6 +24,13 @@ function repository(
 ): MarketDataSyncRepository {
   return {
     latestManualAttemptAt: vi.fn().mockResolvedValue(null),
+    latestFxEffectiveDate: vi.fn().mockResolvedValue("2026-09-04"),
+    claimSyncLease: vi.fn().mockResolvedValue({
+      runId: "lease-id",
+      userId: "user-id",
+      acquired: true,
+      reason: null,
+    }),
     loadActiveInstruments: vi.fn().mockResolvedValue(instruments),
     startRun: vi.fn().mockResolvedValue("run-id"),
     finishRun: vi.fn().mockResolvedValue(undefined),
@@ -146,5 +153,60 @@ describe("market quote synchronization", () => {
 
     expect(result).toMatchObject({ status: "failed", failureCount: 1 });
     expect(repo.upsertQuote).not.toHaveBeenCalled();
+  });
+
+  it("treats older or equal provider quotes as idempotent skips", async () => {
+    const repo = repository({
+      upsertQuote: vi.fn().mockResolvedValue(false),
+    });
+    const provider: MarketDataProvider = {
+      search: vi.fn(),
+      getQuotes: vi
+        .fn()
+        .mockResolvedValue([quote("pzu", "PLN"), quote("msft", "USD")]),
+    };
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    const result = await syncMarketQuotes({
+      repository: repo,
+      provider,
+      userId: "user-id",
+    });
+
+    expect(result).toMatchObject({
+      status: "success",
+      requestedCount: 2,
+      successCount: 0,
+      failureCount: 0,
+      skippedCount: 2,
+    });
+    expect(repo.finishRun).toHaveBeenCalledWith(
+      "run-id",
+      expect.objectContaining({ status: "success", failureCount: 0 }),
+    );
+  });
+
+  it("stops before starting a provider batch after the soft deadline", async () => {
+    const repo = repository();
+    const provider: MarketDataProvider = {
+      search: vi.fn(),
+      getQuotes: vi.fn(),
+    };
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    const result = await syncMarketQuotes({
+      repository: repo,
+      provider,
+      userId: "user-id",
+      deadlineAtMs: 0,
+    });
+
+    expect(result).toMatchObject({
+      status: "failed",
+      requestedCount: 2,
+      successCount: 0,
+      failureCount: 2,
+    });
+    expect(provider.getQuotes).not.toHaveBeenCalled();
   });
 });

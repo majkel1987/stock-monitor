@@ -88,7 +88,7 @@ select is(
     select outcome from public.create_monitoring_with_thesis(
       '14000000-0000-4000-8000-000000000011',
       (select id from public.status_definitions where user_id = auth.uid() and slug = 'DEEP_DIVE'),
-      '2026-09-01T18:30:00Z', 80, 82, 74, 60, 76,
+      '2026-09-01T18:30:00Z', 80::smallint, 82::smallint, 74::smallint, 60::smallint, 76::smallint,
       'Accumulate', 'First snapshot', '["Backlog"]', '["Labor"]',
       100, 'USD', '2026-09-01T16:00:00Z', 4.00, null, null,
       'First thesis', 'Bull', 'Base', 'Bear', '["Awards"]', '["Labor"]', '["Backlog decline"]'
@@ -122,8 +122,8 @@ select is(
   (
     select outcome from public.create_monitoring_with_thesis(
       '14000000-0000-4000-8000-000000000011',
-      (select id from public.status_definitions where user_id = auth.uid() and slug = 'WAIT'),
-      '2026-09-02T18:30:00Z', 75, null, 70, 55, 72,
+      (select id from public.status_definitions where user_id = auth.uid() and slug = 'WAIT_FOR_CORRECTION'),
+      '2026-09-02T18:30:00Z', 75::smallint, null, 70::smallint, 55::smallint, 72::smallint,
       'Wait', 'Correction snapshot', '[]', '[]', 98, 'USD',
       '2026-09-02T16:00:00Z', 4.10, null,
       (select id from public.monitoring_results where user_id = auth.uid() order by analyzed_at limit 1),
@@ -203,7 +203,7 @@ select is(
 );
 select is(
   (select sd.slug from public.watchlist_items wi join public.status_definitions sd on sd.id = wi.current_status_id where wi.user_id = auth.uid()),
-  'WAIT',
+  'WAIT_FOR_CORRECTION',
   'thesis failure leaves current status unchanged'
 );
 
@@ -320,7 +320,6 @@ select lives_ok(
 );
 
 reset role;
-set local role authenticated;
 select set_config('request.jwt.claim.sub', '14000000-0000-4000-8000-000000000001', true);
 select throws_ok(
   $$update public.monitoring_results set summary = 'Changed' where user_id = auth.uid()$$,

@@ -56,6 +56,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Start local Supabase
         run: pnpm db:start
@@ -65,6 +69,12 @@ jobs:
 
       - name: Run database tests
         run: pnpm db:test
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run critical E2E
+        run: pnpm test:e2e:local
 
       - name: Stop local Supabase
         if: always()

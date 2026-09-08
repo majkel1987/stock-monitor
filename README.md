@@ -51,8 +51,9 @@ and key values after `pnpm db:start`.
 1. In Supabase Dashboard, open **Authentication → Users**, choose **Add user**, and create the sole
    email/password account manually. Store its strong password outside the repository.
 2. Under **Authentication → Sign In / Providers**, open the email provider and turn off **Allow new
-   users to sign up**. Also keep anonymous sign-ins disabled. Local development already sets
-   `auth.email.enable_signup = false` and `auth.sms.enable_signup = false` in `supabase/config.toml`.
+   users to sign up**. Also keep anonymous sign-ins disabled. Local development sets the global
+   `auth.enable_signup = false`; the email provider remains enabled so manually provisioned users
+   can still sign in, while the unused phone provider remains disabled.
 3. Set `ALLOWED_USER_EMAIL` to that exact account address in `.env.local` and in the deployment
    environment. Comparison is case-insensitive and is performed on the server after Supabase Auth
    confirms the current user.
@@ -182,6 +183,7 @@ user-owned default status records have been created by M1.
 | `pnpm test`           | Run Vitest once                            |
 | `pnpm test:watch`     | Run Vitest in watch mode                   |
 | `pnpm test:e2e`       | Run the Playwright smoke test              |
+| `pnpm test:e2e:local` | Provision a local user and run full E2E    |
 | `pnpm provider:spike` | Verify required EODHD ticker coverage      |
 | `pnpm db:start`       | Start local Supabase                       |
 | `pnpm db:stop`        | Stop local Supabase                        |
@@ -214,7 +216,7 @@ Read [AGENTS.md](AGENTS.md), the
 
 ## Current implementation status
 
-> M6 Market Data Integration is implemented on top of the M1–M5 application.
+> M7 Automation and Operational Hardening is implemented on top of M1–M6.
 
 `/dashboard` now reads authenticated PostgreSQL data through a bounded dashboard query model. It
 shows market/status counts, deterministically ranked opportunities, stocks near an active buy
@@ -234,4 +236,19 @@ stored quote and compute market-aware freshness centrally; page rendering never 
 The NBP adapter stores the latest official USD/PLN table A reference rate and prefills it for new
 USD monitoring records. The field remains editable, and saved monitoring FX values stay immutable.
 See [the provider coverage spike](docs/provider-spike.md) for the reproducible eight-symbol check.
-Until M7 enables scheduling, quotes and FX change only after an authenticated manual refresh.
+M7 adds a production-only Supabase Cron schedule. Every 30 minutes during a broad weekday UTC
+window, `pg_net` signs a POST to the protected Next.js Node.js route. The route runs the same quote
+and FX application use cases as manual refresh. Market-aware application logic decides whether GPW,
+USA, or the daily NBP fixing is due; one global advisory-guarded durable lease prevents overlap
+between manual and scheduled work. Provider retries, batches, deadlines, partial outcomes, and crash
+recovery are bounded and observable through `sync_runs` and Settings → Data.
+
+EODHD remains optional at application startup: without it, research and manual stock/price flows
+continue to work and synchronization reports `provider_not_configured`. Required production values
+are listed in `.env.example`; public values are limited to the Supabase URL and anonymous key. All
+other credentials are server-only.
+
+Use the [deployment runbook](docs/runbooks/deployment.md) for controlled production setup, the
+[provider outage](docs/runbooks/provider-outage.md) and [cron failure](docs/runbooks/cron-failure.md)
+procedures for recovery, and establish the weekly [backup/restore procedure](docs/runbooks/backup-restore.md)
+before treating Supabase as the only copy of research history.

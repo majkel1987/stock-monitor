@@ -28,6 +28,12 @@ export default defineConfig({
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "public-test-key",
       ALLOWED_USER_EMAIL:
         process.env.ALLOWED_USER_EMAIL ?? "owner@example.test",
+      SUPABASE_SERVICE_ROLE_KEY:
+        process.env.SUPABASE_SERVICE_ROLE_KEY ?? "service-role-test-key",
+      CRON_SECRET:
+        process.env.CRON_SECRET ??
+        "local-playwright-cron-secret-at-least-32-chars",
+      APP_URL: process.env.APP_URL ?? "http://localhost:3000",
     },
   },
 });

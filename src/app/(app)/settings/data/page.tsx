@@ -29,12 +29,15 @@ function when(value: string | null) {
 }
 
 function runName(run: SyncRunSummary) {
+  if (run.jobType === "scheduled_market_sync") return "Scheduled sync";
+  if (run.jobType === "manual_market_sync") return "Manual sync";
   return run.jobType === "fx_usd_pln" ? "FX · USD/PLN" : "Market quotes";
 }
 
 function runTone(status: SyncRunSummary["status"]) {
   if (status === "success") return "text-[var(--positive)]";
-  if (status === "failed") return "text-[var(--negative)]";
+  if (status === "failed" || status === "abandoned")
+    return "text-[var(--negative)]";
   if (status === "partial") return "text-[var(--warning)]";
   return "text-[var(--text-secondary)]";
 }

@@ -67,6 +67,16 @@ export class EodhdMarketDataProvider implements MarketDataProvider {
   }
 }
 
-export function createEodhdProvider(apiToken: string) {
-  return new EodhdMarketDataProvider(new HttpEodhdClient(apiToken));
+export function createEodhdProvider(
+  apiToken: string,
+  options: { deadlineAtMs?: number } = {},
+) {
+  return new EodhdMarketDataProvider(
+    new HttpEodhdClient(
+      apiToken,
+      fetch,
+      8_000,
+      options.deadlineAtMs ?? Number.POSITIVE_INFINITY,
+    ),
+  );
 }

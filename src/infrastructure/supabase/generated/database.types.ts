@@ -786,6 +786,24 @@ export type Database = {
           watchlist_item_id: string
         }[]
       }
+      claim_market_sync: {
+        Args: {
+          p_job_type: string
+          p_metadata?: Json
+          p_owner_email: string | null
+          p_stale_after_seconds: number
+          p_user_id: string | null
+        }
+        Returns: {
+          acquired: boolean
+          reason: string
+          run_id: string
+          user_id: string | null
+        }[]
+      }
+      configure_market_sync_cron: { Args: never; Returns: number }
+      disable_market_sync_cron: { Args: never; Returns: boolean }
+      enqueue_market_sync: { Args: never; Returns: number }
       create_monitoring_with_thesis: {
         Args: {
           p_analyzed_at: string

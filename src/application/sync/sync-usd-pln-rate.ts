@@ -1,7 +1,10 @@
 import type { FxRateProvider } from "./fx-rate-provider";
 import type { MarketDataSyncRepository } from "./sync-types";
 
-export type FxSyncResult = { status: "success" | "failed" };
+export type FxSyncResult = {
+  status: "success" | "failed";
+  runId: string;
+};
 
 export async function syncUsdPlnRate({
   provider,
@@ -32,13 +35,15 @@ export async function syncUsdPlnRate({
     });
     console.info("market_data_sync", {
       provider: "NBP",
+      runId,
       operation: "fx_usd_pln",
       requestedCount: 1,
       successCount: 1,
       failureCount: 0,
       durationMs: Date.now() - startedAtMs,
+      status: "success",
     });
-    return { status: "success" };
+    return { status: "success", runId };
   } catch {
     await repository.finishRun(runId, {
       status: "failed",
@@ -49,12 +54,14 @@ export async function syncUsdPlnRate({
     });
     console.info("market_data_sync", {
       provider: "NBP",
+      runId,
       operation: "fx_usd_pln",
       requestedCount: 1,
       successCount: 0,
       failureCount: 1,
       durationMs: Date.now() - startedAtMs,
+      status: "failed",
     });
-    return { status: "failed" };
+    return { status: "failed", runId };
   }
 }

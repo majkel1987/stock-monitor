@@ -33,6 +33,12 @@ export class NbpFxRateProvider implements FxRateProvider {
   }
 }
 
-export function createNbpProvider() {
-  return new NbpFxRateProvider(new HttpNbpClient());
+export function createNbpProvider(options: { deadlineAtMs?: number } = {}) {
+  return new NbpFxRateProvider(
+    new HttpNbpClient(
+      fetch,
+      8_000,
+      options.deadlineAtMs ?? Number.POSITIVE_INFINITY,
+    ),
+  );
 }

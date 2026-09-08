@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(29);
+select plan(39);
 
 select has_table('public', 'fx_rates', 'current/daily FX persistence exists');
 select has_function(
@@ -11,6 +11,44 @@ select has_function(
   'add_provider_stock_to_watchlist',
   array['text','text','text','text','character','text','text','text','uuid','jsonb'],
   'provider-backed Add Stock RPC exists'
+);
+select has_function(
+  'public',
+  'claim_market_sync',
+  array['text','uuid','text','integer','jsonb'],
+  'global sync lease claim RPC exists'
+);
+select ok(
+  has_function_privilege(
+    'service_role',
+    'public.claim_market_sync(text,uuid,text,integer,jsonb)',
+    'EXECUTE'
+  ),
+  'service role can claim the synchronization lease'
+);
+select ok(
+  not has_function_privilege(
+    'authenticated',
+    'public.claim_market_sync(text,uuid,text,integer,jsonb)',
+    'EXECUTE'
+  ),
+  'authenticated users cannot invoke sync infrastructure directly'
+);
+select ok(
+  not has_function_privilege(
+    'anon',
+    'public.claim_market_sync(text,uuid,text,integer,jsonb)',
+    'EXECUTE'
+  ),
+  'anonymous users cannot claim the synchronization lease'
+);
+select ok(
+  not has_function_privilege('anon', 'public.enqueue_market_sync()', 'EXECUTE'),
+  'anonymous users cannot enqueue scheduled HTTP requests'
+);
+select ok(
+  not has_function_privilege('authenticated', 'public.enqueue_market_sync()', 'EXECUTE'),
+  'authenticated users cannot enqueue scheduled HTTP requests'
 );
 select has_function(
   'public',
@@ -182,6 +220,60 @@ select is(
 
 reset role;
 set local role service_role;
+
+create temporary table first_sync_claim as
+select * from public.claim_market_sync(
+  'scheduled_market_sync', null, 'm6-owner@example.com', 240,
+  '{"test":"first"}'::jsonb
+);
+select ok(
+  (select acquired from first_sync_claim),
+  'the first scheduled synchronization acquires the global lease'
+);
+
+create temporary table overlapping_sync_claim as
+select * from public.claim_market_sync(
+  'scheduled_market_sync', null, 'm6-owner@example.com', 240,
+  '{"test":"overlap"}'::jsonb
+);
+select is(
+  (select reason from overlapping_sync_claim),
+  'skipped_locked',
+  'an overlapping synchronization is recorded and skipped'
+);
+
+update public.sync_runs
+set status = 'success', finished_at = now()
+where id = (select run_id from first_sync_claim);
+
+insert into public.sync_runs (
+  job_type, provider, started_at, status, metadata
+) values (
+  'manual_market_sync', 'EODHD/NBP', now() - interval '10 minutes',
+  'running', '{"test":"abandoned"}'::jsonb
+);
+
+create temporary table recovery_sync_claim as
+select * from public.claim_market_sync(
+  'scheduled_market_sync', null, 'm6-owner@example.com', 240,
+  '{"test":"recovery"}'::jsonb
+);
+select ok(
+  (select acquired from recovery_sync_claim),
+  'a stale lease is recovered before the next scheduled run'
+);
+select is(
+  (
+    select status from public.sync_runs
+    where metadata ->> 'test' = 'abandoned'
+  ),
+  'failed',
+  'stale running synchronization is marked failed'
+);
+
+update public.sync_runs
+set status = 'success', finished_at = now()
+where id = (select run_id from recovery_sync_claim);
 
 select is(
   public.upsert_market_quote(

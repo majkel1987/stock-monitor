@@ -7,6 +7,13 @@ import { isSessionCookie } from "@/infrastructure/supabase/server/sign-out";
 import { getPublicEnv } from "@/lib/env/public";
 
 export async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const hasIndependentApiAuthorization =
+    pathname === "/api/health" || pathname === "/api/internal/market-sync";
+  if (hasIndependentApiAuthorization) {
+    return NextResponse.next({ request });
+  }
+
   const env = getPublicEnv();
   let response = NextResponse.next({ request });
   const client = createServerClient<Database>(
@@ -38,14 +45,19 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  const pathname = request.nextUrl.pathname;
   let destination: NextResponse | undefined;
-  if (pathname.startsWith("/api/") && access.status !== "allowed") {
+  if (
+    pathname.startsWith("/api/") &&
+    access.status !== "allowed"
+  ) {
     destination = NextResponse.json(
       { error: access.status },
       { status: access.status === "forbidden" ? 403 : 401 },
     );
-  } else if (pathname !== "/login" && access.status !== "allowed") {
+  } else if (
+    pathname !== "/login" &&
+    access.status !== "allowed"
+  ) {
     const url = new URL("/login", request.url);
     if (access.status === "forbidden")
       url.searchParams.set("error", "access_denied");

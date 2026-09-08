@@ -1,9 +1,11 @@
 import { classifyMarketDataFreshness } from "@/domain/markets/freshness";
+import type { MarketCode } from "@/domain/markets/market";
 import type { MarketDataProvider } from "./market-data-provider";
 import type { MarketDataSyncRepository, SyncFailure } from "./sync-types";
 
 const BATCH_SIZE = 20;
 const MANUAL_COOLDOWN_MS = 2 * 60_000;
+const MAX_FAILURE_MESSAGE_LENGTH = 240;
 
 export type MarketQuoteSyncResult = {
   status:
@@ -16,7 +18,9 @@ export type MarketQuoteSyncResult = {
   requestedCount: number;
   successCount: number;
   failureCount: number;
+  skippedCount: number;
   retryAt: string | null;
+  runId: string | null;
 };
 
 function failureFor(
@@ -35,8 +39,8 @@ function failureFor(
     return {
       stockId,
       providerSymbol,
-      category: error.code,
-      message: error.message,
+      category: error.code.slice(0, 64),
+      message: error.message.slice(0, MAX_FAILURE_MESSAGE_LENGTH),
     };
   }
   return {
@@ -53,12 +57,16 @@ export async function syncMarketQuotes({
   userId,
   now = new Date(),
   trigger = "manual",
+  markets,
+  deadlineAtMs = Number.POSITIVE_INFINITY,
 }: {
   repository: MarketDataSyncRepository;
   provider: MarketDataProvider | null;
   userId: string;
   now?: Date;
   trigger?: "manual" | "scheduled";
+  markets?: MarketCode[];
+  deadlineAtMs?: number;
 }): Promise<MarketQuoteSyncResult> {
   const startedAtMs = Date.now();
   if (trigger === "manual") {
@@ -71,18 +79,20 @@ export async function syncMarketQuotes({
           requestedCount: 0,
           successCount: 0,
           failureCount: 0,
+          skippedCount: 0,
           retryAt: retryAt.toISOString(),
+          runId: null,
         };
       }
     }
   }
 
-  const instruments = await repository.loadActiveInstruments(userId);
+  const instruments = await repository.loadActiveInstruments(userId, markets);
   const runId = await repository.startRun({
     jobType: trigger === "manual" ? "market_quotes_manual" : "market_quotes",
     provider: "EODHD",
     requestedCount: instruments.length,
-    metadata: { trigger, requestedByUserId: userId },
+    metadata: { trigger, markets: markets ?? ["GPW", "USA"] },
   });
 
   if (!provider) {
@@ -98,7 +108,9 @@ export async function syncMarketQuotes({
       requestedCount: instruments.length,
       successCount: 0,
       failureCount: 0,
+      skippedCount: instruments.length,
       retryAt: null,
+      runId,
     };
   }
 
@@ -115,14 +127,28 @@ export async function syncMarketQuotes({
       requestedCount: 0,
       successCount: 0,
       failureCount: 0,
+      skippedCount: 0,
       retryAt: null,
+      runId,
     };
   }
 
   let successCount = 0;
+  let skippedCount = 0;
   const failures: SyncFailure[] = [];
 
   for (let offset = 0; offset < instruments.length; offset += BATCH_SIZE) {
+    if (Date.now() >= deadlineAtMs - 1_000) {
+      for (const instrument of instruments.slice(offset)) {
+        failures.push({
+          stockId: instrument.stockId,
+          providerSymbol: instrument.providerSymbol,
+          category: "deadline_exceeded",
+          message: "The synchronization soft deadline was reached.",
+        });
+      }
+      break;
+    }
     const batch = instruments.slice(offset, offset + BATCH_SIZE);
     try {
       const quotes = await provider.getQuotes(batch);
@@ -160,14 +186,7 @@ export async function syncMarketQuotes({
         });
         const saved = await repository.upsertQuote(quote, qualityStatus);
         if (saved) successCount += 1;
-        else {
-          failures.push({
-            stockId: instrument.stockId,
-            providerSymbol: instrument.providerSymbol,
-            category: "quote_older_than_stored",
-            message: "A newer or equal quote is already stored.",
-          });
-        }
+        else skippedCount += 1;
       }
     } catch (error) {
       for (const instrument of batch) {
@@ -179,11 +198,7 @@ export async function syncMarketQuotes({
   }
 
   const status =
-    successCount === instruments.length
-      ? "success"
-      : successCount > 0
-        ? "partial"
-        : "failed";
+    failures.length === 0 ? "success" : successCount > 0 ? "partial" : "failed";
   await repository.finishRun(runId, {
     status,
     successCount,
@@ -192,16 +207,24 @@ export async function syncMarketQuotes({
       failures.length > 0
         ? `${failures.length} of ${instruments.length} quotes were not updated.`
         : null,
-    metadata: { trigger, failures: failures.slice(0, 100) },
+    metadata: {
+      trigger,
+      markets: markets ?? ["GPW", "USA"],
+      skippedCount,
+      failures: failures.slice(0, 100),
+    },
   });
 
   console.info("market_data_sync", {
     provider: "EODHD",
+    runId,
     operation: trigger,
     requestedCount: instruments.length,
     successCount,
     failureCount: failures.length,
+    skippedCount,
     durationMs: Date.now() - startedAtMs,
+    status,
   });
 
   return {
@@ -209,6 +232,8 @@ export async function syncMarketQuotes({
     requestedCount: instruments.length,
     successCount,
     failureCount: failures.length,
+    skippedCount,
     retryAt: null,
+    runId,
   };
 }

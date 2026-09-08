@@ -1,6 +1,7 @@
 export type EodhdErrorCode =
   | "provider_unavailable"
   | "provider_rate_limited"
+  | "provider_authentication_failed"
   | "provider_invalid_response";
 
 export class EodhdError extends Error {

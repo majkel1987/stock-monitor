@@ -1,5 +1,6 @@
 import "server-only";
 
+import { fetchWithRetry } from "@/infrastructure/http/fetch-with-retry";
 import { EodhdError } from "./eodhd-errors";
 
 const EODHD_BASE_URL = "https://eodhd.com/api";
@@ -14,6 +15,7 @@ export class HttpEodhdClient implements EodhdClient {
     private readonly apiToken: string,
     private readonly fetcher: typeof fetch = fetch,
     private readonly timeoutMs = 8_000,
+    private readonly deadlineAtMs = Number.POSITIVE_INFINITY,
   ) {}
 
   private async get(path: string, params: Record<string, string>) {
@@ -24,47 +26,51 @@ export class HttpEodhdClient implements EodhdClient {
       fmt: "json",
     }).toString();
 
-    for (let attempt = 0; attempt < 2; attempt += 1) {
-      try {
-        const response = await this.fetcher(url, {
-          headers: { Accept: "application/json" },
-          cache: "no-store",
-          signal: AbortSignal.timeout(this.timeoutMs),
-        });
-
-        if (response.status === 429) {
-          throw new EodhdError(
-            "provider_rate_limited",
-            "EODHD rate limit reached.",
-          );
-        }
-        if (!response.ok) {
-          if (response.status >= 500 && attempt === 0) continue;
-          throw new EodhdError(
-            "provider_unavailable",
-            `EODHD request failed with status ${response.status}.`,
-          );
-        }
-
-        try {
-          return await response.json();
-        } catch {
-          throw new EodhdError(
-            "provider_invalid_response",
-            "EODHD returned invalid JSON.",
-          );
-        }
-      } catch (error) {
-        if (error instanceof EodhdError) throw error;
-        if (attempt === 0) continue;
-        throw new EodhdError(
-          "provider_unavailable",
-          "EODHD could not be reached.",
-        );
-      }
+    let response: Response;
+    try {
+      response = await fetchWithRetry(
+        url,
+        { headers: { Accept: "application/json" }, cache: "no-store" },
+        {
+          fetcher: this.fetcher,
+          timeoutMs: this.timeoutMs,
+          deadlineAtMs: this.deadlineAtMs,
+        },
+      );
+    } catch {
+      throw new EodhdError(
+        "provider_unavailable",
+        "EODHD could not be reached.",
+      );
     }
 
-    throw new EodhdError("provider_unavailable", "EODHD could not be reached.");
+    if (response.status === 401 || response.status === 403) {
+      throw new EodhdError(
+        "provider_authentication_failed",
+        "EODHD authentication failed.",
+      );
+    }
+    if (response.status === 429) {
+      throw new EodhdError(
+        "provider_rate_limited",
+        "EODHD rate limit reached after bounded retries.",
+      );
+    }
+    if (!response.ok) {
+      throw new EodhdError(
+        "provider_unavailable",
+        `EODHD request failed with status ${response.status}.`,
+      );
+    }
+
+    try {
+      return await response.json();
+    } catch {
+      throw new EodhdError(
+        "provider_invalid_response",
+        "EODHD returned invalid JSON.",
+      );
+    }
   }
 
   search(query: string) {

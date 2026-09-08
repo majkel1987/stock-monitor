@@ -29,5 +29,14 @@ test("private HTTP entry point rejects anonymous requests", async ({
 }) => {
   const response = await request.post("/api/internal/market-sync");
   expect(response.status()).toBe(401);
-  await expect(response.json()).resolves.toEqual({ error: "unauthenticated" });
+  await expect(response.json()).resolves.toEqual({ error: "unauthorized" });
+});
+
+test("public health endpoint exposes no internal details", async ({
+  request,
+}) => {
+  const response = await request.get("/api/health");
+  expect(response.status()).toBe(200);
+  await expect(response.json()).resolves.toEqual({ status: "ok" });
+  expect(response.headers()["cache-control"]).toContain("no-store");
 });
