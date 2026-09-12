@@ -4,6 +4,7 @@ import type {
   NormalizedQuote,
   ProviderInstrument,
 } from "@/application/sync/market-data-provider";
+import type { StooqCsvParsedData } from "@/application/sync/import-stooq-csv";
 import {
   MARKET_SESSIONS,
   zonedSessionTimestamp,
@@ -50,7 +51,32 @@ export function parseStooqCsvQuote(
     marketCap: null,
     asOf: asOf.toISOString(),
     receivedAt: receivedAt.toISOString(),
-    provider: "Stooq",
+    provider: "Stooq CSV",
     delayMinutes: null,
+  };
+}
+
+export function parseStooqCsvImport(
+  payload: string,
+  instrument: ProviderInstrument,
+  receivedAt: Date,
+): StooqCsvParsedData {
+  const rows = parseStooqDailyCsv(payload).sort((left, right) =>
+    left.Date.localeCompare(right.Date),
+  );
+
+  return {
+    prices: rows.map((row) => ({
+      tradingDate: row.Date,
+      open: row.Open,
+      high: row.High,
+      low: row.Low,
+      close: row.Close,
+      adjustedClose: null,
+      volume: row.Volume,
+      currency: "PLN",
+      provider: "Stooq CSV",
+    })),
+    latestQuote: parseStooqCsvQuote(payload, instrument, receivedAt),
   };
 }

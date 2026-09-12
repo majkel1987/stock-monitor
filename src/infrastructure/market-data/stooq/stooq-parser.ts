@@ -34,7 +34,34 @@ const stooqDailyRowSchema = z
 
 export type StooqDailyRow = z.infer<typeof stooqDailyRowSchema>;
 
-function splitCsvLine(line: string) {
+type CanonicalColumn = "Date" | "Open" | "High" | "Low" | "Close" | "Volume";
+
+const headerAliases: Record<string, CanonicalColumn> = {
+  date: "Date",
+  data: "Date",
+  open: "Open",
+  otwarcie: "Open",
+  high: "High",
+  najwyzszy: "High",
+  maksimum: "High",
+  low: "Low",
+  najnizszy: "Low",
+  minimum: "Low",
+  close: "Close",
+  zamkniecie: "Close",
+  volume: "Volume",
+  wolumen: "Volume",
+};
+
+function normalizeHeader(value: string) {
+  return value
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function splitCsvLine(line: string, delimiter: "," | ";") {
   const values: string[] = [];
   let value = "";
   let quoted = false;
@@ -48,7 +75,7 @@ function splitCsvLine(line: string) {
       } else {
         quoted = !quoted;
       }
-    } else if (character === "," && !quoted) {
+    } else if (character === delimiter && !quoted) {
       values.push(value);
       value = "";
     } else {
@@ -73,12 +100,20 @@ export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
     );
   }
 
-  const lines = trimmed.split(/\r?\n/).filter(Boolean);
-  const header = lines[0] ? splitCsvLine(lines[0]) : [];
+  const lines = trimmed
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const delimiter = (lines[0]?.includes(";") ? ";" : ",") as "," | ";";
+  const header = lines[0] ? splitCsvLine(lines[0], delimiter) : [];
   const required = ["Date", "Open", "High", "Low", "Close", "Volume"];
+  const canonicalHeader = header.map(
+    (column) => headerAliases[normalizeHeader(column)] ?? null,
+  );
   if (
-    header.length !== required.length ||
-    required.some((column, index) => header[index] !== column)
+    required.some(
+      (column) => !canonicalHeader.includes(column as CanonicalColumn),
+    )
   ) {
     throw new StooqError(
       "provider_invalid_response",
@@ -87,7 +122,7 @@ export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
   }
 
   const rows = lines.slice(1).map((line) => {
-    const values = splitCsvLine(line);
+    const values = splitCsvLine(line, delimiter);
     if (values.length !== header.length) {
       throw new StooqError(
         "provider_invalid_response",
@@ -96,7 +131,9 @@ export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
     }
     const parsed = stooqDailyRowSchema.safeParse(
       Object.fromEntries(
-        header.map((column, index) => [column, values[index] ?? ""]),
+        canonicalHeader.flatMap((column, index) =>
+          column ? [[column, values[index] ?? ""]] : [],
+        ),
       ),
     );
     if (!parsed.success) {

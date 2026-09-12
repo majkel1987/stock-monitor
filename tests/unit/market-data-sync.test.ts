@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { MarketDataProvider } from "@/application/sync/market-data-provider";
 import { syncMarketQuotes } from "@/application/sync/sync-market-quotes";
 import type { MarketDataSyncRepository } from "@/application/sync/sync-types";
+import { resolveMarketDataProviderSymbol } from "@/infrastructure/supabase/queries/market-data-sync";
 
 const instruments = [
   {
@@ -65,6 +66,15 @@ function quote(stockId: string, currency: "PLN" | "USD") {
 }
 
 describe("market quote synchronization", () => {
+  it("maps legacy EME.US to Massive EME without changing canonical identity", () => {
+    const stock = { market: "USA" as const, ticker: "EME" };
+
+    expect(
+      resolveMarketDataProviderSymbol(stock.market, undefined, "EME.US"),
+    ).toBe("EME");
+    expect(stock).toEqual({ market: "USA", ticker: "EME" });
+  });
+
   it("persists valid symbols and records a partial result for a missing symbol", async () => {
     const repo = repository();
     const provider: MarketDataProvider = {

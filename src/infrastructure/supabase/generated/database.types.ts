@@ -754,6 +754,23 @@ export type Database = {
       }
     }
     Functions: {
+      import_stooq_csv_prices: {
+        Args: {
+          p_as_of: string
+          p_day_change_pct: string | null
+          p_previous_close: string | null
+          p_price: string
+          p_quality_status: string
+          p_received_at: string
+          p_rows: Json
+          p_stock_id: string
+          p_volume: string | null
+        }
+        Returns: {
+          history_inserted_count: number
+          quote_updated: boolean
+        }[]
+      }
       add_provider_stock_to_watchlist: {
         Args: {
           p_currency: string

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Suspense } from "react";
 
 import { logout } from "@/app/(auth)/login/actions";
+import type { MarketDataConfiguration } from "@/application/sync/market-data-configuration";
 import { RefreshMarketDataButton } from "./refresh-market-data-button";
 import { AppSidebar, AppSidebarFallback } from "./app-sidebar";
 
@@ -67,20 +68,22 @@ function TopBar({
 export function AppShell({
   children,
   lastSuccessfulSyncAt,
-  providerConfigured,
+  marketDataConfiguration,
 }: Readonly<{
   children: ReactNode;
   lastSuccessfulSyncAt: string | null;
-  providerConfigured: boolean;
+  marketDataConfiguration: MarketDataConfiguration;
 }>) {
   return (
     <div className="flex min-h-screen min-w-[1180px] bg-[var(--bg-primary)]">
       <Suspense
         fallback={
-          <AppSidebarFallback providerConfigured={providerConfigured} />
+          <AppSidebarFallback
+            marketDataConfiguration={marketDataConfiguration}
+          />
         }
       >
-        <AppSidebar providerConfigured={providerConfigured} />
+        <AppSidebar marketDataConfiguration={marketDataConfiguration} />
       </Suspense>
       <div className="min-w-0 flex-1">
         <TopBar lastSuccessfulSyncAt={lastSuccessfulSyncAt} />

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { getMarketDataStatus } from "@/application/sync/get-market-data-status";
+import { classifyMarketDataConfiguration } from "@/application/sync/market-data-configuration";
 import { AppShell } from "@/components/layout/app-shell";
 import { createSupabaseMarketDataStatusReader } from "@/infrastructure/supabase/queries/market-data-status";
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
@@ -20,10 +21,15 @@ export default async function ApplicationLayout({
   } catch {
     // The application remains usable when operational metadata is unavailable.
   }
+  const env = getServerEnv();
+  const marketDataConfiguration = classifyMarketDataConfiguration({
+    writesConfigured: Boolean(env.SUPABASE_SERVICE_ROLE_KEY),
+    usaProviderConfigured: Boolean(env.MASSIVE_API_KEY),
+  });
   return (
     <AppShell
       lastSuccessfulSyncAt={lastSuccessfulSyncAt}
-      providerConfigured={Boolean(getServerEnv().MASSIVE_API_KEY)}
+      marketDataConfiguration={marketDataConfiguration}
     >
       {children}
     </AppShell>

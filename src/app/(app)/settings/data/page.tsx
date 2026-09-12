@@ -67,7 +67,9 @@ function DataError() {
 export default async function DataSettingsPage() {
   const user = await requireAllowedUser();
   const client = await createClient();
-  const massiveConfigured = Boolean(getServerEnv().MASSIVE_API_KEY);
+  const env = getServerEnv();
+  const massiveConfigured = Boolean(env.MASSIVE_API_KEY);
+  const writesConfigured = Boolean(env.SUPABASE_SERVICE_ROLE_KEY);
   let status;
   let gpwImportTargets: StooqCsvImportTarget[];
   try {
@@ -113,6 +115,7 @@ export default async function DataSettingsPage() {
         description="Market-data provider health and synchronization history"
         title="Settings"
       >
+        <StooqCsvImportForm targets={gpwImportTargets} />
         <RefreshMarketDataButton label="Sync USA + FX" />
       </PageHeader>
 
@@ -129,16 +132,26 @@ export default async function DataSettingsPage() {
                 Stooq CSV + Massive
               </strong>
               <span className="mt-[2px] font-mono text-[9px] text-[var(--text-muted)]">
-                {massiveConfigured
-                  ? "GPW manual file · USA API configured"
-                  : "GPW manual file · USA API not configured"}
+                {!writesConfigured
+                  ? "Database writes not configured"
+                  : massiveConfigured
+                    ? "GPW manual file · USA API configured"
+                    : "GPW manual file · USA API not configured"}
               </span>
             </div>
             {[
               [
                 "CONFIGURATION",
-                massiveConfigured ? "HYBRID READY" : "GPW CSV ONLY",
-                massiveConfigured ? "positive" : "warning",
+                !writesConfigured
+                  ? "CONFIG INCOMPLETE"
+                  : massiveConfigured
+                    ? "HYBRID READY"
+                    : "GPW CSV ONLY",
+                !writesConfigured
+                  ? "negative"
+                  : massiveConfigured
+                    ? "positive"
+                    : "warning",
               ],
               ["LAST SUCCESS", when(status.lastSuccessfulSyncAt), "default"],
               ["LAST FAILURE", when(status.lastFailureAt), "warning"],
@@ -156,21 +169,13 @@ export default async function DataSettingsPage() {
                   {label}
                 </span>
                 <span
-                  className={`font-mono text-[11px] font-semibold ${tone === "positive" ? "text-[var(--positive)]" : tone === "warning" ? "text-[var(--warning)]" : "text-[var(--text-primary)]"}`}
+                  className={`font-mono text-[11px] font-semibold ${tone === "positive" ? "text-[var(--positive)]" : tone === "warning" ? "text-[var(--warning)]" : tone === "negative" ? "text-[var(--negative)]" : "text-[var(--text-primary)]"}`}
                 >
                   {value}
                 </span>
               </div>
             ))}
           </div>
-        </Surface>
-
-        <Surface>
-          <SectionHeader
-            meta="Date, Open, High, Low, Close, Volume · max 750 KB"
-            title="Import GPW prices from Stooq"
-          />
-          <StooqCsvImportForm targets={gpwImportTargets} />
         </Surface>
 
         <Surface className="min-h-48">

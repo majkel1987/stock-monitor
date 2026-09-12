@@ -7,7 +7,7 @@ import { importStooqCsv } from "@/application/sync/import-stooq-csv";
 import { runManualMarketSync } from "@/application/sync/run-manual-market-sync";
 import { createNbpProvider } from "@/infrastructure/fx/nbp/nbp-provider";
 import { createMarketDataProviders } from "@/infrastructure/market-data/providers";
-import { parseStooqCsvQuote } from "@/infrastructure/market-data/stooq/stooq-csv-adapter";
+import { parseStooqCsvImport } from "@/infrastructure/market-data/stooq/stooq-csv-adapter";
 import { createSupabaseMarketDataSyncRepository } from "@/infrastructure/supabase/queries/market-data-sync";
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
 import { createServiceClient } from "@/infrastructure/supabase/server/create-service-client";
@@ -38,6 +38,14 @@ const stooqCsvUploadSchema = z.object({
     .refine((file) => file.name.toLowerCase().endsWith(".csv"), {
       message: "Choose a CSV file exported from Stooq.",
     })
+    .refine(
+      (file) =>
+        file.type === "" ||
+        ["text/csv", "text/plain", "application/vnd.ms-excel"].includes(
+          file.type.toLowerCase(),
+        ),
+      { message: "The selected file must be CSV text." },
+    )
     .refine((file) => file.size > 0 && file.size <= MAX_STOOQ_CSV_BYTES, {
       message: "The CSV file must be between 1 byte and 750 KB.",
     }),
@@ -81,7 +89,7 @@ export async function importStooqCsvAction(
   try {
     const result = await importStooqCsv({
       repository: createSupabaseMarketDataSyncRepository(serviceClient),
-      parseQuote: parseStooqCsvQuote,
+      parseQuote: parseStooqCsvImport,
       userId: user.id,
       stockId: parsed.data.stockId,
       payload: await parsed.data.file.text(),
@@ -112,11 +120,11 @@ export async function importStooqCsvAction(
     return result.status === "saved"
       ? {
           status: "success",
-          message: `Stooq price for ${result.tradingDate} imported.`,
+          message: `${result.historyInsertedCount ?? 0} historical rows imported; the ${result.tradingDate} quote is now current.`,
         }
       : {
           status: "success",
-          message: `No update was needed; ${result.tradingDate} is not newer than the stored quote.`,
+          message: `${result.historyInsertedCount ?? 0} new historical rows imported; the current quote was retained because ${result.tradingDate} is not newer.`,
         };
   } catch {
     return {

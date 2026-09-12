@@ -7,25 +7,53 @@ import type { MarketDataSyncRepository } from "./sync-types";
 
 export interface StooqCsvImportRepository extends Pick<
   MarketDataSyncRepository,
-  "startRun" | "finishRun" | "upsertQuote"
+  "startRun" | "finishRun"
 > {
   findActiveGpwInstrument(
     userId: string,
     stockId: string,
   ): Promise<ProviderInstrument | null>;
+  importPrices(input: StooqCsvPersistenceInput): Promise<{
+    historyInsertedCount: number;
+    quoteUpdated: boolean;
+  }>;
 }
 
 export type StooqCsvImportResult = {
   status:
     "saved" | "not_newer" | "invalid_stock" | "invalid_csv" | "future_quote";
   tradingDate?: string;
+  historyInsertedCount?: number;
 };
 
 export type StooqCsvQuoteParser = (
   payload: string,
   instrument: ProviderInstrument,
   receivedAt: Date,
-) => NormalizedQuote;
+) => StooqCsvParsedData;
+
+export type StooqCsvPrice = {
+  tradingDate: string;
+  open: string;
+  high: string;
+  low: string;
+  close: string;
+  adjustedClose: string | null;
+  volume: string;
+  currency: "PLN";
+  provider: "Stooq CSV";
+};
+
+export type StooqCsvParsedData = {
+  prices: StooqCsvPrice[];
+  latestQuote: NormalizedQuote;
+};
+
+export type StooqCsvPersistenceInput = {
+  prices: StooqCsvPrice[];
+  latestQuote: NormalizedQuote;
+  qualityStatus: ReturnType<typeof classifyMarketDataFreshness>;
+};
 
 export async function importStooqCsv({
   repository,
@@ -59,9 +87,9 @@ export async function importStooqCsv({
     },
   });
 
-  let quote: NormalizedQuote;
+  let parsedCsv: StooqCsvParsedData;
   try {
-    quote = parseQuote(payload, instrument, now);
+    parsedCsv = parseQuote(payload, instrument, now);
   } catch {
     await repository.finishRun(runId, {
       status: "failed",
@@ -78,6 +106,7 @@ export async function importStooqCsv({
     return { status: "invalid_csv" };
   }
 
+  const quote = parsedCsv.latestQuote;
   if (Date.parse(quote.asOf) > now.getTime() + 5 * 60_000) {
     await repository.finishRun(runId, {
       status: "failed",
@@ -100,9 +129,15 @@ export async function importStooqCsv({
     asOf: quote.asOf,
     now,
   });
-  let saved: boolean;
+  let persistenceResult: Awaited<
+    ReturnType<StooqCsvImportRepository["importPrices"]>
+  >;
   try {
-    saved = await repository.upsertQuote(quote, qualityStatus);
+    persistenceResult = await repository.importPrices({
+      prices: parsedCsv.prices,
+      latestQuote: quote,
+      qualityStatus,
+    });
   } catch (error) {
     try {
       await repository.finishRun(runId, {
@@ -125,7 +160,7 @@ export async function importStooqCsv({
   }
   await repository.finishRun(runId, {
     status: "success",
-    successCount: saved ? 1 : 0,
+    successCount: persistenceResult.quoteUpdated ? 1 : 0,
     failureCount: 0,
     errorSummary: null,
     metadata: {
@@ -133,12 +168,14 @@ export async function importStooqCsv({
       market: "GPW",
       stockId,
       tradingDate: quote.tradingDate,
-      skippedCount: saved ? 0 : 1,
+      historyInsertedCount: persistenceResult.historyInsertedCount,
+      skippedCount: persistenceResult.quoteUpdated ? 0 : 1,
     },
   });
 
   return {
-    status: saved ? "saved" : "not_newer",
+    status: persistenceResult.quoteUpdated ? "saved" : "not_newer",
     tradingDate: quote.tradingDate,
+    historyInsertedCount: persistenceResult.historyInsertedCount,
   };
 }

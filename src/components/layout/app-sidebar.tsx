@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType } from "react";
 
+import type { MarketDataConfiguration } from "@/application/sync/market-data-configuration";
+
 const navigation: ReadonlyArray<{
   href: string;
   label: string;
@@ -39,11 +41,13 @@ const navigation: ReadonlyArray<{
 
 function SidebarContents({
   pathname,
-  providerConfigured = false,
+  marketDataConfiguration = "incomplete",
 }: {
   pathname?: string;
-  providerConfigured?: boolean;
+  marketDataConfiguration?: MarketDataConfiguration;
 }) {
+  const ready = marketDataConfiguration === "ready";
+  const incomplete = marketDataConfiguration === "incomplete";
   return (
     <aside className="flex w-[208px] shrink-0 flex-col gap-5 border-r border-[var(--border-default)] bg-[var(--bg-secondary)] p-4">
       <Link className="flex h-9 items-center gap-[9px]" href="/dashboard">
@@ -90,16 +94,22 @@ function SidebarContents({
         <div className="flex items-center gap-[7px]">
           <span
             aria-hidden="true"
-            className={`size-1.5 rounded-full ${providerConfigured ? "bg-[var(--positive)]" : "bg-[var(--warning)]"}`}
+            className={`size-1.5 rounded-full ${ready ? "bg-[var(--positive)]" : incomplete ? "bg-[var(--negative)]" : "bg-[var(--warning)]"}`}
           />
           <span className="text-[9px] leading-3 font-semibold text-[var(--text-secondary)]">
-            {providerConfigured ? "MARKET DATA READY" : "GPW CSV MODE"}
+            {ready
+              ? "MARKET DATA READY"
+              : incomplete
+                ? "CONFIG INCOMPLETE"
+                : "GPW CSV MODE"}
           </span>
         </div>
         <span className="text-[9px] leading-3 text-[var(--text-muted)]">
-          {providerConfigured
+          {ready
             ? "Stooq CSV · Massive + NBP"
-            : "Massive API not configured"}
+            : incomplete
+              ? "Database writes not configured"
+              : "Massive API not configured"}
         </span>
       </div>
     </aside>
@@ -107,22 +117,22 @@ function SidebarContents({
 }
 
 export function AppSidebar({
-  providerConfigured,
+  marketDataConfiguration,
 }: {
-  providerConfigured: boolean;
+  marketDataConfiguration: MarketDataConfiguration;
 }) {
   return (
     <SidebarContents
       pathname={usePathname()}
-      providerConfigured={providerConfigured}
+      marketDataConfiguration={marketDataConfiguration}
     />
   );
 }
 
 export function AppSidebarFallback({
-  providerConfigured,
+  marketDataConfiguration,
 }: {
-  providerConfigured: boolean;
+  marketDataConfiguration: MarketDataConfiguration;
 }) {
-  return <SidebarContents providerConfigured={providerConfigured} />;
+  return <SidebarContents marketDataConfiguration={marketDataConfiguration} />;
 }

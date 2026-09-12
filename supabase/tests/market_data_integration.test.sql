@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(39);
+select plan(54);
 
 select has_table('public', 'fx_rates', 'current/daily FX persistence exists');
 select has_function(
@@ -79,6 +79,28 @@ select ok(
     'EXECUTE'
   ),
   'FX writes are restricted to the server synchronization role'
+);
+select has_function(
+  'public',
+  'import_stooq_csv_prices',
+  array['uuid','jsonb','text','text','text','text','timestamp with time zone','timestamp with time zone','text'],
+  'atomic Stooq CSV history import RPC exists'
+);
+select ok(
+  has_function_privilege(
+    'service_role',
+    'public.import_stooq_csv_prices(uuid,jsonb,text,text,text,text,timestamptz,timestamptz,text)',
+    'EXECUTE'
+  ),
+  'service role can import Stooq CSV history'
+);
+select ok(
+  not has_function_privilege(
+    'authenticated',
+    'public.import_stooq_csv_prices(uuid,jsonb,text,text,text,text,timestamptz,timestamptz,text)',
+    'EXECUTE'
+  ),
+  'authenticated users cannot invoke Stooq persistence directly'
 );
 
 insert into auth.users (
@@ -347,6 +369,72 @@ select is(
   'stored FX rate preserves numeric precision'
 );
 
+create temporary table first_stooq_csv_import as
+select * from public.import_stooq_csv_prices(
+  (select s.id from public.stocks s join public.markets m on m.id = s.market_id where m.code = 'GPW' and s.ticker = 'PZU'),
+  jsonb_build_array(
+    jsonb_build_object('trading_date', current_date - 2, 'open', '118.10', 'high', '121.00', 'low', '117.80', 'close', '120.00', 'adjusted_close', null, 'volume', '1000'),
+    jsonb_build_object('trading_date', current_date - 1, 'open', '120.10', 'high', '123.00', 'low', '119.80', 'close', '122.50', 'adjusted_close', null, 'volume', '1200')
+  ),
+  '122.50', '120.00', '2.0833333333333333', '1200',
+  now() + interval '1 day', now(), 'fresh'
+);
+select is(
+  (select history_inserted_count from first_stooq_csv_import),
+  2,
+  'Stooq CSV import writes every validated historical row'
+);
+select ok(
+  (select quote_updated from first_stooq_csv_import),
+  'a newer Stooq CSV close advances the latest quote'
+);
+select is(
+  (
+    select count(*)::integer from public.stock_prices p
+    join public.stocks s on s.id = p.stock_id
+    where s.ticker = 'PZU' and p.provider = 'Stooq CSV'
+  ),
+  2,
+  'Stooq CSV history has no missing rows'
+);
+
+create temporary table repeated_stooq_csv_import as
+select * from public.import_stooq_csv_prices(
+  (select s.id from public.stocks s join public.markets m on m.id = s.market_id where m.code = 'GPW' and s.ticker = 'PZU'),
+  jsonb_build_array(
+    jsonb_build_object('trading_date', current_date - 2, 'open', '118.10', 'high', '121.00', 'low', '117.80', 'close', '120.00', 'adjusted_close', null, 'volume', '1000'),
+    jsonb_build_object('trading_date', current_date - 1, 'open', '120.10', 'high', '123.00', 'low', '119.80', 'close', '122.50', 'adjusted_close', null, 'volume', '1200')
+  ),
+  '122.50', '120.00', '2.0833333333333333', '1200',
+  now() + interval '1 day', now(), 'fresh'
+);
+select is(
+  (select history_inserted_count from repeated_stooq_csv_import),
+  0,
+  'reimporting the same Stooq CSV is history-idempotent'
+);
+select ok(
+  not (select quote_updated from repeated_stooq_csv_import),
+  'an equal Stooq CSV quote does not replace the stored quote'
+);
+select ok(
+  not (
+    select quote_updated from public.import_stooq_csv_prices(
+      (select s.id from public.stocks s join public.markets m on m.id = s.market_id where m.code = 'GPW' and s.ticker = 'PZU'),
+      jsonb_build_array(
+        jsonb_build_object('trading_date', current_date - 3, 'open', '114', 'high', '116', 'low', '113', 'close', '115', 'adjusted_close', null, 'volume', '900')
+      ),
+      '115', null, null, '900', now() - interval '3 days', now(), 'stale'
+    )
+  ),
+  'an older Stooq CSV quote cannot replace a newer quote'
+);
+select is(
+  (select price from public.market_quotes q join public.stocks s on s.id = q.stock_id where s.ticker = 'PZU'),
+  122.50::numeric,
+  'older Stooq history leaves the latest quote unchanged'
+);
+
 reset role;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
@@ -383,6 +471,18 @@ select is(
 
 reset role;
 set local role service_role;
+select throws_ok(
+  $$
+    select * from public.import_stooq_csv_prices(
+      (select s.id from public.stocks s join public.markets m on m.id = s.market_id where m.code = 'USA' and s.ticker = 'M6USD'),
+      jsonb_build_array(jsonb_build_object('trading_date', current_date, 'open', '1', 'high', '1', 'low', '1', 'close', '1', 'adjusted_close', null, 'volume', '1')),
+      '1', null, null, '1', now(), now(), 'fresh'
+    )
+  $$,
+  '22023',
+  'Stooq CSV requires a GPW stock',
+  'Stooq CSV persistence rejects a USA stock'
+);
 select ok(
   public.upsert_fx_rate(
     'USDPLN', current_date + 1, 4.30, now() + interval '1 day', now() + interval '1 second', 'NBP'

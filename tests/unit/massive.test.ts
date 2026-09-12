@@ -20,6 +20,39 @@ const bar = {
 };
 
 describe("Massive Basic EOD adapter", () => {
+  it("normalizes an EME quote while preserving its canonical stock id", async () => {
+    const provider = new MassiveMarketDataProvider(
+      {
+        search: vi.fn(),
+        previousDay: vi.fn().mockResolvedValue({
+          ...bar,
+          ticker: "EME",
+          results: [{ ...bar.results[0], T: "EME", c: 123.45 }],
+        }),
+      },
+      () => new Date("2026-09-11T00:00:00.000Z"),
+    );
+
+    await expect(
+      provider.getQuotes([
+        {
+          stockId: "eme-stock-id",
+          provider: "MASSIVE",
+          providerSymbol: "EME",
+          market: "USA",
+          currency: "USD",
+        },
+      ]),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        stockId: "eme-stock-id",
+        price: "123.45",
+        currency: "USD",
+        provider: "Massive",
+      }),
+    ]);
+  });
+
   it("normalizes a previous-day aggregate without inventing previous close", async () => {
     const provider = new MassiveMarketDataProvider(
       {

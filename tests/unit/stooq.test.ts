@@ -57,9 +57,26 @@ describe("Stooq CSV adapter", () => {
         previousClose: "60.80",
         volume: "1200000",
         currency: "PLN",
-        provider: "Stooq",
+        provider: "Stooq CSV",
         asOf: "2026-09-10T15:00:00.000Z",
       }),
     );
+  });
+
+  it("accepts semicolon-delimited Polish headers and ignores extra columns", () => {
+    expect(
+      parseStooqDailyCsv(
+        "Data;Otwarcie;Najwyższy;Najniższy;Zamknięcie;Wolumen;Uwagi\n2026-09-10;60.90;62.00;60.50;61.75;1200000;EOD",
+      ),
+    ).toEqual([
+      {
+        Date: "2026-09-10",
+        Open: "60.90",
+        High: "62.00",
+        Low: "60.50",
+        Close: "61.75",
+        Volume: "1200000",
+      },
+    ]);
   });
 });

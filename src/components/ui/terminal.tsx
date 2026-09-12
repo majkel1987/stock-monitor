@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -47,6 +47,7 @@ export function ActionButton({
   type = "button",
   form,
   disabled = false,
+  onClick,
 }: {
   children: ReactNode;
   variant?: "primary" | "secondary" | "ghost";
@@ -54,6 +55,7 @@ export function ActionButton({
   type?: "button" | "submit";
   form?: string;
   disabled?: boolean;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }) {
   const variants = {
     primary:
@@ -73,6 +75,7 @@ export function ActionButton({
       )}
       disabled={disabled}
       form={form}
+      onClick={onClick}
       type={type}
     >
       {children}

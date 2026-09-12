@@ -17,6 +17,18 @@ export class MarketDataSyncInfrastructureError extends Error {
   }
 }
 
+export function resolveMarketDataProviderSymbol(
+  market: "GPW" | "USA",
+  directSymbol: string | undefined,
+  legacyEodhdSymbol: string | undefined,
+) {
+  return (
+    directSymbol ??
+    legacyEodhdSymbol?.replace(market === "GPW" ? /\.WAR$/i : /\.US$/i, "") ??
+    null
+  );
+}
+
 export function createSupabaseMarketDataSyncRepository(
   client: SupabaseClient<Database>,
 ): MarketDataSyncRepository & StooqCsvImportRepository {
@@ -128,11 +140,11 @@ export function createSupabaseMarketDataSyncRepository(
           `${stock.id}:${provider}`,
         );
         const legacySymbol = mappingByStockAndProvider.get(`${stock.id}:EODHD`);
-        const providerSymbol =
-          directSymbol ??
-          (legacySymbol
-            ? legacySymbol.replace(market === "GPW" ? /\.WAR$/i : /\.US$/i, "")
-            : null);
+        const providerSymbol = resolveMarketDataProviderSymbol(
+          market,
+          directSymbol,
+          legacySymbol,
+        );
         if (!providerSymbol) return [];
         return [
           {
@@ -196,6 +208,36 @@ export function createSupabaseMarketDataSyncRepository(
         .single();
       if (error) throw new MarketDataSyncInfrastructureError();
       return data.id;
+    },
+
+    async importPrices(input) {
+      const quote = input.latestQuote;
+      const { data, error } = await client
+        .rpc("import_stooq_csv_prices", {
+          p_stock_id: quote.stockId,
+          p_rows: input.prices.map((price) => ({
+            trading_date: price.tradingDate,
+            open: price.open,
+            high: price.high,
+            low: price.low,
+            close: price.close,
+            adjusted_close: price.adjustedClose,
+            volume: price.volume,
+          })),
+          p_price: quote.price,
+          p_previous_close: quote.previousClose,
+          p_day_change_pct: quote.dayChangePct,
+          p_volume: quote.volume,
+          p_as_of: quote.asOf,
+          p_received_at: quote.receivedAt,
+          p_quality_status: input.qualityStatus,
+        })
+        .single();
+      if (error || !data) throw new MarketDataSyncInfrastructureError();
+      return {
+        historyInsertedCount: data.history_inserted_count,
+        quoteUpdated: data.quote_updated,
+      };
     },
 
     async finishRun(runId, input) {
