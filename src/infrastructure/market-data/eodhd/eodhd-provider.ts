@@ -15,6 +15,9 @@ import {
 } from "./eodhd-schemas";
 
 export class EodhdMarketDataProvider implements MarketDataProvider {
+  readonly code = "EODHD";
+  readonly displayName = "EOD Historical Data";
+
   constructor(private readonly client: EodhdClient) {}
 
   async search(query: string, market?: MarketCode) {

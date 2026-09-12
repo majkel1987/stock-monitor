@@ -73,3 +73,33 @@ export function zonedDateParts(
     minuteOfDay: hour * 60 + minute,
   };
 }
+
+export function zonedSessionTimestamp(
+  dateKey: string,
+  minuteOfDay: number,
+  timeZone: string,
+) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return null;
+  const hour = Math.floor(minuteOfDay / 60);
+  const minute = minuteOfDay % 60;
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+
+  const clock = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  const desiredLocalAsUtc = Date.parse(`${dateKey}T${clock}:00.000Z`);
+  if (Number.isNaN(desiredLocalAsUtc)) return null;
+
+  let candidate = new Date(desiredLocalAsUtc);
+  for (let pass = 0; pass < 2; pass += 1) {
+    const observed = zonedDateParts(candidate, timeZone);
+    if (!observed) return null;
+    const observedHour = Math.floor(observed.minuteOfDay / 60);
+    const observedMinute = observed.minuteOfDay % 60;
+    const observedLocalAsUtc = Date.parse(
+      `${observed.date}T${String(observedHour).padStart(2, "0")}:${String(observedMinute).padStart(2, "0")}:00.000Z`,
+    );
+    candidate = new Date(
+      candidate.getTime() + desiredLocalAsUtc - observedLocalAsUtc,
+    );
+  }
+  return candidate;
+}

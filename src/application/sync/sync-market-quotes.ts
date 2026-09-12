@@ -1,11 +1,12 @@
 import { classifyMarketDataFreshness } from "@/domain/markets/freshness";
 import type { MarketCode } from "@/domain/markets/market";
-import type { MarketDataProvider } from "./market-data-provider";
+import type { MarketDataProviderRegistry } from "./market-data-provider";
 import type { MarketDataSyncRepository, SyncFailure } from "./sync-types";
 
 const BATCH_SIZE = 20;
 const MANUAL_COOLDOWN_MS = 2 * 60_000;
 const MAX_FAILURE_MESSAGE_LENGTH = 240;
+const MARKETS = ["GPW", "USA"] as const;
 
 export type MarketQuoteSyncResult = {
   status:
@@ -22,6 +23,14 @@ export type MarketQuoteSyncResult = {
   retryAt: string | null;
   runId: string | null;
 };
+
+function providerName(market: MarketCode) {
+  return market === "GPW" ? "Stooq" : "Massive";
+}
+
+function providerLabel(markets: readonly MarketCode[]) {
+  return [...new Set(markets.map(providerName))].join("/") || "Stooq/Massive";
+}
 
 function failureFor(
   stockId: string | null,
@@ -53,7 +62,7 @@ function failureFor(
 
 export async function syncMarketQuotes({
   repository,
-  provider,
+  providers,
   userId,
   now = new Date(),
   trigger = "manual",
@@ -61,7 +70,7 @@ export async function syncMarketQuotes({
   deadlineAtMs = Number.POSITIVE_INFINITY,
 }: {
   repository: MarketDataSyncRepository;
-  provider: MarketDataProvider | null;
+  providers: MarketDataProviderRegistry;
   userId: string;
   now?: Date;
   trigger?: "manual" | "scheduled";
@@ -87,32 +96,17 @@ export async function syncMarketQuotes({
     }
   }
 
-  const instruments = await repository.loadActiveInstruments(userId, markets);
+  const selectedMarkets = markets ?? [...MARKETS];
+  const instruments = await repository.loadActiveInstruments(
+    userId,
+    selectedMarkets,
+  );
   const runId = await repository.startRun({
     jobType: trigger === "manual" ? "market_quotes_manual" : "market_quotes",
-    provider: "EODHD",
+    provider: providerLabel(selectedMarkets),
     requestedCount: instruments.length,
-    metadata: { trigger, markets: markets ?? ["GPW", "USA"] },
+    metadata: { trigger, markets: selectedMarkets },
   });
-
-  if (!provider) {
-    await repository.finishRun(runId, {
-      status: "skipped",
-      successCount: 0,
-      failureCount: 0,
-      errorSummary: "provider_not_configured",
-      metadata: { trigger, reason: "provider_not_configured" },
-    });
-    return {
-      status: "provider_not_configured",
-      requestedCount: instruments.length,
-      successCount: 0,
-      failureCount: 0,
-      skippedCount: instruments.length,
-      retryAt: null,
-      runId,
-    };
-  }
 
   if (instruments.length === 0) {
     await repository.finishRun(runId, {
@@ -133,66 +127,110 @@ export async function syncMarketQuotes({
     };
   }
 
+  const configuredInstrumentCount = instruments.filter(
+    (instrument) => providers[instrument.market],
+  ).length;
+  if (configuredInstrumentCount === 0) {
+    await repository.finishRun(runId, {
+      status: "skipped",
+      successCount: 0,
+      failureCount: 0,
+      errorSummary: "provider_not_configured",
+      metadata: { trigger, reason: "provider_not_configured" },
+    });
+    return {
+      status: "provider_not_configured",
+      requestedCount: instruments.length,
+      successCount: 0,
+      failureCount: 0,
+      skippedCount: instruments.length,
+      retryAt: null,
+      runId,
+    };
+  }
+
   let successCount = 0;
   let skippedCount = 0;
   const failures: SyncFailure[] = [];
 
-  for (let offset = 0; offset < instruments.length; offset += BATCH_SIZE) {
-    if (Date.now() >= deadlineAtMs - 1_000) {
-      for (const instrument of instruments.slice(offset)) {
+  for (const market of selectedMarkets) {
+    const marketInstruments = instruments.filter(
+      (instrument) => instrument.market === market,
+    );
+    if (marketInstruments.length === 0) continue;
+    const provider = providers[market];
+    if (!provider) {
+      for (const instrument of marketInstruments) {
         failures.push({
           stockId: instrument.stockId,
           providerSymbol: instrument.providerSymbol,
-          category: "deadline_exceeded",
-          message: "The synchronization soft deadline was reached.",
+          category: "provider_not_configured",
+          message: `${providerName(market)} is not configured.`,
         });
       }
-      break;
+      continue;
     }
-    const batch = instruments.slice(offset, offset + BATCH_SIZE);
-    try {
-      const quotes = await provider.getQuotes(batch);
-      const quoteByStock = new Map(
-        quotes.map((quote) => [quote.stockId, quote]),
-      );
 
-      for (const instrument of batch) {
-        const quote = quoteByStock.get(instrument.stockId);
-        if (!quote) {
+    for (
+      let offset = 0;
+      offset < marketInstruments.length;
+      offset += BATCH_SIZE
+    ) {
+      if (Date.now() >= deadlineAtMs - 1_000) {
+        for (const instrument of marketInstruments.slice(offset)) {
           failures.push({
             stockId: instrument.stockId,
             providerSymbol: instrument.providerSymbol,
-            category: "provider_invalid_response",
-            message: "Provider response did not include this symbol.",
+            category: "deadline_exceeded",
+            message: "The synchronization soft deadline was reached.",
           });
-          continue;
         }
-        if (quote.currency !== instrument.currency) {
-          failures.push({
-            stockId: instrument.stockId,
-            providerSymbol: instrument.providerSymbol,
-            category: "currency_mismatch",
-            message:
-              "Quote currency differs from the canonical stock currency.",
-          });
-          continue;
-        }
-
-        const qualityStatus = classifyMarketDataFreshness({
-          market: instrument.market,
-          asOf: quote.asOf,
-          now,
-          expectedDelayMinutes: quote.delayMinutes ?? 20,
-        });
-        const saved = await repository.upsertQuote(quote, qualityStatus);
-        if (saved) successCount += 1;
-        else skippedCount += 1;
+        break;
       }
-    } catch (error) {
-      for (const instrument of batch) {
-        failures.push(
-          failureFor(instrument.stockId, instrument.providerSymbol, error),
+      const batch = marketInstruments.slice(offset, offset + BATCH_SIZE);
+      try {
+        const quotes = await provider.getQuotes(batch);
+        const quoteByStock = new Map(
+          quotes.map((quote) => [quote.stockId, quote]),
         );
+
+        for (const instrument of batch) {
+          const quote = quoteByStock.get(instrument.stockId);
+          if (!quote) {
+            failures.push({
+              stockId: instrument.stockId,
+              providerSymbol: instrument.providerSymbol,
+              category: "provider_invalid_response",
+              message: "Provider response did not include this symbol.",
+            });
+            continue;
+          }
+          if (quote.currency !== instrument.currency) {
+            failures.push({
+              stockId: instrument.stockId,
+              providerSymbol: instrument.providerSymbol,
+              category: "currency_mismatch",
+              message:
+                "Quote currency differs from the canonical stock currency.",
+            });
+            continue;
+          }
+
+          const qualityStatus = classifyMarketDataFreshness({
+            market: instrument.market,
+            asOf: quote.asOf,
+            now,
+          });
+          const saved = await repository.upsertQuote(quote, qualityStatus);
+          if (saved) successCount += 1;
+          else skippedCount += 1;
+        }
+      } catch (error) {
+        for (const instrument of batch) {
+          failures.push(
+            failureFor(instrument.stockId, instrument.providerSymbol, error),
+          );
+        }
       }
     }
   }
@@ -209,14 +247,14 @@ export async function syncMarketQuotes({
         : null,
     metadata: {
       trigger,
-      markets: markets ?? ["GPW", "USA"],
+      markets: selectedMarkets,
       skippedCount,
       failures: failures.slice(0, 100),
     },
   });
 
   console.info("market_data_sync", {
-    provider: "EODHD",
+    provider: providerLabel(selectedMarkets),
     runId,
     operation: trigger,
     requestedCount: instruments.length,

@@ -338,7 +338,7 @@ Core MVP responsibilities include:
 - thesis revisions,
 - notes,
 - dashboard aggregations,
-- EODHD market-data integration,
+- Stooq GPW EOD and Massive USA EOD market-data integrations,
 - NBP USD/PLN integration,
 - periodic price synchronization,
 - manual fallback when provider data is unavailable.
@@ -460,7 +460,7 @@ Use:
 - conditional quote upserts by `as_of`,
 - partial-success reporting.
 
-Do NOT use Vercel Cron for the required 30-minute MVP synchronization.
+Do NOT use Vercel Cron for the MVP EOD synchronization.
 
 ---
 
@@ -524,7 +524,7 @@ Example:
 
 ```text
 Internal identity: GPW + PZU
-EODHD symbol:      PZU.WAR
+Stooq symbol:      PZU
 ```
 
 Store provider mappings separately.
@@ -535,9 +535,10 @@ All provider responses must:
 2. be normalized,
 3. only then enter application/domain code.
 
-Primary provider:
+Primary providers:
 
-- EODHD, after coverage verification.
+- Stooq EOD for GPW, after coverage verification;
+- Massive Basic EOD for USA, after coverage verification.
 
 Manual instrument and manual price fallback must remain possible.
 
@@ -773,7 +774,8 @@ stock-monitor/
 │  │  │  └─ generated/
 │  │  ├─ market-data/
 │  │  │  ├─ market-data-provider.ts
-│  │  │  ├─ eodhd/
+│  │  │  ├─ stooq/
+│  │  │  ├─ massive/
 │  │  │  └─ fixtures/
 │  │  ├─ fx/
 │  │  │  ├─ fx-rate-provider.ts
@@ -824,7 +826,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ALLOWED_USER_EMAIL=
 
-EODHD_API_TOKEN=
+MASSIVE_API_KEY=
 CRON_SECRET=
 APP_URL=
 ```

@@ -27,14 +27,10 @@ export function classifyMarketDataFreshness({
   market,
   asOf,
   now = new Date(),
-  expectedDelayMinutes = 20,
-  toleranceMinutes = 45,
 }: {
   market: MarketCode;
   asOf: string | Date | null;
   now?: Date;
-  expectedDelayMinutes?: number;
-  toleranceMinutes?: number;
 }): MarketDataFreshness {
   if (!asOf) return "unknown";
 
@@ -42,28 +38,22 @@ export function classifyMarketDataFreshness({
   const session = MARKET_SESSIONS[market];
   const current = zonedDateParts(now, session.timeZone);
   const quote = zonedDateParts(quoteDate, session.timeZone);
-  const ageMinutes = (now.getTime() - quoteDate.getTime()) / 60_000;
-
-  if (!current || !quote || !Number.isFinite(ageMinutes) || ageMinutes < -5) {
+  if (!current || !quote || quoteDate.getTime() > now.getTime() + 5 * 60_000) {
     return "unknown";
   }
 
   const isWeekday = isBusinessWeekday(current.weekday);
-  if (!isWeekday) {
-    return quote.date >= previousWeekday(current.date) ? "closed" : "stale";
+  const expectedSessionDate =
+    isWeekday && current.minuteOfDay >= session.closeMinute
+      ? current.date
+      : previousWeekday(current.date);
+  if (quote.date < expectedSessionDate) return "stale";
+  if (
+    !isWeekday ||
+    current.minuteOfDay < session.openMinute ||
+    current.minuteOfDay >= session.closeMinute
+  ) {
+    return "closed";
   }
-
-  if (current.minuteOfDay < session.openMinute) {
-    return quote.date >= previousWeekday(current.date) ? "closed" : "stale";
-  }
-
-  if (current.minuteOfDay >= session.closeMinute) {
-    return quote.date === current.date ? "closed" : "stale";
-  }
-
-  if (quote.date !== current.date) return "stale";
-
-  return ageMinutes <= expectedDelayMinutes + toleranceMinutes
-    ? "fresh"
-    : "delayed";
+  return "fresh";
 }

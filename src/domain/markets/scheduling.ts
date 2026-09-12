@@ -5,8 +5,8 @@ import {
   zonedDateParts,
 } from "./market-session";
 
-const POST_CLOSE_CAPTURE_MINUTES = 30;
-const NBP_FIRST_ATTEMPT_MINUTE = 12 * 60;
+const POST_CLOSE_EOD_DELAY_MINUTES = 90;
+const NBP_FIRST_ATTEMPT_MINUTE = 13 * 60;
 
 export function shouldSyncMarket(market: MarketCode, now: Date) {
   const session = MARKET_SESSIONS[market];
@@ -14,8 +14,7 @@ export function shouldSyncMarket(market: MarketCode, now: Date) {
   if (!current || !isBusinessWeekday(current.weekday)) return false;
 
   return (
-    current.minuteOfDay >= session.openMinute &&
-    current.minuteOfDay <= session.closeMinute + POST_CLOSE_CAPTURE_MINUTES
+    current.minuteOfDay >= session.closeMinute + POST_CLOSE_EOD_DELAY_MINUTES
   );
 }
 

@@ -24,6 +24,7 @@ function repository(): MarketDataSyncRepository {
     loadActiveInstruments: vi.fn().mockResolvedValue([
       {
         stockId: "pzu",
+        provider: "STOOQ",
         providerSymbol: "PZU.WAR",
         market: "GPW",
         currency: "PLN",
@@ -44,12 +45,12 @@ describe("scheduled market synchronization", () => {
 
     const result = await runScheduledMarketSync({
       repository: repo,
-      marketDataProvider: null,
+      marketDataProviders: {},
       fxRateProvider: {
         getUsdPln: vi.fn().mockRejectedValue(new Error("NBP unavailable")),
       },
       ownerEmail: "owner@example.test",
-      now: new Date("2026-09-07T14:00:00.000Z"),
+      now: new Date("2026-09-07T18:30:00.000Z"),
       deadlineAtMs: Date.now() + 60_000,
     });
 
@@ -71,12 +72,18 @@ describe("scheduled market synchronization", () => {
       release = resolve;
     });
     const provider = {
+      code: "STOOQ",
+      displayName: "Stooq",
       search: vi.fn(),
       getQuotes: vi.fn().mockImplementation(async () => {
         await waiting;
         return [
           {
             stockId: "pzu",
+            tradingDate: "2026-09-07",
+            open: "99",
+            high: "101",
+            low: "98",
             price: "100",
             currency: "PLN" as const,
             previousClose: null,
@@ -87,18 +94,18 @@ describe("scheduled market synchronization", () => {
             marketCap: null,
             asOf: "2026-09-07T14:00:00.000Z",
             receivedAt: "2026-09-07T14:10:00.000Z",
-            provider: "EODHD",
-            delayMinutes: 20,
+            provider: "Stooq",
+            delayMinutes: null,
           },
         ];
       }),
     };
     const input = {
       repository: repo,
-      marketDataProvider: provider,
+      marketDataProviders: { GPW: provider },
       fxRateProvider: { getUsdPln: vi.fn() },
       ownerEmail: "owner@example.test",
-      now: new Date("2026-09-07T14:00:00.000Z"),
+      now: new Date("2026-09-07T18:30:00.000Z"),
       deadlineAtMs: Date.now() + 60_000,
     };
     vi.spyOn(console, "info").mockImplementation(() => undefined);

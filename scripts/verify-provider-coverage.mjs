@@ -1,93 +1,151 @@
 const targets = [
-  { ticker: "PZU", market: "GPW", suffix: ".WAR" },
-  { ticker: "XTB", market: "GPW", suffix: ".WAR" },
-  { ticker: "DVL", market: "GPW", suffix: ".WAR" },
-  { ticker: "ABE", market: "GPW", suffix: ".WAR" },
-  { ticker: "MSFT", market: "USA", suffix: ".US" },
-  { ticker: "V", market: "USA", suffix: ".US" },
-  { ticker: "EME", market: "USA", suffix: ".US" },
-  { ticker: "FIX", market: "USA", suffix: ".US" },
+  { ticker: "PZU", market: "GPW", provider: "Stooq" },
+  { ticker: "XTB", market: "GPW", provider: "Stooq" },
+  { ticker: "DVL", market: "GPW", provider: "Stooq" },
+  { ticker: "ABE", market: "GPW", provider: "Stooq" },
+  { ticker: "MSFT", market: "USA", provider: "Massive" },
+  { ticker: "V", market: "USA", provider: "Massive" },
+  { ticker: "EME", market: "USA", provider: "Massive" },
+  { ticker: "FIX", market: "USA", provider: "Massive" },
 ];
 
-const token = process.env.EODHD_API_TOKEN;
-if (!token) {
-  console.log("Provider spike: NOT RUN");
-  console.log("Reason: EODHD_API_TOKEN unavailable");
-  process.exitCode = 2;
-} else {
-  const baseUrl = "https://eodhd.com/api";
+const massiveApiKey = process.env.MASSIVE_API_KEY;
 
-  async function get(path, params = {}) {
-    const url = new URL(`${baseUrl}${path}`);
-    url.searchParams.set("api_token", token);
-    url.searchParams.set("fmt", "json");
-    for (const [key, value] of Object.entries(params)) {
-      url.searchParams.set(key, value);
+function compactDate(date) {
+  return date.toISOString().slice(0, 10).replaceAll("-", "");
+}
+
+async function stooqQuote(ticker) {
+  const to = new Date();
+  const from = new Date(to);
+  from.setUTCDate(from.getUTCDate() - 14);
+  const url = new URL("https://stooq.com/q/d/l/");
+  url.search = new URLSearchParams({
+    s: ticker.toLowerCase(),
+    d1: compactDate(from),
+    d2: compactDate(to),
+    i: "d",
+  }).toString();
+  const response = await fetch(url, {
+    headers: { Accept: "text/csv,text/plain" },
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const payload = (await response.text()).trim();
+  const lines = payload.split(/\r?\n/);
+  if (lines[0] !== "Date,Open,High,Low,Close,Volume" || lines.length < 2) {
+    throw new Error("invalid CSV response");
+  }
+  const values = lines.at(-1).split(",");
+  if (
+    values.length !== 6 ||
+    values.some((value) => !value || value === "N/D")
+  ) {
+    throw new Error("invalid EOD row");
+  }
+  return {
+    providerSymbol: ticker,
+    price: values[4],
+    currency: "PLN",
+    asOf: values[0],
+    volume: values[5],
+  };
+}
+
+async function massiveQuote(ticker) {
+  if (!massiveApiKey) throw new Error("MASSIVE_API_KEY unavailable");
+  const url = new URL(
+    `/v2/aggs/ticker/${encodeURIComponent(ticker)}/prev`,
+    "https://api.massive.com",
+  );
+  url.search = new URLSearchParams({
+    adjusted: "true",
+    apiKey: massiveApiKey,
+  }).toString();
+  const response = await fetch(url, {
+    headers: { Accept: "application/json" },
+    signal: AbortSignal.timeout(8_000),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const payload = await response.json();
+  const row = payload?.results?.[0];
+  if (
+    payload?.status !== "OK" ||
+    row?.T !== ticker ||
+    !Number.isFinite(row?.c) ||
+    !Number.isFinite(row?.t)
+  ) {
+    throw new Error("invalid EOD response");
+  }
+  return {
+    providerSymbol: ticker,
+    price: row.c,
+    currency: "USD",
+    asOf: new Date(row.t).toISOString().slice(0, 10),
+    volume: row.v ?? null,
+  };
+}
+
+const results = [];
+let massiveRequests = 0;
+for (const target of targets) {
+  try {
+    if (target.provider === "Massive" && massiveRequests > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 12_100));
     }
-    const response = await fetch(url, {
+    const quote =
+      target.provider === "Stooq"
+        ? await stooqQuote(target.ticker)
+        : await massiveQuote(target.ticker);
+    if (target.provider === "Massive") massiveRequests += 1;
+    results.push({
+      Ticker: target.ticker,
+      Market: target.market,
+      Provider: target.provider,
+      "Provider Symbol": quote.providerSymbol,
+      Price: quote.price,
+      Currency: quote.currency,
+      "As Of": quote.asOf,
+      Volume: quote.volume,
+      Result: "PASS",
+      Notes: "EOD OHLCV available",
+    });
+  } catch (error) {
+    if (target.provider === "Massive" && massiveApiKey) massiveRequests += 1;
+    results.push({
+      Ticker: target.ticker,
+      Market: target.market,
+      Provider: target.provider,
+      "Provider Symbol": target.ticker,
+      Price: null,
+      Currency: target.market === "GPW" ? "PLN" : "USD",
+      "As Of": null,
+      Volume: null,
+      Result: "NOT VERIFIED",
+      Notes: error instanceof Error ? error.message : "unknown error",
+    });
+  }
+}
+
+console.table(results);
+
+try {
+  const response = await fetch(
+    "https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json",
+    {
       headers: { Accept: "application/json" },
       signal: AbortSignal.timeout(8_000),
-    });
-    if (!response.ok) {
-      throw new Error(`EODHD request failed with HTTP ${response.status}`);
-    }
-    return response.json();
-  }
-
-  const results = [];
-  for (const target of targets) {
-    try {
-      const search = await get(`/search/${encodeURIComponent(target.ticker)}`, {
-        limit: "20",
-      });
-      const candidates = Array.isArray(search) ? search : [];
-      const candidate = candidates.find(
-        (item) =>
-          typeof item?.Code === "string" &&
-          item.Code.toUpperCase() === `${target.ticker}${target.suffix}`,
-      );
-      if (!candidate) {
-        results.push({
-          ticker: target.ticker,
-          market: target.market,
-          search: "missing",
-          providerSymbol: "missing",
-          error: "Exact expected listing was not returned by provider search.",
-        });
-        continue;
-      }
-
-      const quote = await get(
-        `/real-time/${encodeURIComponent(candidate.Code)}`,
-      );
-      const field = (value) =>
-        value === null || value === undefined ? "missing" : "available";
-      results.push({
-        ticker: target.ticker,
-        market: target.market,
-        search: "available",
-        providerSymbol: candidate.Code,
-        price: field(quote?.close),
-        currency: field(candidate.Currency),
-        timestamp: field(quote?.timestamp),
-        previousClose: field(quote?.previousClose),
-        dailyChange: field(quote?.change_p),
-        volume: field(quote?.volume),
-        fiftyTwoWeekHigh: "missing from real-time endpoint",
-        fiftyTwoWeekLow: "missing from real-time endpoint",
-        marketCap: "missing from real-time endpoint",
-      });
-    } catch (error) {
-      results.push({
-        ticker: target.ticker,
-        market: target.market,
-        search: "unexpected",
-        error:
-          error instanceof Error ? error.message : "Unknown provider error",
-      });
-    }
-  }
-
-  console.table(results);
-  if (results.some((result) => result.error)) process.exitCode = 1;
+    },
+  );
+  const payload = await response.json();
+  const rate = payload?.rates?.[0];
+  console.log("NBP USD/PLN", {
+    effectiveDate: rate?.effectiveDate ?? null,
+    rate: rate?.mid ?? null,
+    result: response.ok && Number.isFinite(rate?.mid) ? "PASS" : "FAIL",
+  });
+} catch {
+  console.log("NBP USD/PLN", { result: "NOT VERIFIED" });
 }
+
+if (results.some((result) => result.Result !== "PASS")) process.exitCode = 2;

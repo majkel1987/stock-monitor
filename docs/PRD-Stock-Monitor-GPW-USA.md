@@ -11,9 +11,9 @@
 ## Decyzje wiążące
 
 1. **Architektura:** Next.js (React + TypeScript) na Vercel + Supabase (PostgreSQL, Auth, Row Level Security, Cron/Edge Functions).
-2. **Dane rynkowe MVP:** adapter do EODHD; plan `EOD+Intraday — All World Extended` jako rekomendowany wariant płatny. Obsługuje GPW (`WAR`, np. `PZU.WAR`) i USA w jednym API. Aplikacja musi pozwalać uruchomić MVP także bez klucza dostawcy, z cenami wprowadzanymi ręcznie.
+2. **Dane rynkowe MVP:** GPW przez Stooq EOD, USA przez Massive Basic EOD, USD/PLN przez NBP. Supabase jest cache'em i jedynym źródłem cen dla UI. Aplikacja musi działać także bez kluczy providerów, z ostatnimi zapisanymi lub ręcznymi cenami.
 3. **Dane fundamentalne:** poza MVP; w V1 przez drugi adapter i osobną subskrypcję dopiero po sprawdzeniu pokrycia na reprezentatywnej próbce spółek.
-4. **Częstotliwość cen:** co 30 minut w czasie sesji; odległości od poziomów są obliczane przy odczycie, a nie osobnym zadaniem.
+4. **Częstotliwość cen:** po jednej synchronizacji EOD po zamknięciu GPW i USA; odległości od poziomów są obliczane przy odczycie, a nie osobnym zadaniem.
 5. **Statusy:** edytowalne przez użytkownika. Domyślne statusy są seedem danych, nie enumem zaszytym w interfejsie.
 6. **Historia:** wyniki monitoringu i wersje thesis są niezmienne; korekta tworzy nową rewizję albo jawnie oznaczoną poprawkę, nigdy ciche nadpisanie.
 7. **MVP:** watchlista, klasyfikacja, ceny, poziomy, monitoring history, notatki, dashboard i ręczny formularz. Import JSON, fundamenty, alerty oraz portfolio są V1/V2.
@@ -111,7 +111,7 @@ W MVP i V1 nie należy budować:
 - pracuje głównie na desktopie;
 - przegląda od kilkudziesięciu do około 200 spółek;
 - wykonuje monitoring okresowo, a nie stale;
-- akceptuje ceny opóźnione o 15–30 minut i fundamenty dzienne;
+- akceptuje ceny End-of-Day i fundamenty dzienne;
 - używa ChatGPT do części analiz;
 - oczekuje kontroli nad statusem, thesis i decyzją końcową.
 
@@ -544,26 +544,24 @@ POST /api/v1/monitoring-imports/{id}/commit
 
 ### Rekomendacja
 
-**MVP: EODHD przez własny adapter `MarketDataProvider`.** Publiczna dokumentacja potwierdza GPW jako `WAR`/`XWAR`, 612 aktywnych tickerów i symbole takie jak `ABE.WAR`, a także wspólną obsługę rynku USA. Plan All World Extended obejmuje EOD i intraday/delayed dla światowych giełd za publicznie prezentowaną cenę **29,99 USD/mies.** przy rozliczeniu miesięcznym (24,99 USD/mies. w przeliczeniu przy płatności rocznej). Przed zakupem trzeba wykonać spike dla PZU, XTB, DVL, ABE, MSFT, V, EME i FIX, ponieważ obecność giełdy nie gwarantuje kompletności każdego pola.
-
-Jeśli w MVP wystarczy cena zamknięcia, tańszy plan EOD All World kosztuje publicznie **19,99 USD/mies.** (16,58 USD/mies. w przeliczeniu rocznym). Fundamenty kosztują osobno 59,99 USD/mies. i nie wchodzą do MVP.
+**MVP: dwa małe adaptery `MarketDataProvider`: Stooq EOD dla GPW i Massive Basic EOD dla USA.** EOD odpowiada rytmowi pracy aplikacji i usuwa koszt płatnego wspólnego feedu. Massive Basic zapewnia USA EOD z limitem pięciu wywołań na minutę. Stooq zapewnia GPW EOD, ale aktualny download CSV wymaga serwerowego klucza i nie ma SLA. Przed uznaniem integracji za zweryfikowaną trzeba wykonać spike dla PZU, XTB, DVL, ABE, MSFT, V, EME i FIX.
 
 ### Porównanie dostawców — stan na 30.08.2026
 
 | Dostawca | GPW | USA | Darmowy/niski plan | Ocena dla projektu |
 |---|---|---|---|---|
-| **EODHD** | Tak, jawne `WAR/XWAR`; EOD i zależnie od planu delayed | Tak | Free 20 calls/day; EOD World $19.99; EOD+Intraday $29.99 miesięcznie | **Najlepszy kompromis MVP**: jeden adapter i niski koszt; fundamenty osobno |
+| **EODHD** | Tak, jawne `WAR/XWAR` | Tak | Płatne plany globalne | Poprzednia rekomendacja; nie jest aktywnym providerem MVP |
 | **Twelve Data** | Tak, jawna strona XWAR i lista symboli | Tak, real-time w planach osobistych | Basic: 8 credits/min, 800/day, tylko 3 rynki/global trial; Grow publicznie $79/mies. | Najlepsza płatna alternatywa, lecz droższa; coverage GPW należy potwierdzić dla planu |
 | **Financial Modeling Prep** | Dopiero global coverage w Ultimate | Bardzo dobre fundamenty i ceny | Basic 250 calls/day EOD; Starter $22 US; Premium $59 US/UK/CA; Ultimate $149 global przy annual billing | Dobre USA/fundamenty, nieopłacalne dla GPW w tym projekcie |
-| **Alpha Vantage** | Globalne daily deklarowane, lecz GPW i kompletność nie są wystarczająco jawne | Tak | Free 25 calls/day; quote free domyślnie EOD, delayed USA premium | Limit za niski dla 30-min watchlisty; możliwy adapter eksperymentalny |
+| **Alpha Vantage** | Globalne daily deklarowane, lecz GPW i kompletność nie są wystarczająco jawne | Tak | Free 25 calls/day; quote free domyślnie EOD, delayed USA premium | Brak wystarczająco jawnego pokrycia GPW; możliwy adapter eksperymentalny |
 | **Finnhub** | Ceny międzynarodowe według dokumentacji głównie Enterprise; brak mocnego uzasadnienia GPW dla hobby | Dobre USA, darmowy dostęp do części danych | Plan free, limity zależne od konta; global real-time Enterprise | Dobry dla USA, słaby jako jedno źródło GPW+USA |
-| **Massive (Polygon)** | Nie | Bardzo dobre, pełny rynek USA | Free EOD 5 req/min; Starter $29 z 15-min delay | Świetny adapter USA, lecz wymaga drugiego dostawcy dla GPW |
+| **Massive** | Nie | Bardzo dobre, pełny rynek USA | Free EOD 5 req/min | **Aktywny provider USA MVP** |
 | **Yahoo Finance** | Tak w UI, np. `PZU.WA`, quote delayed | Tak | Bezpłatne strony; brak stabilnego, oficjalnego publicznego API dla tego zastosowania | Tylko prototyp/fallback developerski; ryzyko zmian endpointu i warunków użycia |
-| **Stooq** | Dobre EOD/CSV dla Polski | Częściowe | Bezpłatne | Użyteczne do ręcznego importu lub awaryjnego EOD; brak kontraktu API/SLA i nie należy opierać na nim krytycznej automatyzacji |
+| **Stooq** | Dobre EOD/CSV dla Polski | Częściowe | Bezpłatne, wymagany klucz downloadu | **Aktywny provider GPW MVP**; brak SLA wymaga cache i manual fallback |
 
-### Dlaczego nie łączyć od razu dwóch najlepszych źródeł
+### Dlaczego dwa źródła
 
-Massive dla USA plus osobne źródło GPW dałoby lepsze pokrycie USA, ale podwaja mapowanie symboli, obsługę błędów, koszty i testy. Przy prywatnej watchliście ważniejsza jest spójność i prostota. Architektura adapterów pozwoli rozdzielić źródła w V1, jeśli dane EODHD okażą się niewystarczające.
+Brak sensownego darmowego wspólnego API dla GPW i USA. EOD wystarcza dla prywatnego procesu badawczego, a dwa małe adaptery pozwalają uniknąć miesięcznej opłaty. Wspólny kontrakt i osobne mapowania ograniczają vendor lock-in oraz izolują różnice CSV/JSON.
 
 ### Kontrakt adaptera
 
@@ -580,8 +578,10 @@ Kod domenowy nie może znać suffixów `.WAR`, `.WA` ani formatów odpowiedzi. M
 
 ```text
 internal: market=GPW, ticker=PZU
-EODHD:    PZU.WAR
-Yahoo:    PZU.WA
+Stooq:    PZU
+
+internal: market=USA, ticker=MSFT
+Massive:  MSFT
 ```
 
 ### Normalizacja quote
@@ -697,7 +697,7 @@ Jedna najnowsza migawka na spółkę: `stock_id` PK, `price`, `previous_close`, 
 
 #### `stock_prices`
 
-Historia ograniczona do jednego EOD na spółkę i sesję w MVP: `id`, `stock_id`, `trading_date`, `open`, `high`, `low`, `close`, `adjusted_close`, `volume`, `currency`, `provider`; unique `(stock_id, trading_date, provider)`. Nie zapisujemy każdej 30-minutowej odpowiedzi, bo MVP nie potrzebuje wykresu intraday.
+Historia ograniczona do jednego EOD na spółkę i sesję w MVP: `id`, `stock_id`, `trading_date`, `open`, `high`, `low`, `close`, `adjusted_close`, `volume`, `currency`, `provider`; unique `(stock_id, trading_date, provider)`. Nie zapisujemy odpowiedzi intraday, bo MVP nie potrzebuje wykresu intraday.
 
 #### `fundamental_snapshots` — V1
 
@@ -974,7 +974,7 @@ Lewy rail: `Dashboard`, `Watchlist`, `Monitoring`, `Settings`. Globalny command/
 2. Seed rynków i edytowalnych statusów.
 3. Dodanie/archiwizacja GPW i USA, także tryb manualny.
 4. Watchlista z wyszukiwaniem, filtrowaniem i sortowaniem.
-5. Adapter EODHD, latest quote, ręczny refresh i scheduler 30-min.
+5. Adaptery Stooq/Massive EOD, latest quote, historia EOD, ręczny refresh i dzienny scheduler.
 6. Widoczna świeżość, źródło i błędy ceny.
 7. Formularz i niezmienna historia monitoringu.
 8. Scores, rekomendacja, argumenty, ryzyka, historyczna cena i USD/PLN.
@@ -1056,7 +1056,7 @@ Każda funkcja V2 wymaga potwierdzenia realnym użyciem MVP. Nie należy rezerwo
 - repo prywatne na GitHub;
 - Vercel Hobby dla Next.js;
 - Supabase Free na development/MVP, region możliwie bliski Polsce;
-- EODHD jako jedyny początkowy koszt cykliczny;
+- Stooq, Massive Basic i NBP bez kosztu miesięcznego, zgodnie z bieżącymi planami i limitami;
 - upgrade Supabase Pro, gdy historia stanie się krytyczna, potrzebne będą gwarantowane backupy/brak pauzy lub limit 500 MB zacznie być istotny;
 - preview deployments łączą się z osobnym projektem dev lub używają bezpiecznej bazy testowej, nigdy produkcyjnego service role;
 - produkcyjne migracje wykonywane przez CI po ręcznym zatwierdzeniu.
@@ -1133,7 +1133,7 @@ W ciągu jednego krótkiego etapu należy dla 8 tickerów sprawdzić: search, sy
 
 ### Etap 0 — provider spike i fundament projektu (2–3 dni)
 
-- zweryfikować 8 przykładowych tickerów i plan EODHD;
+- zweryfikować 8 przykładowych tickerów w Stooq i Massive oraz USD/PLN w NBP;
 - założyć Next.js, Supabase local/dev, CI i env validation;
 - zapisać ADR-001 o architekturze i ADR-002 o providerze.
 
@@ -1215,7 +1215,8 @@ stock-monitor/
 │  │  ├─ supabase/
 │  │  ├─ market-data/
 │  │  │  ├─ provider.ts
-│  │  │  ├─ eodhd/
+│  │  │  ├─ stooq/
+│  │  │  ├─ massive/
 │  │  │  └─ fixtures/
 │  │  └─ fx/
 │  └─ lib/
@@ -1256,7 +1257,7 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=        # server-only; nie prefixować NEXT_PUBLIC
 ALLOWED_USER_EMAIL=
-EODHD_API_TOKEN=                  # tylko Edge Function / server
+MASSIVE_API_KEY=                  # tylko server
 CRON_SECRET=
 APP_URL=
 ```
@@ -1264,7 +1265,7 @@ APP_URL=
 ## Otwarte decyzje, które nie blokują MVP
 
 1. Magic link vs hasło — rekomendowany magic link; można zmienić bez wpływu na domenę.
-2. EODHD EOD vs Extended — zależy od wyniku spike i potrzeby ceny w trakcie sesji; architektura jest identyczna.
+2. Stooq i Massive wymagają zakończenia spike'a z prawdziwymi kluczami przed uznaniem coverage za potwierdzone.
 3. Źródło USD/PLN — NBP jest preferowane dla historycznego, oficjalnego kursu; provider może służyć do orientacyjnego intraday.
 4. Nazwa produktu i branding.
 5. Dokładny domyślny próg `monitoring stale` — startowo 30 dni, konfigurowalny w V1.

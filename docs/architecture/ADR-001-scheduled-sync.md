@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted for MVP M7.
+Superseded by [ADR-002](ADR-002-eod-market-data-providers.md) for schedule frequency; the lease and
+overlap-protection decision remains accepted.
 
 ## Context
 

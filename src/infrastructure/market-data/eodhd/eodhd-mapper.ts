@@ -36,6 +36,7 @@ export function mapEodhdCandidate(
   }
 
   return {
+    provider: "EODHD",
     providerSymbol,
     ticker,
     market,
@@ -69,6 +70,10 @@ export function mapEodhdQuote(
 
   return {
     stockId: instrument.stockId,
+    tradingDate: asOf.toISOString().slice(0, 10),
+    open: null,
+    high: null,
+    low: null,
     price: String(row.close),
     currency: instrument.currency,
     previousClose:

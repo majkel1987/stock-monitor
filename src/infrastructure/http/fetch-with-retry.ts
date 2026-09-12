@@ -13,6 +13,8 @@ type RetryOptions = {
   deadlineAtMs?: number;
   sleep?: (delayMs: number) => Promise<void>;
   random?: () => number;
+  maxAttempts?: number;
+  retryRateLimits?: boolean;
 };
 
 function retryAfterMs(response: Response, nowMs: number) {
@@ -26,8 +28,8 @@ function retryAfterMs(response: Response, nowMs: number) {
   return Number.isNaN(dateMs) ? null : Math.max(0, dateMs - nowMs);
 }
 
-function shouldRetryStatus(status: number) {
-  return status === 429 || status >= 500;
+function shouldRetryStatus(status: number, retryRateLimits: boolean) {
+  return (retryRateLimits && status === 429) || status >= 500;
 }
 
 export async function fetchWithRetry(
@@ -43,13 +45,11 @@ export async function fetchWithRetry(
     ((delayMs: number) =>
       new Promise<void>((resolve) => setTimeout(resolve, delayMs)));
   const random = options.random ?? Math.random;
+  const maxAttempts = options.maxAttempts ?? PROVIDER_RETRY_POLICY.maxAttempts;
+  const retryRateLimits = options.retryRateLimits ?? true;
   let lastNetworkError: unknown;
 
-  for (
-    let attempt = 1;
-    attempt <= PROVIDER_RETRY_POLICY.maxAttempts;
-    attempt += 1
-  ) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     if (Date.now() >= deadlineAtMs) {
       throw new Error("provider_deadline_exceeded");
     }
@@ -62,8 +62,8 @@ export async function fetchWithRetry(
         ),
       });
       if (
-        !shouldRetryStatus(response.status) ||
-        attempt === PROVIDER_RETRY_POLICY.maxAttempts
+        !shouldRetryStatus(response.status, retryRateLimits) ||
+        attempt === maxAttempts
       ) {
         return response;
       }
@@ -82,7 +82,7 @@ export async function fetchWithRetry(
       await sleep(delayMs);
     } catch (error) {
       lastNetworkError = error;
-      if (attempt === PROVIDER_RETRY_POLICY.maxAttempts) throw error;
+      if (attempt === maxAttempts) throw error;
 
       const remainingMs = deadlineAtMs - Date.now();
       const delayMs = Math.min(

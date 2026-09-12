@@ -1,8 +1,25 @@
 import { describe, expect, it } from "vitest";
 
 import { classifyMarketDataFreshness } from "@/domain/markets/freshness";
+import { zonedSessionTimestamp } from "@/domain/markets/market-session";
 
 describe("market-aware quote freshness", () => {
+  it("converts the GPW close from Warsaw time across DST", () => {
+    expect(
+      zonedSessionTimestamp(
+        "2026-09-10",
+        17 * 60,
+        "Europe/Warsaw",
+      )?.toISOString(),
+    ).toBe("2026-09-10T15:00:00.000Z");
+    expect(
+      zonedSessionTimestamp(
+        "2026-12-10",
+        17 * 60,
+        "Europe/Warsaw",
+      )?.toISOString(),
+    ).toBe("2026-12-10T16:00:00.000Z");
+  });
   it("classifies a recent quote during an open GPW session as fresh", () => {
     expect(
       classifyMarketDataFreshness({
@@ -13,14 +30,14 @@ describe("market-aware quote freshness", () => {
     ).toBe("fresh");
   });
 
-  it("classifies an older same-session quote as delayed", () => {
+  it("treats the last completed EOD session as current while the market is open", () => {
     expect(
       classifyMarketDataFreshness({
         market: "USA",
-        asOf: "2026-09-04T14:00:00Z",
+        asOf: "2026-09-03T04:00:00Z",
         now: new Date("2026-09-04T16:00:00Z"),
       }),
-    ).toBe("delayed");
+    ).toBe("fresh");
   });
 
   it("treats the latest Friday quote as closed during the weekend", () => {

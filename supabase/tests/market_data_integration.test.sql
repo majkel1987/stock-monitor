@@ -305,6 +305,42 @@ select ok(
   ),
   'NBP USD/PLN reference rate is persisted'
 );
+
+select ok(
+  public.upsert_eod_market_quote(
+    (select s.id from public.stocks s join public.markets m on m.id = s.market_id where m.code = 'GPW' and s.ticker = 'PZU'),
+    current_date, 109, 112, 108, 111, 110, null, null, 12345, null, null,
+    'PLN', current_date + interval '23 hours 59 minutes', now(), 'Stooq', null, 'closed'
+  ),
+  'a current EOD row updates the latest quote'
+);
+select is(
+  public.upsert_eod_market_quote(
+    (select s.id from public.stocks s join public.markets m on m.id = s.market_id where m.code = 'GPW' and s.ticker = 'PZU'),
+    current_date, 999, 999, 999, 999, 998, null, null, 1, null, null,
+    'PLN', current_date + interval '23 hours 59 minutes', now(), 'Stooq', null, 'closed'
+  ),
+  false,
+  'an equal EOD timestamp is an idempotent latest-quote skip'
+);
+select is(
+  (
+    select count(*)::integer from public.stock_prices p
+    join public.stocks s on s.id = p.stock_id
+    where s.ticker = 'PZU' and p.trading_date = current_date and p.provider = 'Stooq'
+  ),
+  1,
+  'only one Stooq EOD row exists per stock and session'
+);
+select is(
+  (
+    select close from public.stock_prices p
+    join public.stocks s on s.id = p.stock_id
+    where s.ticker = 'PZU' and p.trading_date = current_date and p.provider = 'Stooq'
+  ),
+  111::numeric,
+  'an idempotent retry does not rewrite stored EOD history'
+);
 select is(
   (select rate from public.fx_rates where pair = 'USDPLN' and provider = 'NBP' and effective_date = current_date),
   4.20::numeric,

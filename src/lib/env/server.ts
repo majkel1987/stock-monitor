@@ -15,6 +15,7 @@ export function getServerEnv() {
     SUPABASE_SERVICE_ROLE_KEY:
       process.env.SUPABASE_SERVICE_ROLE_KEY || undefined,
     ALLOWED_USER_EMAIL: process.env.ALLOWED_USER_EMAIL,
+    MASSIVE_API_KEY: process.env.MASSIVE_API_KEY || undefined,
     EODHD_API_TOKEN: process.env.EODHD_API_TOKEN || undefined,
     CRON_SECRET: process.env.CRON_SECRET || undefined,
     APP_URL: process.env.APP_URL || undefined,

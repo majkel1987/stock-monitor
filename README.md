@@ -35,14 +35,14 @@ login form.
 ## Environment variables
 
 Copy [`.env.example`](.env.example) to `.env.local` and supply values for the integration being
-developed. Public Supabase values are separated from server-only credentials. The EODHD token is
-optional so manual market-data mode remains possible.
+developed. Public Supabase values are separated from server-only credentials. Stooq uses its public
+CSV export; the Massive key is optional so manual market-data mode remains possible.
 
 Never commit real credentials. Server secrets must never use a `NEXT_PUBLIC_` prefix.
 
 The required names are `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-`SUPABASE_SERVICE_ROLE_KEY`, `ALLOWED_USER_EMAIL`, `EODHD_API_TOKEN`, `CRON_SECRET`, and
-`APP_URL`. Auth requires the URL, anon key and allowlisted email. Server-only integration secrets
+`SUPABASE_SERVICE_ROLE_KEY`, `ALLOWED_USER_EMAIL`, `MASSIVE_API_KEY`, `CRON_SECRET`, and `APP_URL`.
+Auth requires the URL, anon key and allowlisted email. Server-only integration secrets
 are validated when their later runtime paths use them. Local Supabase prints development-only URL
 and key values after `pnpm db:start`.
 
@@ -133,8 +133,8 @@ They run in a transaction and roll back their synthetic Auth and application dat
 - RLS and explicit grants are active now. Shared reference/market data is authenticated-read and
   server-write; user-owned data uses owner policies. Normal users cannot hard-delete watchlist,
   monitoring, thesis, notes, or audit history.
-- Quote writes accept only a strictly newer `as_of`, both in the narrow service-role RPC and a
-  table trigger. No intraday quote archive is created.
+- EOD quote writes store at most one `stock_prices` row per stock, session, and provider, then
+  update `market_quotes` only when `as_of` is strictly newer.
 - M4 uses the narrow `create_monitoring_with_thesis` RPC to insert the immutable monitoring
   snapshot, optionally insert its thesis revision, and update the current watchlist status in one
   transaction. The function derives ownership from `auth.uid()` and never accepts a client user ID.
@@ -184,7 +184,7 @@ user-owned default status records have been created by M1.
 | `pnpm test:watch`     | Run Vitest in watch mode                   |
 | `pnpm test:e2e`       | Run the Playwright smoke test              |
 | `pnpm test:e2e:local` | Provision a local user and run full E2E    |
-| `pnpm provider:spike` | Verify required EODHD ticker coverage      |
+| `pnpm provider:spike` | Verify Stooq, Massive, and NBP coverage    |
 | `pnpm db:start`       | Start local Supabase                       |
 | `pnpm db:stop`        | Stop local Supabase                        |
 | `pnpm db:reset`       | Recreate, migrate, and seed the local DB   |
@@ -227,24 +227,24 @@ The dashboard monitoring summary is a `security_invoker` PostgreSQL view, so und
 authoritative. The application obtains the remaining dashboard inputs in bounded bulk queries and
 uses the shared domain price-level calculations rather than duplicating trigger logic.
 
-M6 adds server-side EODHD search and delayed/current quote normalization, verified provider-symbol
-mapping, bounded quote batches, two-minute manual-refresh cooldown, partial-result `sync_runs`, and
-atomic latest-quote persistence. Manual stock and manual quote fallbacks remain available when
-EODHD is not configured or unavailable. Dashboard, Watchlist and Stock Detail read only the latest
-stored quote and compute market-aware freshness centrally; page rendering never waits on EODHD.
+The active market-data path routes GPW instruments to Stooq EOD and USA instruments to Massive
+Basic EOD. Both adapters validate and normalize provider responses before the shared sync use case
+atomically stores one historical session row and conditionally advances the latest quote. Manual
+stock and quote fallbacks remain available. Dashboard, Watchlist, and Stock Detail read only stored
+Supabase data; page rendering never waits on an external market-data provider.
 
 The NBP adapter stores the latest official USD/PLN table A reference rate and prefills it for new
 USD monitoring records. The field remains editable, and saved monitoring FX values stay immutable.
 See [the provider coverage spike](docs/provider-spike.md) for the reproducible eight-symbol check.
-M7 adds a production-only Supabase Cron schedule. Every 30 minutes during a broad weekday UTC
-window, `pg_net` signs a POST to the protected Next.js Node.js route. The route runs the same quote
-and FX application use cases as manual refresh. Market-aware application logic decides whether GPW,
-USA, or the daily NBP fixing is due; one global advisory-guarded durable lease prevents overlap
+Supabase Cron invokes the protected Next.js Node.js route at 18:30 and 23:30 UTC on weekdays.
+These two DST-safe EOD windows cover GPW and USA after their sessions; NBP is refreshed on the first
+eligible call. The route runs the same quote and FX application use cases as manual refresh, while
+one global advisory-guarded durable lease prevents overlap
 between manual and scheduled work. Provider retries, batches, deadlines, partial outcomes, and crash
 recovery are bounded and observable through `sync_runs` and Settings → Data.
 
-EODHD remains optional at application startup: without it, research and manual stock/price flows
-continue to work and synchronization reports `provider_not_configured`. Required production values
+Stooq and Massive remain optional at application startup: without them, research and manual
+stock/price flows continue to work and synchronization reports `provider_not_configured`. Required production values
 are listed in `.env.example`; public values are limited to the Supabase URL and anonymous key. All
 other credentials are server-only.
 

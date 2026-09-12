@@ -25,7 +25,6 @@ export function createSupabaseMarketDataSyncRepository(
         .from("sync_runs")
         .select("started_at")
         .eq("job_type", "market_quotes_manual")
-        .eq("provider", "EODHD")
         .order("started_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -57,6 +56,11 @@ export function createSupabaseMarketDataSyncRepository(
         })
         .single();
       if (error || !data) throw new MarketDataSyncInfrastructureError();
+      const providerUpdate = await client
+        .from("sync_runs")
+        .update({ provider: "Stooq/Massive/NBP" })
+        .eq("id", data.run_id);
+      if (providerUpdate.error) throw new MarketDataSyncInfrastructureError();
       return {
         runId: data.run_id,
         userId: data.user_id,
@@ -83,8 +87,8 @@ export function createSupabaseMarketDataSyncRepository(
           .in("id", stockIds),
         client
           .from("stock_provider_symbols")
-          .select("stock_id,provider_symbol")
-          .eq("provider", "EODHD")
+          .select("stock_id,provider,provider_symbol")
+          .in("provider", ["STOOQ", "MASSIVE", "EODHD"])
           .eq("is_primary", true)
           .in("stock_id", stockIds),
         client.from("markets").select("id,code"),
@@ -99,9 +103,15 @@ export function createSupabaseMarketDataSyncRepository(
       const marketById = new Map(
         marketsResult.data.map((market) => [market.id, market.code]),
       );
+      const mappingByStockAndProvider = new Map(
+        mappingsResult.data.map((mapping) => [
+          `${mapping.stock_id}:${mapping.provider}`,
+          mapping.provider_symbol,
+        ]),
+      );
 
-      return mappingsResult.data.flatMap((mapping) => {
-        const stock = stockById.get(mapping.stock_id);
+      return stockIds.flatMap((stockId) => {
+        const stock = stockById.get(stockId);
         const market = stock ? marketById.get(stock.market_id) : null;
         if (
           !stock ||
@@ -112,10 +122,22 @@ export function createSupabaseMarketDataSyncRepository(
         ) {
           return [];
         }
+        const provider = market === "GPW" ? "STOOQ" : "MASSIVE";
+        const directSymbol = mappingByStockAndProvider.get(
+          `${stock.id}:${provider}`,
+        );
+        const legacySymbol = mappingByStockAndProvider.get(`${stock.id}:EODHD`);
+        const providerSymbol =
+          directSymbol ??
+          (legacySymbol
+            ? legacySymbol.replace(market === "GPW" ? /\.WAR$/i : /\.US$/i, "")
+            : null);
+        if (!providerSymbol) return [];
         return [
           {
             stockId: stock.id,
-            providerSymbol: mapping.provider_symbol,
+            provider,
+            providerSymbol,
             market,
             currency: stock.currency,
           },
@@ -157,8 +179,12 @@ export function createSupabaseMarketDataSyncRepository(
     },
 
     async upsertQuote(quote, qualityStatus) {
-      const { data, error } = await client.rpc("upsert_market_quote", {
+      const { data, error } = await client.rpc("upsert_eod_market_quote", {
         p_stock_id: quote.stockId,
+        p_trading_date: quote.tradingDate,
+        p_open: quote.open === null ? null : Number(quote.open),
+        p_high: quote.high === null ? null : Number(quote.high),
+        p_low: quote.low === null ? null : Number(quote.low),
         p_price: Number(quote.price),
         p_previous_close:
           quote.previousClose === null ? null : Number(quote.previousClose),

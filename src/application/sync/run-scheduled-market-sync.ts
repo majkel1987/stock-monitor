@@ -1,6 +1,6 @@
 import { scheduledWorkDue } from "@/domain/markets/scheduling";
 import type { FxRateProvider } from "./fx-rate-provider";
-import type { MarketDataProvider } from "./market-data-provider";
+import type { MarketDataProviderRegistry } from "./market-data-provider";
 import { syncMarketQuotes } from "./sync-market-quotes";
 import type { MarketDataSyncRepository } from "./sync-types";
 import { syncUsdPlnRate } from "./sync-usd-pln-rate";
@@ -24,14 +24,14 @@ export type ScheduledMarketSyncResult = {
 
 export async function runScheduledMarketSync({
   repository,
-  marketDataProvider,
+  marketDataProviders,
   fxRateProvider,
   ownerEmail,
   now = new Date(),
   deadlineAtMs,
 }: {
   repository: MarketDataSyncRepository;
-  marketDataProvider: MarketDataProvider | null;
+  marketDataProviders: MarketDataProviderRegistry;
   fxRateProvider: FxRateProvider;
   ownerEmail: string;
   now?: Date;
@@ -53,7 +53,7 @@ export async function runScheduledMarketSync({
     log("market_data_sync", {
       runId: claim.runId,
       jobType: "scheduled_market_sync",
-      provider: "EODHD/NBP",
+      provider: "Stooq/Massive/NBP",
       market: null,
       requestedCount: 0,
       successCount: 0,
@@ -89,7 +89,7 @@ export async function runScheduledMarketSync({
       console.info("market_data_sync", {
         runId: claim.runId,
         jobType: "scheduled_market_sync",
-        provider: "EODHD/NBP",
+        provider: "Stooq/Massive/NBP",
         market: null,
         requestedCount: 0,
         successCount: 0,
@@ -109,7 +109,7 @@ export async function runScheduledMarketSync({
     const quoteResult = due.markets.length
       ? await syncMarketQuotes({
           repository,
-          provider: marketDataProvider,
+          providers: marketDataProviders,
           userId: claim.userId,
           now,
           trigger: "scheduled",
@@ -175,7 +175,7 @@ export async function runScheduledMarketSync({
     console.info("market_data_sync", {
       runId: claim.runId,
       jobType: "scheduled_market_sync",
-      provider: "EODHD/NBP",
+      provider: "Stooq/Massive/NBP",
       market: due.markets.join(",") || null,
       requestedCount,
       successCount,
@@ -208,7 +208,7 @@ export async function runScheduledMarketSync({
     console.error("market_data_sync", {
       runId: claim.runId,
       jobType: "scheduled_market_sync",
-      provider: "EODHD/NBP",
+      provider: "Stooq/Massive/NBP",
       market: null,
       requestedCount,
       successCount,

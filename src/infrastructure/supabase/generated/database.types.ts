@@ -861,6 +861,29 @@ export type Database = {
         }
         Returns: boolean
       }
+      upsert_eod_market_quote: {
+        Args: {
+          p_as_of: string
+          p_currency: string
+          p_day_change_pct: number | null
+          p_fifty_two_week_high: number | null
+          p_fifty_two_week_low: number | null
+          p_high: number | null
+          p_low: number | null
+          p_market_cap: number | null
+          p_open: number | null
+          p_previous_close: number | null
+          p_price: number
+          p_provider: string
+          p_quality_status: string
+          p_raw_hash: string | null
+          p_received_at: string
+          p_stock_id: string
+          p_trading_date: string
+          p_volume: number | null
+        }
+        Returns: boolean
+      }
       upsert_market_quote: {
         Args: {
           p_as_of: string

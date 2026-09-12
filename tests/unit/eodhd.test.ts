@@ -44,6 +44,7 @@ describe("EODHD adapter", () => {
     const [quote] = await new EodhdMarketDataProvider(client).getQuotes([
       {
         stockId: "stock-id",
+        provider: "EODHD",
         providerSymbol: "MSFT.US",
         market: "USA",
         currency: "USD",
@@ -75,6 +76,7 @@ describe("EODHD adapter", () => {
       provider.getQuotes([
         {
           stockId: "stock-id",
+          provider: "EODHD",
           providerSymbol: "MSFT.US",
           market: "USA",
           currency: "USD",

@@ -1,6 +1,6 @@
 import { runScheduledMarketSync } from "@/application/sync/run-scheduled-market-sync";
 import { createNbpProvider } from "@/infrastructure/fx/nbp/nbp-provider";
-import { createEodhdProvider } from "@/infrastructure/market-data/eodhd/eodhd-provider";
+import { createMarketDataProviders } from "@/infrastructure/market-data/providers";
 import { createSupabaseMarketDataSyncRepository } from "@/infrastructure/supabase/queries/market-data-sync";
 import { createServiceClient } from "@/infrastructure/supabase/server/create-service-client";
 import { getServerEnv } from "@/lib/env/server";
@@ -30,9 +30,12 @@ export async function POST(request: Request) {
       const deadlineAtMs = Date.now() + 240_000;
       return runScheduledMarketSync({
         repository: createSupabaseMarketDataSyncRepository(serviceClient),
-        marketDataProvider: env.EODHD_API_TOKEN
-          ? createEodhdProvider(env.EODHD_API_TOKEN, { deadlineAtMs })
-          : null,
+        marketDataProviders: createMarketDataProviders(
+          {
+            massiveApiKey: env.MASSIVE_API_KEY,
+          },
+          { deadlineAtMs },
+        ),
         fxRateProvider: createNbpProvider({ deadlineAtMs }),
         ownerEmail: env.ALLOWED_USER_EMAIL,
         deadlineAtMs,

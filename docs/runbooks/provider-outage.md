@@ -5,8 +5,9 @@
 1. Open Settings → Data and inspect the latest attempt, market/FX success timestamps, failure
    summary, counts, and provider configuration state.
 2. Query recent `sync_runs` in Supabase and correlate its `id` with `runId` in Vercel logs.
-3. Classify the failure: EODHD 401/403 configuration, 429 throttling, 5xx/network outage, missing
-   mapping, NBP failure, or an internal error. Do not copy tokens or raw provider payloads into logs.
+3. Classify the failure: Stooq credential/CSV challenge, Massive 401/403 configuration or 429
+   throttling, provider 5xx/network outage, missing mapping, NBP failure, or an internal error. Do
+   not copy tokens or raw provider payloads into logs.
 4. Avoid repeated manual refreshes during a known outage. The automatic process already uses bounded
    attempts; disable cron only if repeated invocations create operational harm.
 

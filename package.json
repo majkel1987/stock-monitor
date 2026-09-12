@@ -17,7 +17,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:local": "node scripts/run-local-e2e.mjs",
-    "provider:spike": "node scripts/verify-provider-coverage.mjs",
+    "provider:spike": "node --env-file-if-exists=.env.local scripts/verify-provider-coverage.mjs",
     "db:start": "pnpm dlx supabase@2.116.0 start",
     "db:stop": "pnpm dlx supabase@2.116.0 stop",
     "db:reset": "pnpm dlx supabase@2.116.0 db reset --local",

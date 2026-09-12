@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { runManualMarketSync } from "@/application/sync/run-manual-market-sync";
 import { createNbpProvider } from "@/infrastructure/fx/nbp/nbp-provider";
-import { createEodhdProvider } from "@/infrastructure/market-data/eodhd/eodhd-provider";
+import { createMarketDataProviders } from "@/infrastructure/market-data/providers";
 import { createSupabaseMarketDataSyncRepository } from "@/infrastructure/supabase/queries/market-data-sync";
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
 import { createServiceClient } from "@/infrastructure/supabase/server/create-service-client";
@@ -35,9 +35,12 @@ export async function refreshMarketDataAction(
   try {
     const result = await runManualMarketSync({
       repository,
-      marketDataProvider: env.EODHD_API_TOKEN
-        ? createEodhdProvider(env.EODHD_API_TOKEN, { deadlineAtMs })
-        : null,
+      marketDataProviders: createMarketDataProviders(
+        {
+          massiveApiKey: env.MASSIVE_API_KEY,
+        },
+        { deadlineAtMs },
+      ),
       fxRateProvider: createNbpProvider({ deadlineAtMs }),
       userId: user.id,
       deadlineAtMs,
@@ -101,8 +104,8 @@ export async function refreshMarketDataAction(
         status: fxResult.status === "success" ? "partial" : "error",
         message:
           fxResult.status === "success"
-            ? "USD/PLN updated. EODHD is not configured."
-            : "EODHD is not configured and USD/PLN could not be updated.",
+            ? "USD/PLN updated. Market-data providers are not configured."
+            : "Market-data providers are not configured and USD/PLN could not be updated.",
       };
     }
     if (quoteResult.status === "skipped") {

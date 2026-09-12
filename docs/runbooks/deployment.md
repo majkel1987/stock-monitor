@@ -21,7 +21,8 @@ must be protected by GitHub's `production` environment approval.
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anonymous key; RLS remains mandatory             |
    | `SUPABASE_SERVICE_ROLE_KEY`     | Server-only                                             |
    | `ALLOWED_USER_EMAIL`            | Server-only access configuration                        |
-   | `EODHD_API_TOKEN`               | Server-only; optional for manual-only mode              |
+   | Stooq                           | Public CSV export; no environment variable              |
+   | `MASSIVE_API_KEY`               | Server-only; required for automatic USA EOD             |
    | `CRON_SECRET`                   | Server-only, random, at least 32 characters             |
    | `APP_URL`                       | Server configuration; canonical HTTPS production origin |
 
@@ -30,7 +31,8 @@ must be protected by GitHub's `production` environment approval.
    the dashboard or another approved secret-input path. Do not paste the values into committed SQL
    or examples.
 10. From a privileged SQL session call `public.configure_market_sync_cron()`. This creates one
-    production-only weekday job using `pg_cron` and `pg_net`; no Edge Function is involved.
+    production-only weekday job at 18:30 and 23:30 UTC using `pg_cron` and `pg_net`; no Edge
+    Function is involved.
 
 The database-side HTTP timeout is 270 seconds. The application stops accepting new provider work
 after 240 seconds, leaving time to persist the terminal `sync_runs` state before the request ends.

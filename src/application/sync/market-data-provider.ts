@@ -1,6 +1,7 @@
 import type { CurrencyCode, MarketCode } from "@/domain/markets/market";
 
 export type InstrumentCandidate = {
+  provider: string;
   providerSymbol: string;
   ticker: string;
   market: MarketCode;
@@ -12,6 +13,7 @@ export type InstrumentCandidate = {
 
 export type ProviderInstrument = {
   stockId: string;
+  provider: string;
   providerSymbol: string;
   market: MarketCode;
   currency: CurrencyCode;
@@ -19,6 +21,10 @@ export type ProviderInstrument = {
 
 export type NormalizedQuote = {
   stockId: string;
+  tradingDate: string;
+  open: string | null;
+  high: string | null;
+  low: string | null;
   price: string;
   currency: CurrencyCode;
   previousClose: string | null;
@@ -34,6 +40,12 @@ export type NormalizedQuote = {
 };
 
 export interface MarketDataProvider {
+  readonly code: string;
+  readonly displayName: string;
   search(query: string, market?: MarketCode): Promise<InstrumentCandidate[]>;
   getQuotes(instruments: ProviderInstrument[]): Promise<NormalizedQuote[]>;
 }
+
+export type MarketDataProviderRegistry = Partial<
+  Record<MarketCode, MarketDataProvider>
+>;

@@ -7,12 +7,14 @@ import type { MarketDataSyncRepository } from "@/application/sync/sync-types";
 const instruments = [
   {
     stockId: "pzu",
+    provider: "STOOQ",
     providerSymbol: "PZU.WAR",
     market: "GPW" as const,
     currency: "PLN" as const,
   },
   {
     stockId: "msft",
+    provider: "MASSIVE",
     providerSymbol: "MSFT.US",
     market: "USA" as const,
     currency: "USD" as const,
@@ -43,6 +45,10 @@ function repository(
 function quote(stockId: string, currency: "PLN" | "USD") {
   return {
     stockId,
+    tradingDate: "2026-09-04",
+    open: "99",
+    high: "101",
+    low: "98",
     price: "100",
     currency,
     previousClose: null,
@@ -53,8 +59,8 @@ function quote(stockId: string, currency: "PLN" | "USD") {
     marketCap: null,
     asOf: "2026-09-04T14:00:00.000Z",
     receivedAt: "2026-09-04T14:20:00.000Z",
-    provider: "EODHD",
-    delayMinutes: 20,
+    provider: currency === "PLN" ? "Stooq" : "Massive",
+    delayMinutes: null,
   };
 }
 
@@ -62,6 +68,8 @@ describe("market quote synchronization", () => {
   it("persists valid symbols and records a partial result for a missing symbol", async () => {
     const repo = repository();
     const provider: MarketDataProvider = {
+      code: "TEST",
+      displayName: "Test",
       search: vi.fn(),
       getQuotes: vi.fn().mockResolvedValue([quote("pzu", "PLN")]),
     };
@@ -69,7 +77,7 @@ describe("market quote synchronization", () => {
 
     const result = await syncMarketQuotes({
       repository: repo,
-      provider,
+      providers: { GPW: provider, USA: provider },
       userId: "user-id",
       now: new Date("2026-09-04T14:20:00.000Z"),
     });
@@ -90,6 +98,8 @@ describe("market quote synchronization", () => {
   it("does not erase or write quotes when the provider fails", async () => {
     const repo = repository();
     const provider: MarketDataProvider = {
+      code: "TEST",
+      displayName: "Test",
       search: vi.fn(),
       getQuotes: vi.fn().mockRejectedValue({
         code: "provider_unavailable",
@@ -100,7 +110,7 @@ describe("market quote synchronization", () => {
 
     const result = await syncMarketQuotes({
       repository: repo,
-      provider,
+      providers: { GPW: provider, USA: provider },
       userId: "user-id",
     });
 
@@ -119,13 +129,15 @@ describe("market quote synchronization", () => {
         .mockResolvedValue("2026-09-04T14:19:00.000Z"),
     });
     const provider: MarketDataProvider = {
+      code: "TEST",
+      displayName: "Test",
       search: vi.fn(),
       getQuotes: vi.fn(),
     };
 
     const result = await syncMarketQuotes({
       repository: repo,
-      provider,
+      providers: { GPW: provider, USA: provider },
       userId: "user-id",
       now: new Date("2026-09-04T14:20:00.000Z"),
     });
@@ -140,6 +152,8 @@ describe("market quote synchronization", () => {
       loadActiveInstruments: vi.fn().mockResolvedValue([instruments[1]]),
     });
     const provider: MarketDataProvider = {
+      code: "TEST",
+      displayName: "Test",
       search: vi.fn(),
       getQuotes: vi.fn().mockResolvedValue([quote("msft", "PLN")]),
     };
@@ -147,7 +161,7 @@ describe("market quote synchronization", () => {
 
     const result = await syncMarketQuotes({
       repository: repo,
-      provider,
+      providers: { GPW: provider, USA: provider },
       userId: "user-id",
     });
 
@@ -160,6 +174,8 @@ describe("market quote synchronization", () => {
       upsertQuote: vi.fn().mockResolvedValue(false),
     });
     const provider: MarketDataProvider = {
+      code: "TEST",
+      displayName: "Test",
       search: vi.fn(),
       getQuotes: vi
         .fn()
@@ -169,7 +185,7 @@ describe("market quote synchronization", () => {
 
     const result = await syncMarketQuotes({
       repository: repo,
-      provider,
+      providers: { GPW: provider, USA: provider },
       userId: "user-id",
     });
 
@@ -189,6 +205,8 @@ describe("market quote synchronization", () => {
   it("stops before starting a provider batch after the soft deadline", async () => {
     const repo = repository();
     const provider: MarketDataProvider = {
+      code: "TEST",
+      displayName: "Test",
       search: vi.fn(),
       getQuotes: vi.fn(),
     };
@@ -196,7 +214,7 @@ describe("market quote synchronization", () => {
 
     const result = await syncMarketQuotes({
       repository: repo,
-      provider,
+      providers: { GPW: provider, USA: provider },
       userId: "user-id",
       deadlineAtMs: 0,
     });
@@ -208,5 +226,41 @@ describe("market quote synchronization", () => {
       failureCount: 2,
     });
     expect(provider.getQuotes).not.toHaveBeenCalled();
+  });
+
+  it("routes GPW to Stooq and USA to Massive while preserving partial success", async () => {
+    const repo = repository();
+    const stooq: MarketDataProvider = {
+      code: "STOOQ",
+      displayName: "Stooq",
+      search: vi.fn(),
+      getQuotes: vi.fn().mockResolvedValue([quote("pzu", "PLN")]),
+    };
+    const massive: MarketDataProvider = {
+      code: "MASSIVE",
+      displayName: "Massive",
+      search: vi.fn(),
+      getQuotes: vi.fn().mockRejectedValue({
+        code: "provider_unavailable",
+        message: "Massive unavailable.",
+      }),
+    };
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    const result = await syncMarketQuotes({
+      repository: repo,
+      providers: { GPW: stooq, USA: massive },
+      userId: "user-id",
+      now: new Date("2026-09-04T22:00:00.000Z"),
+    });
+
+    expect(stooq.getQuotes).toHaveBeenCalledWith([instruments[0]]);
+    expect(massive.getQuotes).toHaveBeenCalledWith([instruments[1]]);
+    expect(result).toMatchObject({
+      status: "partial",
+      successCount: 1,
+      failureCount: 1,
+    });
+    expect(repo.upsertQuote).toHaveBeenCalledTimes(1);
   });
 });

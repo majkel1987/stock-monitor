@@ -7,11 +7,20 @@ import {
 } from "@/domain/markets/scheduling";
 
 describe("market synchronization scheduling", () => {
-  it("uses each exchange timezone during the US/Poland DST transition gap", () => {
+  it("does not request EOD data during live exchange sessions", () => {
     const transitionGap = new Date("2026-03-10T13:30:00.000Z");
 
-    expect(shouldSyncMarket("USA", transitionGap)).toBe(true);
-    expect(shouldSyncMarket("GPW", transitionGap)).toBe(true);
+    expect(shouldSyncMarket("USA", transitionGap)).toBe(false);
+    expect(shouldSyncMarket("GPW", transitionGap)).toBe(false);
+  });
+
+  it("requests EOD data after a post-close publication buffer", () => {
+    expect(shouldSyncMarket("GPW", new Date("2026-09-07T18:30:00Z"))).toBe(
+      true,
+    );
+    expect(shouldSyncMarket("USA", new Date("2026-09-07T23:30:00Z"))).toBe(
+      true,
+    );
   });
 
   it("does not schedule exchange work during a weekend", () => {
@@ -22,7 +31,7 @@ describe("market synchronization scheduling", () => {
   });
 
   it("requests NBP once after noon Warsaw time until today's rate exists", () => {
-    const now = new Date("2026-09-07T10:30:00.000Z");
+    const now = new Date("2026-09-07T11:30:00.000Z");
 
     expect(shouldSyncUsdPln({ now, latestEffectiveDate: "2026-09-04" })).toBe(
       true,

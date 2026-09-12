@@ -76,7 +76,7 @@ export function createSupabaseMarketDataStatusReader(
         client
           .from("stock_provider_symbols")
           .select("id", { count: "exact", head: true })
-          .eq("provider", "EODHD")
+          .in("provider", ["STOOQ", "MASSIVE"])
           .eq("is_primary", true),
         client
           .from("fx_rates")

@@ -22,6 +22,7 @@ export const publicEnvSchema = z.object({
 export const serverEnvSchema = publicEnvSchema.extend({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
   ALLOWED_USER_EMAIL: z.string().trim().pipe(z.email()),
+  MASSIVE_API_KEY: z.string().min(1).optional(),
   EODHD_API_TOKEN: z.string().min(1).optional(),
   CRON_SECRET: z.string().min(32).optional(),
   APP_URL: appUrlSchema.optional(),

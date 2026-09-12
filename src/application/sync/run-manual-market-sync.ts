@@ -1,5 +1,5 @@
 import type { FxRateProvider } from "./fx-rate-provider";
-import type { MarketDataProvider } from "./market-data-provider";
+import type { MarketDataProviderRegistry } from "./market-data-provider";
 import {
   syncMarketQuotes,
   type MarketQuoteSyncResult,
@@ -18,14 +18,14 @@ export type ManualMarketSyncResult =
 
 export async function runManualMarketSync({
   repository,
-  marketDataProvider,
+  marketDataProviders,
   fxRateProvider,
   userId,
   now = new Date(),
   deadlineAtMs,
 }: {
   repository: MarketDataSyncRepository;
-  marketDataProvider: MarketDataProvider | null;
+  marketDataProviders: MarketDataProviderRegistry;
   fxRateProvider: FxRateProvider;
   userId: string;
   now?: Date;
@@ -43,7 +43,7 @@ export async function runManualMarketSync({
     console.info("market_data_sync", {
       runId: claim.runId,
       jobType: "manual_market_sync",
-      provider: "EODHD/NBP",
+      provider: "Stooq/Massive/NBP",
       market: null,
       requestedCount: 0,
       successCount: 0,
@@ -59,7 +59,7 @@ export async function runManualMarketSync({
   try {
     quotes = await syncMarketQuotes({
       repository,
-      provider: marketDataProvider,
+      providers: marketDataProviders,
       userId,
       now,
       trigger: "manual",
@@ -77,7 +77,7 @@ export async function runManualMarketSync({
       console.info("market_data_sync", {
         runId: claim.runId,
         jobType: "manual_market_sync",
-        provider: "EODHD/NBP",
+        provider: "Stooq/Massive/NBP",
         market: "GPW,USA",
         requestedCount: 0,
         successCount: 0,
@@ -129,7 +129,7 @@ export async function runManualMarketSync({
     console.info("market_data_sync", {
       runId: claim.runId,
       jobType: "manual_market_sync",
-      provider: "EODHD/NBP",
+      provider: "Stooq/Massive/NBP",
       market: "GPW,USA",
       requestedCount,
       successCount,
@@ -154,7 +154,7 @@ export async function runManualMarketSync({
     console.error("market_data_sync", {
       runId: claim.runId,
       jobType: "manual_market_sync",
-      provider: "EODHD/NBP",
+      provider: "Stooq/Massive/NBP",
       market: "GPW,USA",
       requestedCount: 1,
       successCount: 0,
