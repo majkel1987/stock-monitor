@@ -53,7 +53,7 @@ export async function runScheduledMarketSync({
     log("market_data_sync", {
       runId: claim.runId,
       jobType: "scheduled_market_sync",
-      provider: "Stooq/Massive/NBP",
+      provider: "Massive/NBP",
       market: null,
       requestedCount: 0,
       successCount: 0,
@@ -77,7 +77,8 @@ export async function runScheduledMarketSync({
   try {
     const latestFxEffectiveDate = await repository.latestFxEffectiveDate();
     const due = scheduledWorkDue({ now, latestFxEffectiveDate });
-    if (due.markets.length === 0 && !due.fx) {
+    const automatedMarkets = due.markets.filter((market) => market === "USA");
+    if (automatedMarkets.length === 0 && !due.fx) {
       await repository.finishRun(claim.runId, {
         status: "skipped",
         requestedCount: 0,
@@ -89,7 +90,7 @@ export async function runScheduledMarketSync({
       console.info("market_data_sync", {
         runId: claim.runId,
         jobType: "scheduled_market_sync",
-        provider: "Stooq/Massive/NBP",
+        provider: "Massive/NBP",
         market: null,
         requestedCount: 0,
         successCount: 0,
@@ -106,14 +107,14 @@ export async function runScheduledMarketSync({
       };
     }
 
-    const quoteResult = due.markets.length
+    const quoteResult = automatedMarkets.length
       ? await syncMarketQuotes({
           repository,
           providers: marketDataProviders,
           userId: claim.userId,
           now,
           trigger: "scheduled",
-          markets: [...due.markets],
+          markets: automatedMarkets,
           deadlineAtMs,
         })
       : null;
@@ -161,7 +162,7 @@ export async function runScheduledMarketSync({
           : null,
       metadata: {
         trigger: "scheduled",
-        markets: due.markets,
+        markets: automatedMarkets,
         fxDue: due.fx,
         quoteRunId: quoteResult?.runId ?? null,
         fxRunId: fxResult?.runId ?? null,
@@ -175,8 +176,8 @@ export async function runScheduledMarketSync({
     console.info("market_data_sync", {
       runId: claim.runId,
       jobType: "scheduled_market_sync",
-      provider: "Stooq/Massive/NBP",
-      market: due.markets.join(",") || null,
+      provider: "Massive/NBP",
+      market: automatedMarkets.join(",") || null,
       requestedCount,
       successCount,
       failureCount,
@@ -208,7 +209,7 @@ export async function runScheduledMarketSync({
     console.error("market_data_sync", {
       runId: claim.runId,
       jobType: "scheduled_market_sync",
-      provider: "Stooq/Massive/NBP",
+      provider: "Massive/NBP",
       market: null,
       requestedCount,
       successCount,

@@ -50,7 +50,11 @@ export function createSupabaseMarketDataStatusReader(
           .from("sync_runs")
           .select("started_at,finished_at")
           .eq("status", "success")
-          .in("job_type", ["market_quotes", "market_quotes_manual"])
+          .in("job_type", [
+            "market_quotes",
+            "market_quotes_manual",
+            "stooq_csv_import",
+          ])
           .order("finished_at", { ascending: false })
           .limit(1)
           .maybeSingle(),

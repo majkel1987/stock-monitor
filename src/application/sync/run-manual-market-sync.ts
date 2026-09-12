@@ -43,8 +43,8 @@ export async function runManualMarketSync({
     console.info("market_data_sync", {
       runId: claim.runId,
       jobType: "manual_market_sync",
-      provider: "Stooq/Massive/NBP",
-      market: null,
+      provider: "Massive/NBP",
+      market: "USA",
       requestedCount: 0,
       successCount: 0,
       failureCount: 0,
@@ -63,6 +63,7 @@ export async function runManualMarketSync({
       userId,
       now,
       trigger: "manual",
+      markets: ["USA"],
       deadlineAtMs,
     });
     if (quotes.status === "manual_cooldown") {
@@ -77,8 +78,8 @@ export async function runManualMarketSync({
       console.info("market_data_sync", {
         runId: claim.runId,
         jobType: "manual_market_sync",
-        provider: "Stooq/Massive/NBP",
-        market: "GPW,USA",
+        provider: "Massive/NBP",
+        market: "USA",
         requestedCount: 0,
         successCount: 0,
         failureCount: 0,
@@ -129,8 +130,8 @@ export async function runManualMarketSync({
     console.info("market_data_sync", {
       runId: claim.runId,
       jobType: "manual_market_sync",
-      provider: "Stooq/Massive/NBP",
-      market: "GPW,USA",
+      provider: "Massive/NBP",
+      market: "USA",
       requestedCount,
       successCount,
       failureCount,
@@ -154,8 +155,8 @@ export async function runManualMarketSync({
     console.error("market_data_sync", {
       runId: claim.runId,
       jobType: "manual_market_sync",
-      provider: "Stooq/Massive/NBP",
-      market: "GPW,USA",
+      provider: "Massive/NBP",
+      market: "USA",
       requestedCount: 1,
       successCount: 0,
       failureCount: 1,

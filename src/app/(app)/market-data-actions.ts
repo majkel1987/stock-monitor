@@ -1,10 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
+import { importStooqCsv } from "@/application/sync/import-stooq-csv";
 import { runManualMarketSync } from "@/application/sync/run-manual-market-sync";
 import { createNbpProvider } from "@/infrastructure/fx/nbp/nbp-provider";
 import { createMarketDataProviders } from "@/infrastructure/market-data/providers";
+import { parseStooqCsvQuote } from "@/infrastructure/market-data/stooq/stooq-csv-adapter";
 import { createSupabaseMarketDataSyncRepository } from "@/infrastructure/supabase/queries/market-data-sync";
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
 import { createServiceClient } from "@/infrastructure/supabase/server/create-service-client";
@@ -14,6 +17,114 @@ export type RefreshMarketDataActionState = {
   status: "idle" | "success" | "partial" | "error" | "cooldown";
   message?: string;
 };
+
+export type ImportStooqCsvActionState = {
+  status: "idle" | "success" | "error";
+  message?: string;
+};
+
+const MAX_STOOQ_CSV_BYTES = 750_000;
+const stooqCsvUploadSchema = z.object({
+  stockId: z.uuid(),
+  file: z
+    .custom<File>(
+      (value) =>
+        typeof value === "object" &&
+        value !== null &&
+        "name" in value &&
+        "size" in value &&
+        "text" in value,
+    )
+    .refine((file) => file.name.toLowerCase().endsWith(".csv"), {
+      message: "Choose a CSV file exported from Stooq.",
+    })
+    .refine((file) => file.size > 0 && file.size <= MAX_STOOQ_CSV_BYTES, {
+      message: "The CSV file must be between 1 byte and 750 KB.",
+    }),
+});
+
+function revalidateMarketDataViews() {
+  revalidatePath("/dashboard");
+  revalidatePath("/watchlist");
+  revalidatePath("/settings/data");
+  revalidatePath("/stocks/[market]/[ticker]", "page");
+  revalidatePath("/monitoring/new");
+}
+
+export async function importStooqCsvAction(
+  _previousState: ImportStooqCsvActionState,
+  formData: FormData,
+): Promise<ImportStooqCsvActionState> {
+  void _previousState;
+  const user = await requireAllowedUser();
+  const parsed = stooqCsvUploadSchema.safeParse({
+    stockId: formData.get("stockId"),
+    file: formData.get("file"),
+  });
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message:
+        parsed.error.issues[0]?.message ??
+        "Choose a GPW stock and a valid Stooq CSV file.",
+    };
+  }
+
+  const serviceClient = createServiceClient();
+  if (!serviceClient) {
+    return {
+      status: "error",
+      message: "Market-data writes are not configured on this server.",
+    };
+  }
+
+  try {
+    const result = await importStooqCsv({
+      repository: createSupabaseMarketDataSyncRepository(serviceClient),
+      parseQuote: parseStooqCsvQuote,
+      userId: user.id,
+      stockId: parsed.data.stockId,
+      payload: await parsed.data.file.text(),
+      fileName: parsed.data.file.name.slice(0, 160),
+    });
+
+    if (result.status === "invalid_stock") {
+      return {
+        status: "error",
+        message: "Choose an active GPW stock from your watchlist.",
+      };
+    }
+    if (result.status === "invalid_csv") {
+      return {
+        status: "error",
+        message:
+          "The file must contain Date, Open, High, Low, Close, and Volume columns in Stooq format.",
+      };
+    }
+    if (result.status === "future_quote") {
+      return {
+        status: "error",
+        message: `The file contains an EOD quote dated ${result.tradingDate} before that GPW session has closed.`,
+      };
+    }
+
+    revalidateMarketDataViews();
+    return result.status === "saved"
+      ? {
+          status: "success",
+          message: `Stooq price for ${result.tradingDate} imported.`,
+        }
+      : {
+          status: "success",
+          message: `No update was needed; ${result.tradingDate} is not newer than the stored quote.`,
+        };
+  } catch {
+    return {
+      status: "error",
+      message: "The Stooq CSV could not be imported. Stored data was kept.",
+    };
+  }
+}
 
 export async function refreshMarketDataAction(
   _previousState: RefreshMarketDataActionState,
@@ -87,16 +198,12 @@ export async function refreshMarketDataAction(
       };
     }
     const fxResult = result.fx;
-    revalidatePath("/dashboard");
-    revalidatePath("/watchlist");
-    revalidatePath("/settings/data");
-    revalidatePath("/stocks/[market]/[ticker]", "page");
-    revalidatePath("/monitoring/new");
+    revalidateMarketDataViews();
 
     if (quoteResult.status === "success" && fxResult.status === "success") {
       return {
         status: "success",
-        message: `${quoteResult.successCount} quotes and USD/PLN updated.`,
+        message: `${quoteResult.successCount} USA quotes and USD/PLN updated.`,
       };
     }
     if (quoteResult.status === "provider_not_configured") {

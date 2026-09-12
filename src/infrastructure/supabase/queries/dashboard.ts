@@ -157,7 +157,11 @@ export function createSupabaseDashboardReader(
           .from("sync_runs")
           .select("finished_at")
           .eq("status", "success")
-          .in("job_type", ["market_quotes", "market_quotes_manual"])
+          .in("job_type", [
+            "market_quotes",
+            "market_quotes_manual",
+            "stooq_csv_import",
+          ])
           .not("finished_at", "is", null)
           .order("finished_at", { ascending: false })
           .limit(1)

@@ -330,7 +330,7 @@ export default async function DashboardPage() {
         <span className="font-mono text-[10px] text-[var(--text-muted)]">
           {syncLabel}
         </span>
-        <RefreshMarketDataButton label="Refresh prices" />
+        <RefreshMarketDataButton label="Refresh USA + FX" />
       </PageHeader>
 
       {data.marketOverview.all === 0 ? (

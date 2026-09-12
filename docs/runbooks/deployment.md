@@ -21,7 +21,7 @@ must be protected by GitHub's `production` environment approval.
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anonymous key; RLS remains mandatory             |
    | `SUPABASE_SERVICE_ROLE_KEY`     | Server-only                                             |
    | `ALLOWED_USER_EMAIL`            | Server-only access configuration                        |
-   | Stooq                           | Public CSV export; no environment variable              |
+   | Stooq                           | Local CSV import only; no runtime connection or secret  |
    | `MASSIVE_API_KEY`               | Server-only; required for automatic USA EOD             |
    | `CRON_SECRET`                   | Server-only, random, at least 32 characters             |
    | `APP_URL`                       | Server configuration; canonical HTTPS production origin |
@@ -32,7 +32,8 @@ must be protected by GitHub's `production` environment approval.
    or examples.
 10. From a privileged SQL session call `public.configure_market_sync_cron()`. This creates one
     production-only weekday job at 18:30 and 23:30 UTC using `pg_cron` and `pg_net`; no Edge
-    Function is involved.
+    Function is involved. The job updates Massive USA EOD and NBP only. GPW requires a user import
+    in Settings → Data.
 
 The database-side HTTP timeout is 270 seconds. The application stops accepting new provider work
 after 240 seconds, leaving time to persist the terminal `sync_runs` state before the request ends.
@@ -40,7 +41,7 @@ after 240 seconds, leaving time to persist the terminal `sync_runs` state before
 ## Smoke tests
 
 Verify `/api/health` returns only `{"status":"ok"}`. Then verify login, dashboard, one Stock Detail,
-manual refresh, and recent `sync_runs`. Perform one scheduled endpoint invocation using a secret read
+manual USA/FX refresh, one Stooq CSV import, and recent `sync_runs`. Perform one scheduled endpoint invocation using a secret read
 interactively from the operator's secret manager (not a literal in command history). Confirm the
 response is small, an orchestrator run exists, counts are plausible, and a newer provider quote is
 stored when one is available.

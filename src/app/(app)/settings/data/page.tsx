@@ -1,13 +1,22 @@
 import { AlertTriangle } from "lucide-react";
 
 import type { SyncRunSummary } from "@/application/sync/get-market-data-status";
+import { getWatchlist } from "@/application/watchlist/get-watchlist";
 import { RefreshMarketDataButton } from "@/components/layout/refresh-market-data-button";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
+import {
+  StooqCsvImportForm,
+  type StooqCsvImportTarget,
+} from "@/components/settings/stooq-csv-import-form";
 import { PageHeader, SectionHeader, Surface } from "@/components/ui/terminal";
 import {
   createSupabaseMarketDataStatusReader,
   MarketDataStatusInfrastructureError,
 } from "@/infrastructure/supabase/queries/market-data-status";
+import {
+  createSupabaseWatchlistReader,
+  WatchlistInfrastructureError,
+} from "@/infrastructure/supabase/queries/watchlist";
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
 import { createClient } from "@/infrastructure/supabase/server/create-client";
 import { getServerEnv } from "@/lib/env/server";
@@ -31,6 +40,7 @@ function when(value: string | null) {
 function runName(run: SyncRunSummary) {
   if (run.jobType === "scheduled_market_sync") return "Scheduled sync";
   if (run.jobType === "manual_market_sync") return "Manual sync";
+  if (run.jobType === "stooq_csv_import") return "Stooq CSV import";
   return run.jobType === "fx_usd_pln" ? "FX · USD/PLN" : "Market quotes";
 }
 
@@ -55,14 +65,29 @@ function DataError() {
 }
 
 export default async function DataSettingsPage() {
-  await requireAllowedUser();
+  const user = await requireAllowedUser();
   const client = await createClient();
-  const providerConfigured = Boolean(getServerEnv().EODHD_API_TOKEN);
+  const massiveConfigured = Boolean(getServerEnv().MASSIVE_API_KEY);
   let status;
+  let gpwImportTargets: StooqCsvImportTarget[];
   try {
-    status = await createSupabaseMarketDataStatusReader(client).read();
+    [status, gpwImportTargets] = await Promise.all([
+      createSupabaseMarketDataStatusReader(client).read(),
+      getWatchlist(createSupabaseWatchlistReader(client), user.id, {
+        market: "GPW",
+      }).then((data) =>
+        data.rows.map((row) => ({
+          stockId: row.stockId,
+          ticker: row.ticker,
+          name: row.name,
+        })),
+      ),
+    ]);
   } catch (error) {
-    if (error instanceof MarketDataStatusInfrastructureError) {
+    if (
+      error instanceof MarketDataStatusInfrastructureError ||
+      error instanceof WatchlistInfrastructureError
+    ) {
       return (
         <div className="flex min-h-[1028px] flex-col gap-[18px] p-6">
           <PageHeader
@@ -88,7 +113,7 @@ export default async function DataSettingsPage() {
         description="Market-data provider health and synchronization history"
         title="Settings"
       >
-        <RefreshMarketDataButton label="Synchronize now" />
+        <RefreshMarketDataButton label="Sync USA + FX" />
       </PageHeader>
 
       <SettingsTabs active="data" />
@@ -101,19 +126,19 @@ export default async function DataSettingsPage() {
                 MARKET DATA PROVIDER
               </span>
               <strong className="text-[13px] leading-[18px]">
-                EOD Historical Data
+                Stooq CSV + Massive
               </strong>
               <span className="mt-[2px] font-mono text-[9px] text-[var(--text-muted)]">
-                {providerConfigured
-                  ? "API key configured · value hidden"
-                  : "API key not configured · manual mode available"}
+                {massiveConfigured
+                  ? "GPW manual file · USA API configured"
+                  : "GPW manual file · USA API not configured"}
               </span>
             </div>
             {[
               [
                 "CONFIGURATION",
-                providerConfigured ? "CONFIGURED" : "NOT CONFIGURED",
-                providerConfigured ? "positive" : "warning",
+                massiveConfigured ? "HYBRID READY" : "GPW CSV ONLY",
+                massiveConfigured ? "positive" : "warning",
               ],
               ["LAST SUCCESS", when(status.lastSuccessfulSyncAt), "default"],
               ["LAST FAILURE", when(status.lastFailureAt), "warning"],
@@ -138,6 +163,14 @@ export default async function DataSettingsPage() {
               </div>
             ))}
           </div>
+        </Surface>
+
+        <Surface>
+          <SectionHeader
+            meta="Date, Open, High, Low, Close, Volume · max 750 KB"
+            title="Import GPW prices from Stooq"
+          />
+          <StooqCsvImportForm targets={gpwImportTargets} />
         </Surface>
 
         <Surface className="min-h-48">

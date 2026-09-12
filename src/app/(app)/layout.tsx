@@ -23,7 +23,7 @@ export default async function ApplicationLayout({
   return (
     <AppShell
       lastSuccessfulSyncAt={lastSuccessfulSyncAt}
-      providerConfigured={Boolean(getServerEnv().EODHD_API_TOKEN)}
+      providerConfigured={Boolean(getServerEnv().MASSIVE_API_KEY)}
     >
       {children}
     </AppShell>

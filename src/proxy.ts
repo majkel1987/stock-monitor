@@ -14,6 +14,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next({ request });
   }
 
+  const isPublicAuthRoute =
+    pathname === "/login" ||
+    pathname === "/forgot-password" ||
+    pathname === "/auth/callback";
+
   const env = getPublicEnv();
   let response = NextResponse.next({ request });
   const client = createServerClient<Database>(
@@ -46,18 +51,12 @@ export async function proxy(request: NextRequest) {
   }
 
   let destination: NextResponse | undefined;
-  if (
-    pathname.startsWith("/api/") &&
-    access.status !== "allowed"
-  ) {
+  if (pathname.startsWith("/api/") && access.status !== "allowed") {
     destination = NextResponse.json(
       { error: access.status },
       { status: access.status === "forbidden" ? 403 : 401 },
     );
-  } else if (
-    pathname !== "/login" &&
-    access.status !== "allowed"
-  ) {
+  } else if (!isPublicAuthRoute && access.status !== "allowed") {
     const url = new URL("/login", request.url);
     if (access.status === "forbidden")
       url.searchParams.set("error", "access_denied");

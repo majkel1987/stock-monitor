@@ -316,7 +316,9 @@ Massive: MSFT
 
 The suffix belongs only in `stock_provider_symbols` and the adapter.
 
-Massive Basic advertises USA EOD at five calls per minute. Stooq exposes GPW daily CSV without an API key, although automated clients may encounter its browser-verification layer. The eight-symbol provider spike remains mandatory before production use.
+Massive Basic advertises USA EOD at five calls per minute. Stooq exposes GPW daily CSV, which the
+user downloads in a browser and imports locally; the application runtime does not cross Stooq's
+browser-verification layer. The eight-symbol provider spike remains a development diagnostic.
 
 ### NBP
 
@@ -416,7 +418,7 @@ Server Components, Server Actions, URL state, component state and React transiti
 | Supabase Cron             | Included with database |             $0/month | Keep jobs below ten minutes and avoid high concurrency                                                              | Not expected at this workload                                                           |
 | GitHub repository/Actions | Free                   |             $0/month | 2,000 Actions minutes/month for private repositories                                                                | Excessive CI frequency or large E2E matrix                                              |
 | NBP API                   | Public API             |             $0/month | Daily reference data; not an SLA-backed intraday feed                                                               | Only if a different FX definition becomes required                                      |
-| Stooq GPW EOD             | Public CSV export       |             $0/month | No API key; no SLA; automated access and coverage require verification                                                 | Provider access or reliability becomes insufficient                                     |
+| Stooq GPW EOD             | Local CSV import        |             $0/month | User downloads the file; no runtime API key or automated access                                                        | Manual import becomes operationally insufficient                                        |
 | Massive Stocks Basic      | Free                   |             $0/month | USA EOD, two years history, five API calls per minute                                                                 | Watchlist cannot complete within bounded EOD runs                                       |
 | Optional domain           | Registrar              |  Roughly $10–20/year | Not required; Vercel domain works                                                                                   | Vanity URL desired                                                                      |
 
@@ -490,7 +492,7 @@ Vercel Hobby's current Function maximum is 300 seconds with Fluid Compute, which
 - SQL migrations, generated Supabase types and narrow transactional RPC.
 - Server Components, Server Actions and protected Route Handlers.
 - Supabase Cron calling a single Vercel synchronization endpoint.
-- Stooq, Massive, and NBP adapters.
+- Local Stooq CSV import plus Massive and NBP adapters.
 - Manual-data fallback.
 - Vitest, small pgTAP/RLS suite and one critical Playwright journey.
 - `sync_runs`, structured logs and independent backups.
@@ -560,7 +562,8 @@ Do not use Vercel Cron for the MVP EOD schedule.
 Do not deploy Supabase Edge Functions.
 
 EXTERNAL DATA:
-Use Stooq for GPW EOD and Massive Basic for USA EOD only after the required symbol-coverage spike.
+Use user-selected local Stooq CSV files for GPW EOD; the application runtime must not call Stooq
+directly. Use Massive Basic for USA EOD after the required symbol-coverage spike.
 Persist provider symbols separately from canonical market+ticker identity.
 Normalize every provider response before it reaches application or domain code.
 Use the official NBP API through a separate FxRateProvider.

@@ -35,8 +35,9 @@ login form.
 ## Environment variables
 
 Copy [`.env.example`](.env.example) to `.env.local` and supply values for the integration being
-developed. Public Supabase values are separated from server-only credentials. Stooq uses its public
-CSV export; the Massive key is optional so manual market-data mode remains possible.
+developed. Public Supabase values are separated from server-only credentials. GPW prices are loaded
+from local Stooq CSV files selected by the user; the application never downloads them from Stooq.
+The Massive key is optional so manual market-data mode remains possible.
 
 Never commit real credentials. Server secrets must never use a `NEXT_PUBLIC_` prefix.
 
@@ -184,7 +185,7 @@ user-owned default status records have been created by M1.
 | `pnpm test:watch`     | Run Vitest in watch mode                   |
 | `pnpm test:e2e`       | Run the Playwright smoke test              |
 | `pnpm test:e2e:local` | Provision a local user and run full E2E    |
-| `pnpm provider:spike` | Verify Stooq, Massive, and NBP coverage    |
+| `pnpm provider:spike` | Run the development-only provider coverage diagnostic |
 | `pnpm db:start`       | Start local Supabase                       |
 | `pnpm db:stop`        | Stop local Supabase                        |
 | `pnpm db:reset`       | Recreate, migrate, and seed the local DB   |
@@ -227,24 +228,26 @@ The dashboard monitoring summary is a `security_invoker` PostgreSQL view, so und
 authoritative. The application obtains the remaining dashboard inputs in bounded bulk queries and
 uses the shared domain price-level calculations rather than duplicating trigger logic.
 
-The active market-data path routes GPW instruments to Stooq EOD and USA instruments to Massive
-Basic EOD. Both adapters validate and normalize provider responses before the shared sync use case
-atomically stores one historical session row and conditionally advances the latest quote. Manual
-stock and quote fallbacks remain available. Dashboard, Watchlist, and Stock Detail read only stored
-Supabase data; page rendering never waits on an external market-data provider.
+The active market-data path imports GPW EOD files downloaded manually from Stooq and retrieves USA
+EOD prices from Massive Basic. Settings → Data associates each uploaded Stooq CSV with a selected
+active GPW stock, validates and normalizes the file, then uses the same conditional quote upsert as
+the Massive adapter. Manual stock and quote fallbacks remain available. Dashboard, Watchlist, and
+Stock Detail read only stored Supabase data; page rendering never waits on an external market-data
+provider.
 
 The NBP adapter stores the latest official USD/PLN table A reference rate and prefills it for new
 USD monitoring records. The field remains editable, and saved monitoring FX values stay immutable.
 See [the provider coverage spike](docs/provider-spike.md) for the reproducible eight-symbol check.
 Supabase Cron invokes the protected Next.js Node.js route at 18:30 and 23:30 UTC on weekdays.
-These two DST-safe EOD windows cover GPW and USA after their sessions; NBP is refreshed on the first
-eligible call. The route runs the same quote and FX application use cases as manual refresh, while
+These two DST-safe EOD windows cover USA and NBP; GPW is intentionally excluded because its source
+is a local user-selected CSV file. The route runs the same USA quote and FX application use cases as manual refresh, while
 one global advisory-guarded durable lease prevents overlap
 between manual and scheduled work. Provider retries, batches, deadlines, partial outcomes, and crash
 recovery are bounded and observable through `sync_runs` and Settings → Data.
 
-Stooq and Massive remain optional at application startup: without them, research and manual
-stock/price flows continue to work and synchronization reports `provider_not_configured`. Required production values
+Stooq requires no runtime connection or secret. Massive remains optional at application startup:
+without it, research, GPW CSV import, and manual stock/price flows continue to work, while automatic
+USA synchronization reports `provider_not_configured`. Required production values
 are listed in `.env.example`; public values are limited to the Supabase URL and anonymous key. All
 other credentials are server-only.
 

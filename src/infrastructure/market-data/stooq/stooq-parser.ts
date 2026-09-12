@@ -58,18 +58,18 @@ function splitCsvLine(line: string) {
   if (quoted)
     throw new StooqError(
       "provider_invalid_response",
-      "Stooq returned malformed CSV.",
+      "Stooq CSV is malformed.",
     );
   values.push(value);
   return values;
 }
 
 export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
-  const trimmed = payload.trim();
+  const trimmed = payload.trim().replace(/^\uFEFF/, "");
   if (!trimmed || /^\s*</.test(trimmed) || /exceeded/i.test(trimmed)) {
     throw new StooqError(
       "provider_invalid_response",
-      "Stooq did not return daily CSV data.",
+      "The file does not contain Stooq daily CSV data.",
     );
   }
 
@@ -82,7 +82,7 @@ export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
   ) {
     throw new StooqError(
       "provider_invalid_response",
-      "Stooq returned an unexpected CSV header.",
+      "The Stooq CSV header is not supported.",
     );
   }
 
@@ -91,7 +91,7 @@ export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
     if (values.length !== header.length) {
       throw new StooqError(
         "provider_invalid_response",
-        "Stooq returned an invalid daily price row.",
+        "The Stooq CSV contains an invalid daily price row.",
       );
     }
     const parsed = stooqDailyRowSchema.safeParse(
@@ -102,7 +102,7 @@ export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
     if (!parsed.success) {
       throw new StooqError(
         "provider_invalid_response",
-        "Stooq returned an invalid daily price row.",
+        "The Stooq CSV contains an invalid daily price row.",
       );
     }
     return parsed.data;
@@ -111,7 +111,7 @@ export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
   if (rows.length === 0) {
     throw new StooqError(
       "provider_invalid_response",
-      "Stooq returned no daily prices.",
+      "The Stooq CSV contains no daily prices.",
     );
   }
   return rows;

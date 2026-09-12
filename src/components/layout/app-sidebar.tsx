@@ -93,13 +93,13 @@ function SidebarContents({
             className={`size-1.5 rounded-full ${providerConfigured ? "bg-[var(--positive)]" : "bg-[var(--warning)]"}`}
           />
           <span className="text-[9px] leading-3 font-semibold text-[var(--text-secondary)]">
-            {providerConfigured ? "MARKET DATA CONFIGURED" : "MANUAL DATA MODE"}
+            {providerConfigured ? "MARKET DATA READY" : "GPW CSV MODE"}
           </span>
         </div>
         <span className="text-[9px] leading-3 text-[var(--text-muted)]">
           {providerConfigured
-            ? "EODHD + NBP · manual refresh"
-            : "EODHD token not configured"}
+            ? "Stooq CSV · Massive + NBP"
+            : "Massive API not configured"}
         </span>
       </div>
     </aside>

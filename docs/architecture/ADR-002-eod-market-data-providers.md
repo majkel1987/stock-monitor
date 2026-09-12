@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted on 2026-09-11.
+Accepted on 2026-09-11. The automated Stooq portion was superseded by
+[ADR-003](ADR-003-manual-stooq-csv-import.md) on 2026-09-12; the Massive, NBP, storage, and mapping
+decisions remain accepted.
 
 ## Context
 
@@ -34,7 +36,8 @@ unavailable Stooq CSV export degrades that market to stored/manual data without 
 - Two small adapters and mappings are maintained instead of one combined vendor adapter.
 - Massive requests are sequential and spaced for the Basic five-calls-per-minute quota; a large
   watchlist may require another scheduled run after the serverless deadline.
-- Stooq's public CSV export has no SLA and may challenge automated requests. The application keeps
-  the last successful Supabase quote during an outage.
+- Stooq's public CSV export has no SLA and may challenge automated requests. ADR-003 removes that
+  runtime dependency in favor of a local user-selected file; the application still keeps the last
+  successful Supabase quote when no newer file is imported.
 - The common adapter contract limits vendor lock-in and keeps provider payloads out of application
   and domain code.

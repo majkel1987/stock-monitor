@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { login } from "./actions";
 
@@ -7,6 +8,7 @@ export const metadata: Metadata = { title: "Sign in" };
 const messages = {
   invalid_credentials: "Invalid email or password.",
   access_denied: "Access is not authorized for this account.",
+  recovery_failed: "The recovery link is invalid or has expired.",
 } as const;
 
 export default async function LoginPage({
@@ -41,7 +43,7 @@ export default async function LoginPage({
           </p>
         </div>
 
-        <form action={login} className="flex h-[162px] flex-col gap-3">
+        <form action={login} className="flex flex-col gap-3">
           <label className="flex flex-col gap-[5px]">
             <span className="text-[11px] leading-[14px] font-semibold text-[var(--text-secondary)]">
               Email
@@ -57,8 +59,14 @@ export default async function LoginPage({
             />
           </label>
           <label className="flex flex-col gap-[5px]">
-            <span className="text-[11px] leading-[14px] font-semibold text-[var(--text-secondary)]">
-              Password
+            <span className="flex items-center justify-between text-[11px] leading-[14px] font-semibold text-[var(--text-secondary)]">
+              <span>Password</span>
+              <Link
+                className="font-normal text-[var(--accent-primary)] hover:text-[var(--accent-hover)]"
+                href="/forgot-password"
+              >
+                Forgot password?
+              </Link>
             </span>
             <input
               autoComplete="current-password"

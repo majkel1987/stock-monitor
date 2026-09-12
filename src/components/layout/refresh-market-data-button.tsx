@@ -35,7 +35,9 @@ export function RefreshMarketDataButton({
           className,
         )}
         disabled={pending}
-        title={state.message ?? "Refresh EODHD quotes and the NBP USD/PLN rate"}
+        title={
+          state.message ?? "Refresh Massive USA quotes and the NBP USD/PLN rate"
+        }
         type="submit"
       >
         <RefreshCw

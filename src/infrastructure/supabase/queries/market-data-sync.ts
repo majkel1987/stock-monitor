@@ -3,6 +3,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { MarketDataSyncRepository } from "@/application/sync/sync-types";
+import type { StooqCsvImportRepository } from "@/application/sync/import-stooq-csv";
 import { isMarketCode } from "@/domain/markets/market";
 import type {
   Database,
@@ -18,7 +19,7 @@ export class MarketDataSyncInfrastructureError extends Error {
 
 export function createSupabaseMarketDataSyncRepository(
   client: SupabaseClient<Database>,
-): MarketDataSyncRepository {
+): MarketDataSyncRepository & StooqCsvImportRepository {
   return {
     async latestManualAttemptAt() {
       const { data, error } = await client
@@ -58,7 +59,7 @@ export function createSupabaseMarketDataSyncRepository(
       if (error || !data) throw new MarketDataSyncInfrastructureError();
       const providerUpdate = await client
         .from("sync_runs")
-        .update({ provider: "Stooq/Massive/NBP" })
+        .update({ provider: "Massive/NBP" })
         .eq("id", data.run_id);
       if (providerUpdate.error) throw new MarketDataSyncInfrastructureError();
       return {
@@ -143,6 +144,43 @@ export function createSupabaseMarketDataSyncRepository(
           },
         ];
       });
+    },
+
+    async findActiveGpwInstrument(userId, stockId) {
+      const itemResult = await client
+        .from("watchlist_items")
+        .select("stock_id")
+        .eq("user_id", userId)
+        .eq("stock_id", stockId)
+        .is("archived_at", null)
+        .maybeSingle();
+      if (itemResult.error) throw new MarketDataSyncInfrastructureError();
+      if (!itemResult.data) return null;
+
+      const stockResult = await client
+        .from("stocks")
+        .select("id,market_id,ticker,currency")
+        .eq("id", stockId)
+        .maybeSingle();
+      if (stockResult.error) throw new MarketDataSyncInfrastructureError();
+      const stock = stockResult.data;
+      if (!stock || stock.currency !== "PLN") return null;
+
+      const marketResult = await client
+        .from("markets")
+        .select("code")
+        .eq("id", stock.market_id)
+        .maybeSingle();
+      if (marketResult.error) throw new MarketDataSyncInfrastructureError();
+      if (marketResult.data?.code !== "GPW") return null;
+
+      return {
+        stockId: stock.id,
+        provider: "STOOQ",
+        providerSymbol: stock.ticker,
+        market: "GPW",
+        currency: "PLN",
+      };
     },
 
     async startRun(input) {
