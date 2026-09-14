@@ -93,7 +93,10 @@ export type AddStockInput = {
 };
 
 export type AddStockResult =
-  | { status: "created" | "restored" | "already_active" }
+  | {
+      status: "created" | "restored" | "already_active";
+      stockId: string;
+    }
   | {
       status:
         | "invalid_market"

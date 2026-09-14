@@ -34,9 +34,11 @@ const stooqDailyRowSchema = z
 
 export type StooqDailyRow = z.infer<typeof stooqDailyRowSchema>;
 
-type CanonicalColumn = "Date" | "Open" | "High" | "Low" | "Close" | "Volume";
+type CanonicalColumn =
+  "Ticker" | "Date" | "Open" | "High" | "Low" | "Close" | "Volume";
 
 const headerAliases: Record<string, CanonicalColumn> = {
+  ticker: "Ticker",
   date: "Date",
   data: "Date",
   open: "Open",
@@ -49,6 +51,7 @@ const headerAliases: Record<string, CanonicalColumn> = {
   minimum: "Low",
   close: "Close",
   zamkniecie: "Close",
+  vol: "Volume",
   volume: "Volume",
   wolumen: "Volume",
 };
@@ -56,9 +59,20 @@ const headerAliases: Record<string, CanonicalColumn> = {
 function normalizeHeader(value: string) {
   return value
     .trim()
+    .replace(/[<>]/g, "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
+}
+
+function normalizeDate(value: string) {
+  const normalized = value.trim();
+
+  if (/^\d{8}$/.test(normalized)) {
+    return `${normalized.slice(0, 4)}-${normalized.slice(4, 6)}-${normalized.slice(6, 8)}`;
+  }
+
+  return normalized;
 }
 
 function splitCsvLine(line: string, delimiter: "," | ";") {
@@ -91,9 +105,16 @@ function splitCsvLine(line: string, delimiter: "," | ";") {
   return values;
 }
 
-export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
+export function parseStooqDailyCsv(
+  payload: string,
+  providerSymbol?: string,
+): StooqDailyRow[] {
   const trimmed = payload.trim().replace(/^\uFEFF/, "");
-  if (!trimmed || /^\s*</.test(trimmed) || /exceeded/i.test(trimmed)) {
+  if (
+    !trimmed ||
+    /^\s*<(?:!doctype|html|head|body)\b/i.test(trimmed) ||
+    /exceeded/i.test(trimmed)
+  ) {
     throw new StooqError(
       "provider_invalid_response",
       "The file does not contain Stooq daily CSV data.",
@@ -110,6 +131,15 @@ export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
   const canonicalHeader = header.map(
     (column) => headerAliases[normalizeHeader(column)] ?? null,
   );
+  const containsTicker = canonicalHeader.includes("Ticker");
+
+  if (containsTicker && !providerSymbol?.trim()) {
+    throw new StooqError(
+      "provider_invalid_response",
+      "A ticker is required to import a Stooq bulk CSV file.",
+    );
+  }
+
   if (
     required.some(
       (column) => !canonicalHeader.includes(column as CanonicalColumn),
@@ -121,7 +151,7 @@ export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
     );
   }
 
-  const rows = lines.slice(1).map((line) => {
+  const rows = lines.slice(1).flatMap((line) => {
     const values = splitCsvLine(line, delimiter);
     if (values.length !== header.length) {
       throw new StooqError(
@@ -129,20 +159,31 @@ export function parseStooqDailyCsv(payload: string): StooqDailyRow[] {
         "The Stooq CSV contains an invalid daily price row.",
       );
     }
-    const parsed = stooqDailyRowSchema.safeParse(
-      Object.fromEntries(
-        canonicalHeader.flatMap((column, index) =>
-          column ? [[column, values[index] ?? ""]] : [],
-        ),
+    const row = Object.fromEntries(
+      canonicalHeader.flatMap((column, index) =>
+        column ? [[column, values[index] ?? ""]] : [],
       ),
     );
+
+    if (
+      containsTicker &&
+      (row.Ticker ?? "").trim().toUpperCase() !==
+        providerSymbol?.trim().toUpperCase()
+    ) {
+      return [];
+    }
+
+    const parsed = stooqDailyRowSchema.safeParse({
+      ...row,
+      Date: normalizeDate(row.Date ?? ""),
+    });
     if (!parsed.success) {
       throw new StooqError(
         "provider_invalid_response",
         "The Stooq CSV contains an invalid daily price row.",
       );
     }
-    return parsed.data;
+    return [parsed.data];
   });
 
   if (rows.length === 0) {

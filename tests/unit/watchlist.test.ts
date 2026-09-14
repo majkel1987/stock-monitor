@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { addStockToWatchlist } from "@/application/watchlist/add-stock-to-watchlist";
 import { getWatchlist } from "@/application/watchlist/get-watchlist";
 import {
+  addProviderStockSchema,
   addStockSchema,
   parseWatchlistQuery,
 } from "@/application/watchlist/schemas";
@@ -33,10 +34,10 @@ describe("Add Stock application use case", () => {
   it.each(["created", "restored", "already_active"] as const)(
     "returns the %s branch from the persistence boundary",
     async (status) => {
-      const writer = writerWith({ status });
+      const writer = writerWith({ status, stockId: "stock-id" });
       await expect(
         addStockToWatchlist(writer, "owner-id", input),
-      ).resolves.toEqual({ status });
+      ).resolves.toEqual({ status, stockId: "stock-id" });
       expect(writer.addManualStock).toHaveBeenCalledWith("owner-id", {
         ...input,
         ticker: "PZU",
@@ -47,6 +48,26 @@ describe("Add Stock application use case", () => {
 });
 
 describe("watchlist boundary schemas", () => {
+  it("normalizes a valid USA provider ticker", () => {
+    expect(
+      addProviderStockSchema.parse({
+        marketCode: "USA",
+        providerSymbol: " aapl ",
+        initialStatusId: "11111111-1111-4111-8111-111111111111",
+      }).providerSymbol,
+    ).toBe("AAPL");
+  });
+
+  it("rejects malformed USA provider tickers", () => {
+    expect(
+      addProviderStockSchema.safeParse({
+        marketCode: "USA",
+        providerSymbol: "AAPL; DROP TABLE stocks",
+        initialStatusId: "11111111-1111-4111-8111-111111111111",
+      }).success,
+    ).toBe(false);
+  });
+
   it("rejects a blank ticker", () => {
     expect(addStockSchema.safeParse({ ...input, ticker: " " }).success).toBe(
       false,

@@ -1,13 +1,11 @@
 "use client";
 
-import { Search, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useActionState, useEffect, useRef, useState } from "react";
 
 import {
   addProviderStockAction,
   addStockAction,
-  searchInstrumentsAction,
-  type ProviderSearchActionState,
 } from "@/app/(app)/watchlist/actions";
 import type { AddStockActionState } from "@/application/watchlist/action-state";
 import type {
@@ -18,10 +16,6 @@ import { Field, controlClass } from "@/components/ui/terminal";
 import { cn } from "@/lib/utils/cn";
 
 const initialAddState: AddStockActionState = { status: "idle" };
-const initialSearchState: ProviderSearchActionState = {
-  status: "idle",
-  candidates: [],
-};
 
 export function AddStockDialog({
   markets,
@@ -39,10 +33,6 @@ export function AddStockDialog({
   const activeStatuses = statuses.filter((status) => status.isActive);
   const [initialStatusId, setInitialStatusId] = useState(
     activeStatuses[0]?.id ?? "",
-  );
-  const [searchState, searchAction, searchPending] = useActionState(
-    searchInstrumentsAction,
-    initialSearchState,
   );
   const [providerState, providerAction, providerPending] = useActionState(
     addProviderStockAction,
@@ -92,7 +82,7 @@ export function AddStockDialog({
               Add stock
             </h2>
             <p className="pt-1 text-[11px] text-[var(--text-secondary)]">
-              Search EODHD first, or use manual entry as a fallback.
+              Add a USA stock by ticker, or use manual entry as a fallback.
             </p>
           </div>
           <button
@@ -123,110 +113,52 @@ export function AddStockDialog({
 
           <section className="flex flex-col gap-3 rounded-[7px] border border-[var(--border-default)] bg-[var(--surface-default)] p-3">
             <div>
-              <h3 className="text-xs font-semibold">Provider search</h3>
+              <h3 className="text-xs font-semibold">USA · Automatic</h3>
               <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
-                The exact provider symbol is stored separately from the internal
-                ticker.
+                Massive verifies the ticker, fetches the company name and loads
+                the latest EOD price.
               </p>
             </div>
             <form
-              action={searchAction}
-              className="grid grid-cols-[110px_1fr_86px] gap-2"
+              action={providerAction}
+              className="grid grid-cols-[1fr_auto] gap-2"
             >
-              <select className={controlClass} name="marketCode" required>
-                {markets.map((market) => (
-                  <option key={market.code} value={market.code}>
-                    {market.code}
-                  </option>
-                ))}
-              </select>
+              <input name="marketCode" type="hidden" value="USA" />
               <input
+                name="initialStatusId"
+                type="hidden"
+                value={initialStatusId}
+              />
+              <input
+                autoCapitalize="characters"
+                autoComplete="off"
                 className={controlClass}
                 disabled={!providerConfigured}
-                maxLength={80}
-                name="query"
-                placeholder="Ticker or company"
+                maxLength={16}
+                name="providerSymbol"
+                placeholder="Ticker, e.g. AAPL"
                 required
               />
               <button
-                className="flex h-8 items-center justify-center gap-1.5 rounded-[5px] border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-2 text-[11px] font-semibold hover:bg-[var(--surface-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-8 items-center justify-center rounded-[5px] bg-[var(--accent-primary)] px-3 text-[11px] font-semibold text-[var(--bg-primary)] hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={
-                  !providerConfigured || searchPending || !initialStatusId
+                  !providerConfigured || providerPending || !initialStatusId
                 }
                 type="submit"
               >
-                <Search aria-hidden="true" className="size-3" />
-                {searchPending ? "Searching" : "Search"}
+                {providerPending ? "Adding…" : "Add USA stock"}
               </button>
             </form>
 
             {!providerConfigured ? (
               <p className="rounded-[5px] border border-[var(--warning)] bg-[var(--warning-subtle)] p-2 text-[10px] text-[var(--warning)]">
-                EODHD is not configured. Manual entry remains available.
+                Massive is not configured. Manual entry remains available.
               </p>
-            ) : null}
-            {searchState.message ? (
-              <p
-                aria-live="polite"
-                className={cn(
-                  "text-[10px]",
-                  searchState.status === "error"
-                    ? "text-[var(--negative)]"
-                    : "text-[var(--text-secondary)]",
-                )}
-              >
-                {searchState.message}
-              </p>
-            ) : null}
-            {searchState.candidates.length ? (
-              <div className="max-h-52 overflow-auto rounded-[5px] border border-[var(--border-subtle)]">
-                {searchState.candidates.map((candidate) => (
-                  <form
-                    action={providerAction}
-                    className="flex min-h-12 items-center gap-3 border-b border-[var(--border-subtle)] px-3 py-2 last:border-b-0 hover:bg-[var(--surface-hover)]"
-                    key={candidate.providerSymbol}
-                  >
-                    <input
-                      name="marketCode"
-                      type="hidden"
-                      value={candidate.market}
-                    />
-                    <input
-                      name="providerSymbol"
-                      type="hidden"
-                      value={candidate.providerSymbol}
-                    />
-                    <input
-                      name="initialStatusId"
-                      type="hidden"
-                      value={initialStatusId}
-                    />
-                    <span className="min-w-0 flex-1">
-                      <strong className="block truncate font-mono text-[11px]">
-                        {candidate.ticker}
-                        <span className="ml-2 font-sans font-normal text-[var(--text-muted)]">
-                          {candidate.market} · {candidate.currency}
-                        </span>
-                      </strong>
-                      <span className="block truncate text-[10px] text-[var(--text-secondary)]">
-                        {candidate.name} · {candidate.providerSymbol}
-                      </span>
-                    </span>
-                    <button
-                      className="h-7 rounded-[5px] bg-[var(--accent-primary)] px-2.5 text-[10px] font-semibold text-[var(--bg-primary)] disabled:opacity-50"
-                      disabled={providerPending || !initialStatusId}
-                      type="submit"
-                    >
-                      Add
-                    </button>
-                  </form>
-                ))}
-              </div>
             ) : null}
             {providerState.status === "error" && providerState.message ? (
               <p
                 aria-live="polite"
-                className="text-[10px] text-[var(--negative)]"
+                className="rounded-[5px] border border-[var(--negative)] bg-[var(--negative-subtle)] p-2 text-[10px] text-[var(--negative)]"
               >
                 {providerState.message}
               </p>
@@ -237,7 +169,8 @@ export function AddStockDialog({
             <div>
               <h3 className="text-xs font-semibold">Manual fallback</h3>
               <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
-                Use when the provider is unavailable or has no suitable listing.
+                GPW uses imported Stooq CSV files. Manual entry also remains
+                available when a provider cannot verify a listing.
               </p>
             </div>
             <form

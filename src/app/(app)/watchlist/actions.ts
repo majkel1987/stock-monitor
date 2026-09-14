@@ -13,75 +13,21 @@ import {
 import {
   addStockSchema,
   addProviderStockSchema,
-  providerSearchSchema,
   watchlistItemIdSchema,
 } from "@/application/watchlist/schemas";
-import type { InstrumentCandidate } from "@/application/sync/market-data-provider";
+import { syncMarketQuotes } from "@/application/sync/sync-market-quotes";
 import { InvalidTickerError } from "@/domain/stocks/ticker";
+import { MassiveError } from "@/infrastructure/market-data/massive/massive-errors";
+import { createMassiveProvider } from "@/infrastructure/market-data/massive/massive-provider";
+import { createSupabaseMarketDataSyncRepository } from "@/infrastructure/supabase/queries/market-data-sync";
 import {
   createSupabaseWatchlistWriter,
   WatchlistInfrastructureError,
 } from "@/infrastructure/supabase/queries/watchlist";
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
 import { createClient } from "@/infrastructure/supabase/server/create-client";
-import { createEodhdProvider } from "@/infrastructure/market-data/eodhd/eodhd-provider";
-import { EodhdError } from "@/infrastructure/market-data/eodhd/eodhd-errors";
+import { createServiceClient } from "@/infrastructure/supabase/server/create-service-client";
 import { getServerEnv } from "@/lib/env/server";
-
-export type ProviderSearchActionState = {
-  status: "idle" | "success" | "error" | "not_configured";
-  message?: string;
-  candidates: InstrumentCandidate[];
-};
-
-export async function searchInstrumentsAction(
-  _previousState: ProviderSearchActionState,
-  formData: FormData,
-): Promise<ProviderSearchActionState> {
-  await requireAllowedUser();
-  const parsed = providerSearchSchema.safeParse({
-    marketCode: formData.get("marketCode"),
-    query: formData.get("query"),
-  });
-  if (!parsed.success) {
-    return {
-      status: "error",
-      message: "Enter a valid ticker or company name.",
-      candidates: [],
-    };
-  }
-
-  const token = getServerEnv().EODHD_API_TOKEN;
-  if (!token) {
-    return {
-      status: "not_configured",
-      message: "EODHD is not configured. You can still add the stock manually.",
-      candidates: [],
-    };
-  }
-
-  try {
-    const candidates = await createEodhdProvider(token).search(
-      parsed.data.query,
-      parsed.data.marketCode,
-    );
-    return {
-      status: "success",
-      message: candidates.length ? undefined : "No matching instruments found.",
-      candidates,
-    };
-  } catch (error) {
-    if (error instanceof EodhdError) {
-      return {
-        status: "error",
-        message:
-          "Provider search is temporarily unavailable. Add manually instead.",
-        candidates: [],
-      };
-    }
-    throw error;
-  }
-}
 
 export async function addProviderStockAction(
   _previousState: AddStockActionState,
@@ -97,13 +43,15 @@ export async function addProviderStockAction(
     return { status: "error", message: "Choose a valid provider instrument." };
   }
 
-  const token = getServerEnv().EODHD_API_TOKEN;
-  if (!token) {
-    return { status: "error", message: "EODHD is not configured." };
+  const apiKey = getServerEnv().MASSIVE_API_KEY;
+  if (!apiKey) {
+    return { status: "error", message: "Massive is not configured." };
   }
 
   try {
-    const provider = createEodhdProvider(token);
+    const provider = createMassiveProvider(apiKey, {
+      deadlineAtMs: Date.now() + 60_000,
+    });
     const candidates = await provider.search(
       parsed.data.providerSymbol,
       parsed.data.marketCode,
@@ -116,7 +64,7 @@ export async function addProviderStockAction(
     if (!candidate) {
       return {
         status: "error",
-        message: "The provider instrument could not be verified.",
+        message: `No active USA stock exists with ticker ${parsed.data.providerSymbol.toUpperCase()}.`,
       };
     }
 
@@ -127,20 +75,51 @@ export async function addProviderStockAction(
       candidate,
       parsed.data.initialStatusId,
     );
-    if (result.status === "created" || result.status === "restored") {
+    if (
+      result.status === "created" ||
+      result.status === "restored" ||
+      result.status === "already_active"
+    ) {
+      let initialPriceAvailable = false;
+      const serviceClient = createServiceClient();
+      if (serviceClient) {
+        try {
+          const quoteResult = await syncMarketQuotes({
+            repository: createSupabaseMarketDataSyncRepository(serviceClient),
+            providers: { USA: provider },
+            userId: user.id,
+            trigger: "initial",
+            markets: ["USA"],
+            stockIds: [result.stockId],
+            deadlineAtMs: Date.now() + 45_000,
+          });
+          initialPriceAvailable =
+            quoteResult.status === "success" ||
+            quoteResult.status === "partial";
+        } catch {
+          initialPriceAvailable = false;
+        }
+      }
+
       revalidatePath("/watchlist");
       revalidatePath("/dashboard");
+      revalidatePath("/stocks/[market]/[ticker]", "page");
+
+      const baseMessage =
+        result.status === "restored"
+          ? "Archived USA stock restored."
+          : result.status === "already_active"
+            ? "Existing USA stock connected to Massive."
+            : "USA stock added with company details.";
       return {
         status: "success",
-        message:
-          result.status === "restored"
-            ? "Archived provider instrument restored."
-            : "Provider instrument added.",
+        message: initialPriceAvailable
+          ? `${baseMessage} The latest EOD price was fetched.`
+          : `${baseMessage} The initial price is temporarily unavailable; daily synchronization will retry.`,
       };
     }
 
     const messages = {
-      already_active: "This stock is already on your active watchlist.",
       invalid_market: "Choose a supported market.",
       invalid_status: "Choose an active status that belongs to your account.",
       invalid_candidate: "The provider candidate is invalid.",
@@ -149,10 +128,10 @@ export async function addProviderStockAction(
     } as const;
     return { status: "error", message: messages[result.status] };
   } catch (error) {
-    if (error instanceof EodhdError) {
+    if (error instanceof MassiveError) {
       return {
         status: "error",
-        message: "The provider instrument could not be verified right now.",
+        message: "The ticker could not be verified with Massive right now.",
       };
     }
     if (error instanceof WatchlistInfrastructureError) {

@@ -309,7 +309,7 @@ export default async function WatchlistPage({
     : undefined;
   const isUnfilteredEmpty =
     data.summary.active === 0 && data.query.view === "active";
-  const providerConfigured = Boolean(getServerEnv().EODHD_API_TOKEN);
+  const providerConfigured = Boolean(getServerEnv().MASSIVE_API_KEY);
 
   return (
     <div className="flex min-h-[1028px] flex-col gap-[18px] p-6">

@@ -16,9 +16,11 @@ that local file into Stock Monitor instead of allowing the server to call Stooq 
 - The application runtime does not send HTTP requests to Stooq.
 - Settings → Data provides an authenticated import for one selected active GPW stock and one local
   Stooq CSV file.
-- The accepted file uses the standard daily columns `Date,Open,High,Low,Close,Volume` and is limited
-  to 5 MB. The Next.js Server Action request limit includes an additional 20 KB for multipart
-  overhead.
+- The importer accepts both per-symbol files using the standard daily columns
+  `Date,Open,High,Low,Close,Volume` and bulk daily exports using
+  `<TICKER>,<DATE>,<OPEN>,<HIGH>,<LOW>,<CLOSE>,<VOL>`. A bulk export is filtered to the provider
+  symbol of the GPW stock selected in the form. The file is limited to 5 MB, and the Next.js
+  Server Action request limit includes an additional 20 KB for multipart overhead.
 - The latest row becomes the current quote. The preceding row supplies `previousClose` and the
   daily percentage change, preserving the former adapter semantics.
 - The selected stock is re-authorized on the server against the user's active GPW watchlist. File
@@ -32,6 +34,6 @@ that local file into Stock Monitor instead of allowing the server to call Stooq 
 - GPW freshness now depends on the user downloading and importing files after the session closes.
 - Browser challenges, Stooq availability, and Stooq credentials no longer affect the application
   runtime.
-- A file must be associated with a selected GPW stock because the standard daily export does not
-  carry the application's stock identity.
+- A file must be associated with a selected GPW stock because a per-symbol export does not carry
+  the application's stock identity and a bulk export must be narrowed to one instrument safely.
 - Stored research and the last known quote remain available when no new file is imported.

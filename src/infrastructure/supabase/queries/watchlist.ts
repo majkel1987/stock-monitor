@@ -282,6 +282,26 @@ function isAddStockResult(value: string): value is AddStockResult["status"] {
   ].includes(value);
 }
 
+function addStockResult(
+  status: AddStockResult["status"],
+  stockId: string | null,
+): AddStockResult {
+  if (["created", "restored", "already_active"].includes(status)) {
+    if (!stockId) throw new WatchlistInfrastructureError();
+    return {
+      status: status as "created" | "restored" | "already_active",
+      stockId,
+    };
+  }
+
+  return {
+    status: status as Exclude<
+      AddStockResult["status"],
+      "created" | "restored" | "already_active"
+    >,
+  };
+}
+
 export function createSupabaseWatchlistWriter(
   client: SupabaseClient<Database>,
 ): WatchlistWriter {
@@ -301,7 +321,7 @@ export function createSupabaseWatchlistWriter(
         throw new WatchlistInfrastructureError();
       }
 
-      return { status: data[0].outcome };
+      return addStockResult(data[0].outcome, data[0].stock_id);
     },
 
     async addProviderStock(_userId, candidate, initialStatusId) {
@@ -314,7 +334,7 @@ export function createSupabaseWatchlistWriter(
           p_exchange: candidate.exchange,
           p_currency: candidate.currency,
           p_isin: candidate.isin,
-          p_provider: "EODHD",
+          p_provider: candidate.provider,
           p_provider_symbol: candidate.providerSymbol,
           p_status_id: initialStatusId,
           p_metadata: {
@@ -327,7 +347,7 @@ export function createSupabaseWatchlistWriter(
       if (error || !data?.[0] || !isAddStockResult(data[0].outcome)) {
         throw new WatchlistInfrastructureError();
       }
-      return { status: data[0].outcome };
+      return addStockResult(data[0].outcome, data[0].stock_id);
     },
 
     async archive(userId, watchlistItemId) {

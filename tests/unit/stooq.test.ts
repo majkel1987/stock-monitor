@@ -7,6 +7,11 @@ const csv = `Date,Open,High,Low,Close,Volume
 2026-09-09,60.10,61.20,59.80,60.80,1000000
 2026-09-10,60.90,62.00,60.50,61.75,1200000`;
 
+const bulkCsv = `<TICKER>,<PER>,<DATE>,<TIME>,<OPEN>,<HIGH>,<LOW>,<CLOSE>,<VOL>,<OPENINT>
+^AEX,D,20260914,000000,1098.38,1101.04,1095.29,1098.35,0,0
+PZU,D,20260914,000000,76.44,76.84,75.82,76.32,2207185,0
+XTB,D,20260914,000000,73.10,74.20,72.80,73.90,542100,0`;
+
 describe("Stooq CSV adapter", () => {
   it("parses validated daily OHLCV CSV", () => {
     expect(parseStooqDailyCsv(csv)).toEqual([
@@ -60,6 +65,40 @@ describe("Stooq CSV adapter", () => {
         provider: "Stooq CSV",
         asOf: "2026-09-10T15:00:00.000Z",
       }),
+    );
+  });
+
+  it("selects the requested ticker from a Stooq bulk daily export", () => {
+    expect(
+      parseStooqCsvQuote(
+        bulkCsv,
+        {
+          stockId: "pzu",
+          provider: "STOOQ",
+          providerSymbol: "PZU",
+          market: "GPW",
+          currency: "PLN",
+        },
+        new Date("2026-09-14T18:30:00.000Z"),
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        stockId: "pzu",
+        tradingDate: "2026-09-14",
+        open: "76.44",
+        high: "76.84",
+        low: "75.82",
+        price: "76.32",
+        previousClose: null,
+        volume: "2207185",
+        asOf: "2026-09-14T15:00:00.000Z",
+      }),
+    );
+  });
+
+  it("rejects a Stooq bulk export without the requested ticker", () => {
+    expect(() => parseStooqDailyCsv(bulkCsv, "PKO")).toThrow(
+      "The Stooq CSV contains no daily prices.",
     );
   });
 

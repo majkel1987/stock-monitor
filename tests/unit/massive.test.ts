@@ -20,6 +20,38 @@ const bar = {
 };
 
 describe("Massive Basic EOD adapter", () => {
+  it("resolves an exact USA ticker to provider company metadata", async () => {
+    const provider = new MassiveMarketDataProvider({
+      search: vi.fn().mockResolvedValue({
+        status: "OK",
+        results: [
+          {
+            ticker: "AAPL",
+            name: "Apple Inc.",
+            market: "stocks",
+            primary_exchange: "XNAS",
+            currency_name: "usd",
+            active: true,
+          },
+        ],
+      }),
+      previousDay: vi.fn(),
+    });
+
+    await expect(provider.search("aapl", "USA")).resolves.toEqual([
+      {
+        provider: "MASSIVE",
+        providerSymbol: "AAPL",
+        ticker: "AAPL",
+        market: "USA",
+        name: "Apple Inc.",
+        exchange: "XNAS",
+        currency: "USD",
+        isin: null,
+      },
+    ]);
+  });
+
   it("normalizes an EME quote while preserving its canonical stock id", async () => {
     const provider = new MassiveMarketDataProvider(
       {

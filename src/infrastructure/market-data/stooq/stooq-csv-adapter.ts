@@ -16,8 +16,8 @@ export function parseStooqCsvQuote(
   instrument: ProviderInstrument,
   receivedAt: Date,
 ): NormalizedQuote {
-  const rows = parseStooqDailyCsv(payload).sort((left, right) =>
-    left.Date.localeCompare(right.Date),
+  const rows = parseStooqDailyCsv(payload, instrument.providerSymbol).sort(
+    (left, right) => left.Date.localeCompare(right.Date),
   );
   const latest = rows.at(-1)!;
   const previousClose = rows.at(-2)?.Close ?? null;
@@ -61,8 +61,8 @@ export function parseStooqCsvImport(
   instrument: ProviderInstrument,
   receivedAt: Date,
 ): StooqCsvParsedData {
-  const rows = parseStooqDailyCsv(payload).sort((left, right) =>
-    left.Date.localeCompare(right.Date),
+  const rows = parseStooqDailyCsv(payload, instrument.providerSymbol).sort(
+    (left, right) => left.Date.localeCompare(right.Date),
   );
 
   return {

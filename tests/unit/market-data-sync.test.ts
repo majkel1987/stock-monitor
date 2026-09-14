@@ -66,6 +66,39 @@ function quote(stockId: string, currency: "PLN" | "USD") {
 }
 
 describe("market quote synchronization", () => {
+  it("limits an initial synchronization to the newly added stock", async () => {
+    const repo = repository();
+    const provider: MarketDataProvider = {
+      code: "MASSIVE",
+      displayName: "Massive",
+      search: vi.fn(),
+      getQuotes: vi.fn().mockResolvedValue([quote("msft", "USD")]),
+    };
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+
+    const result = await syncMarketQuotes({
+      repository: repo,
+      providers: { USA: provider },
+      userId: "user-id",
+      trigger: "initial",
+      markets: ["USA"],
+      stockIds: ["msft"],
+    });
+
+    expect(provider.getQuotes).toHaveBeenCalledWith([instruments[1]]);
+    expect(repo.startRun).toHaveBeenCalledWith(
+      expect.objectContaining({
+        jobType: "market_quote_initial",
+        requestedCount: 1,
+      }),
+    );
+    expect(result).toMatchObject({
+      status: "success",
+      requestedCount: 1,
+      successCount: 1,
+    });
+  });
+
   it("maps legacy EME.US to Massive EME without changing canonical identity", () => {
     const stock = { market: "USA" as const, ticker: "EME" };
 

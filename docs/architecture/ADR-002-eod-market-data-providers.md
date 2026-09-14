@@ -21,6 +21,10 @@ verification page instead of CSV.
 - USD/PLN continues to use the independent official NBP adapter.
 - Supabase PostgreSQL is the only market-data source read by UI routes.
 - Provider mappings remain in `stock_provider_symbols`; provider symbols do not enter domain types.
+- Adding a USA stock uses an exact Massive ticker lookup. The provider supplies the canonical
+  company name and exchange; an unknown ticker is rejected before persistence.
+- After a USA stock is created, restored, or upgraded from manual mode, the application attempts
+  an initial quote synchronization for that stock and records the attempt in `sync_runs`.
 - `stock_prices` stores one immutable row per stock, trading date, and provider.
 - `market_quotes` advances only when an incoming `as_of` is strictly newer.
 - Supabase Cron invokes the protected Next.js endpoint at 18:30 and 23:30 UTC on weekdays. The

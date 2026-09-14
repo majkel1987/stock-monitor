@@ -67,14 +67,16 @@ export async function syncMarketQuotes({
   now = new Date(),
   trigger = "manual",
   markets,
+  stockIds,
   deadlineAtMs = Number.POSITIVE_INFINITY,
 }: {
   repository: MarketDataSyncRepository;
   providers: MarketDataProviderRegistry;
   userId: string;
   now?: Date;
-  trigger?: "manual" | "scheduled";
+  trigger?: "initial" | "manual" | "scheduled";
   markets?: MarketCode[];
+  stockIds?: string[];
   deadlineAtMs?: number;
 }): Promise<MarketQuoteSyncResult> {
   const startedAtMs = Date.now();
@@ -97,12 +99,23 @@ export async function syncMarketQuotes({
   }
 
   const selectedMarkets = markets ?? [...MARKETS];
-  const instruments = await repository.loadActiveInstruments(
+  const activeInstruments = await repository.loadActiveInstruments(
     userId,
     selectedMarkets,
   );
+  const selectedStockIds = stockIds ? new Set(stockIds) : null;
+  const instruments = selectedStockIds
+    ? activeInstruments.filter((instrument) =>
+        selectedStockIds.has(instrument.stockId),
+      )
+    : activeInstruments;
   const runId = await repository.startRun({
-    jobType: trigger === "manual" ? "market_quotes_manual" : "market_quotes",
+    jobType:
+      trigger === "initial"
+        ? "market_quote_initial"
+        : trigger === "manual"
+          ? "market_quotes_manual"
+          : "market_quotes",
     provider: providerLabel(selectedMarkets),
     requestedCount: instruments.length,
     metadata: { trigger, markets: selectedMarkets },
