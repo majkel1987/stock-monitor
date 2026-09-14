@@ -65,7 +65,7 @@ export function StooqCsvImportForm({
             </h2>
             <p className="text-xs leading-4 text-[var(--text-secondary)]">
               Select an active GPW stock and a Stooq CSV file with daily OHLCV
-              data. Maximum file size is 750 KB.
+              data. Maximum file size is 5 MB.
             </p>
           </div>
 

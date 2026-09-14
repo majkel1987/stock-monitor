@@ -23,7 +23,7 @@ export type ImportStooqCsvActionState = {
   message?: string;
 };
 
-const MAX_STOOQ_CSV_BYTES = 750_000;
+const MAX_STOOQ_CSV_BYTES = 5 * 1024 * 1024;
 const stooqCsvUploadSchema = z.object({
   stockId: z.uuid(),
   file: z
@@ -47,7 +47,7 @@ const stooqCsvUploadSchema = z.object({
       { message: "The selected file must be CSV text." },
     )
     .refine((file) => file.size > 0 && file.size <= MAX_STOOQ_CSV_BYTES, {
-      message: "The CSV file must be between 1 byte and 750 KB.",
+      message: "The CSV file must be between 1 byte and 5 MB.",
     }),
 });
 

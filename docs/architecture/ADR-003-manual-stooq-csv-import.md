@@ -17,7 +17,8 @@ that local file into Stock Monitor instead of allowing the server to call Stooq 
 - Settings → Data provides an authenticated import for one selected active GPW stock and one local
   Stooq CSV file.
 - The accepted file uses the standard daily columns `Date,Open,High,Low,Close,Volume` and is limited
-  to 750 KB, below the default Next.js Server Action request limit after multipart overhead.
+  to 5 MB. The Next.js Server Action request limit includes an additional 20 KB for multipart
+  overhead.
 - The latest row becomes the current quote. The preceding row supplies `previousClose` and the
   daily percentage change, preserving the former adapter semantics.
 - The selected stock is re-authorized on the server against the user's active GPW watchlist. File
