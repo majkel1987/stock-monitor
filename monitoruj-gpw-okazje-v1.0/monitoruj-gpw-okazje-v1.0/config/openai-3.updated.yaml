@@ -1,0 +1,15 @@
+interface:
+  display_name: monitoruj gpw okazje
+  short_description: Monitoruje spółki notowane na GPW pod kątem selektywnych inwestycji
+    średnio- i długoterminowych. Łączy jakość biznesu, wzrost EPS i FCF, wycenę, dywidendę,
+    asymetrię zysku do ryzyka, analizę trendu, anomalii podażowych oraz jakości małych
+    i średnich spółek. Pełny monitoring kończy kanonicznym eksportem JSON do Stock Monitor.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

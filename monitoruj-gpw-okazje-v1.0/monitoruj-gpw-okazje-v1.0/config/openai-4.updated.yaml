@@ -1,0 +1,11 @@
+interface:
+  display_name: Monitoring okazji GPW
+  short_description: "Selektywny screening GPW: jakość, EPS/FCF, wycena i asymetria"
+  default_prompt: "Użyj $monitoruj-gpw-okazje, aby znaleźć aktualne, selektywne okazje inwestycyjne na GPW. Oceń jakość biznesu, wzrost EPS/FCF, wycenę, dywidendę, asymetrię zysku do ryzyka, małe i średnie spółki oraz potencjalne anomalie podażowe. Pokaż czytelny raport, a po pełnym monitoringu wygeneruj również zwalidowany plik JSON zgodny z kontraktem Stock Monitor."
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

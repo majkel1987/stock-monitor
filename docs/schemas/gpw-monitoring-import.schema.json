@@ -1,0 +1,2266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://stock-monitor.local/schemas/gpw-opportunity-monitoring/1.0/schema.json",
+  "title": "GPW Opportunity Monitoring Export",
+  "description": "Kanoniczny kontrakt danych pomiędzy skillem Monitoruj GPW Okazje a aplikacją Stock Monitor.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "exportType",
+    "externalId",
+    "generatedAt",
+    "analysisDate",
+    "market",
+    "profile",
+    "marketRegime",
+    "scanSummary",
+    "marketSources",
+    "companies"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "exportType": {
+      "const": "gpw_opportunity_monitoring"
+    },
+    "externalId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "analysisDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "market": {
+      "const": "GPW"
+    },
+    "profile": {
+      "$ref": "#/$defs/profile"
+    },
+    "marketRegime": {
+      "$ref": "#/$defs/marketRegime"
+    },
+    "scanSummary": {
+      "$ref": "#/$defs/scanSummary"
+    },
+    "marketSources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "companies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/company"
+      }
+    }
+  },
+  "$defs": {
+    "moneyRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "currency"
+      ],
+      "properties": {
+        "from": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "to": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        }
+      }
+    },
+    "priceZone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "currency",
+        "note"
+      ],
+      "properties": {
+        "from": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "to": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseCurrency",
+        "horizon",
+        "riskTolerance",
+        "capitalProtectionPriority",
+        "gradualEntry",
+        "dividendPreference",
+        "maxDeepDiveCandidates",
+        "accountTypes",
+        "preferredSectors",
+        "excludedSectors",
+        "customConstraints",
+        "portfolioContext"
+      ],
+      "properties": {
+        "baseCurrency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "horizon": {
+          "type": "string",
+          "minLength": 1
+        },
+        "riskTolerance": {
+          "enum": [
+            "LOW",
+            "MODERATE",
+            "ELEVATED",
+            "HIGH",
+            "CUSTOM"
+          ]
+        },
+        "capitalProtectionPriority": {
+          "type": "boolean"
+        },
+        "gradualEntry": {
+          "type": "boolean"
+        },
+        "dividendPreference": {
+          "type": "boolean"
+        },
+        "maxDeepDiveCandidates": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50
+        },
+        "accountTypes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "IKE",
+              "IKZE",
+              "TAXABLE",
+              "OTHER"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "preferredSectors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "excludedSectors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "customConstraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "portfolioContext": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "holdings"
+              ],
+              "properties": {
+                "holdings": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "market",
+                      "ticker",
+                      "costBasis",
+                      "currency",
+                      "note"
+                    ],
+                    "properties": {
+                      "market": {
+                        "type": "string"
+                      },
+                      "ticker": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 32
+                      },
+                      "costBasis": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0
+                      },
+                      "currency": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "note": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "marketRegime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "valuationRegime",
+        "marketPhase",
+        "opportunityBreadth",
+        "summary",
+        "keyRisks",
+        "implicationsForScreening"
+      ],
+      "properties": {
+        "valuationRegime": {
+          "enum": [
+            "DEEPLY_UNDERVALUED",
+            "BELOW_HISTORICAL_AVERAGE",
+            "NEAR_HISTORICAL_AVERAGE",
+            "ABOVE_HISTORICAL_AVERAGE",
+            "EXPENSIVE",
+            "UNKNOWN"
+          ]
+        },
+        "marketPhase": {
+          "enum": [
+            "BROAD_BULL",
+            "SELECTIVE_MARKET",
+            "CORRECTION",
+            "BEAR_MARKET",
+            "TRANSITION",
+            "UNKNOWN"
+          ]
+        },
+        "opportunityBreadth": {
+          "enum": [
+            "BROAD",
+            "SELECTIVE",
+            "NARROW",
+            "NONE",
+            "UNKNOWN"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "keyRisks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "implicationsForScreening": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "scanSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "companiesScreened",
+        "companiesConsidered",
+        "companiesExported",
+        "deepDiveCandidates",
+        "buyCandidates",
+        "watchCandidates",
+        "avoidCandidates",
+        "summary"
+      ],
+      "properties": {
+        "companiesScreened": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "companiesConsidered": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "companiesExported": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deepDiveCandidates": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "buyCandidates": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "watchCandidates": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "avoidCandidates": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "summary": {
+          "type": "string"
+        }
+      },
+      "$comment": "Walidacja semantyczna: companiesExported musi być równe długości companies[]."
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticker",
+        "name",
+        "market",
+        "currency",
+        "isin"
+      ],
+      "properties": {
+        "ticker": {
+          "type": "string",
+          "pattern": "^[A-Z0-9_-]{1,16}$",
+          "not": {
+            "pattern": "\\."
+          }
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "market": {
+          "const": "GPW"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "isin": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{2}[A-Z0-9]{9}[0-9]$"
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "reason",
+        "watchReason"
+      ],
+      "properties": {
+        "action": {
+          "enum": [
+            "BUY_GRADUALLY",
+            "WATCH",
+            "HOLD",
+            "REDUCE",
+            "AVOID"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "watchReason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "opportunityCategory"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "BUY_CANDIDATE",
+            "WATCH",
+            "WAIT_FOR_CORRECTION",
+            "DEEP_DIVE",
+            "HOLD",
+            "REDUCE",
+            "AVOID",
+            "KILL_THE_THESIS"
+          ]
+        },
+        "opportunityCategory": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "QUALITY_COMPOUNDER",
+            "GROWTH_AT_REASONABLE_PRICE",
+            "DIVIDEND_QUALITY",
+            "EARNINGS_INFLECTION",
+            "SUPPLY_ANOMALY",
+            "SMALL_CAP_SELECTIVE",
+            "SPECIAL_SITUATION",
+            "WATCH_WITHOUT_PRICE_EDGE",
+            null
+          ]
+        }
+      }
+    },
+    "scoreComponents": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "businessModelAndRecurringRevenue",
+        "competitiveAdvantage",
+        "earningsQualityAndCashConversion",
+        "epsFcfGrowthVisibility",
+        "balanceSheetAndFinancialResilience",
+        "managementOwnershipCapitalAllocation",
+        "industryOutlookAndTargetMarket",
+        "narrativeToNumbers",
+        "valuationAndMarginOfSafety",
+        "riskRewardAsymmetry",
+        "trendTimingSupplyAnomaly",
+        "liquidityGovernanceRiskDataQuality"
+      ],
+      "properties": {
+        "businessModelAndRecurringRevenue": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 10
+        },
+        "competitiveAdvantage": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 10
+        },
+        "earningsQualityAndCashConversion": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 10
+        },
+        "epsFcfGrowthVisibility": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 12
+        },
+        "balanceSheetAndFinancialResilience": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 8
+        },
+        "managementOwnershipCapitalAllocation": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 8
+        },
+        "industryOutlookAndTargetMarket": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 7
+        },
+        "narrativeToNumbers": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 10
+        },
+        "valuationAndMarginOfSafety": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 10
+        },
+        "riskRewardAsymmetry": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 8
+        },
+        "trendTimingSupplyAnomaly": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 3
+        },
+        "liquidityGovernanceRiskDataQuality": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 4
+        }
+      }
+    },
+    "score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "components"
+      ],
+      "properties": {
+        "total": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "components": {
+          "$ref": "#/$defs/scoreComponents"
+        }
+      },
+      "$comment": "Walidacja semantyczna: jeśli total != null, wszystkie komponenty muszą być liczbami, a ich suma musi być równa total."
+    },
+    "marketData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "price",
+        "currency",
+        "asOf",
+        "source"
+      ],
+      "properties": {
+        "price": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "asOf": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "valuationMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "fairValue",
+        "currency",
+        "summary"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "DCF",
+            "DDM",
+            "PE",
+            "EV_EBITDA",
+            "EV_EBIT",
+            "P_FCF",
+            "P_BV",
+            "SOTP",
+            "HISTORICAL_MULTIPLES",
+            "PEERS",
+            "SECTOR_SPECIFIC",
+            "OTHER"
+          ]
+        },
+        "fairValue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "valuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "methods",
+        "fairValueBase",
+        "attractiveEntryZone",
+        "marginOfSafetySummary"
+      ],
+      "properties": {
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/valuationMethod"
+          }
+        },
+        "fairValueBase": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "attractiveEntryZone": {
+          "$ref": "#/$defs/moneyRange"
+        },
+        "marginOfSafetySummary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revenueGrowthAssumption",
+        "marginAssumption",
+        "epsOrFcfAssumption",
+        "sectorMetricAssumption",
+        "terminalAssumption",
+        "dividendsExpected",
+        "fairValue",
+        "currency",
+        "totalReturnPct",
+        "annualizedReturnPct",
+        "probabilityPct"
+      ],
+      "properties": {
+        "revenueGrowthAssumption": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "marginAssumption": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "epsOrFcfAssumption": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sectorMetricAssumption": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "terminalAssumption": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dividendsExpected": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "fairValue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "totalReturnPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "annualizedReturnPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "probabilityPct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "scenarios": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bear",
+        "base",
+        "bull"
+      ],
+      "properties": {
+        "bear": {
+          "$ref": "#/$defs/scenario"
+        },
+        "base": {
+          "$ref": "#/$defs/scenario"
+        },
+        "bull": {
+          "$ref": "#/$defs/scenario"
+        }
+      },
+      "$comment": "Walidacja semantyczna: jeśli wszystkie probabilityPct są znane, ich suma powinna wynosić 100 (z tolerancją na zaokrąglenia)."
+    },
+    "expectedReturn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "horizonYears",
+        "baseTotalReturnPct",
+        "baseAnnualizedReturnPct",
+        "bullTotalReturnPct",
+        "bearDownsidePct",
+        "weightedExpectedReturnPct",
+        "returnDrivers",
+        "asymmetryRatio",
+        "summary"
+      ],
+      "properties": {
+        "horizonYears": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0,
+          "maximum": 20
+        },
+        "baseTotalReturnPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "baseAnnualizedReturnPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "bullTotalReturnPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "bearDownsidePct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "weightedExpectedReturnPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "returnDrivers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "epsFcfGrowthPct",
+            "dividendPct",
+            "multipleChangePct"
+          ],
+          "properties": {
+            "epsFcfGrowthPct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "dividendPct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "multipleChangePct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "asymmetryRatio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "narrativeBridge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catalyst",
+        "economicMechanism",
+        "operationalImpact",
+        "revenueImpact",
+        "marginOrEbitImpact",
+        "epsFcfImpact",
+        "workingCapitalAndCapexImpact",
+        "expectedTiming",
+        "probability",
+        "alreadyPricedIn"
+      ],
+      "properties": {
+        "catalyst": {
+          "type": "string"
+        },
+        "economicMechanism": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "operationalImpact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "revenueImpact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "marginOrEbitImpact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "epsFcfImpact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "workingCapitalAndCapexImpact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "expectedTiming": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "probability": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "alreadyPricedIn": {
+          "enum": [
+            "YES",
+            "PARTLY",
+            "NO",
+            "UNKNOWN"
+          ]
+        }
+      }
+    },
+    "businessQuality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "businessModel",
+        "revenueAndProfitSources",
+        "recurringRevenue",
+        "customerSegmentsAndGeography",
+        "cyclicality",
+        "pricingPower",
+        "competitiveAdvantages",
+        "advantageDurability",
+        "advantageThreats",
+        "marketOpportunity",
+        "managementAndCapitalAllocation"
+      ],
+      "properties": {
+        "businessModel": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "revenueAndProfitSources": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "recurringRevenue": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "customerSegmentsAndGeography": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cyclicality": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pricingPower": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "competitiveAdvantages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "advantageDurability": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "advantageThreats": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "marketOpportunity": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "managementAndCapitalAllocation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "margins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "grossMarginPct",
+        "operatingMarginPct",
+        "netMarginPct",
+        "trend"
+      ],
+      "properties": {
+        "grossMarginPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "operatingMarginPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "netMarginPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "trend": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "financialQuality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "historyCoverage",
+        "latestResultsPeriod",
+        "revenueTrend",
+        "epsTrend",
+        "fcfTrend",
+        "revenueCagrPct",
+        "ebitCagrPct",
+        "netIncomeCagrPct",
+        "epsCagrPct",
+        "fcfCagrPct",
+        "cashConversion",
+        "margins",
+        "operatingCashFlow",
+        "capex",
+        "workingCapital",
+        "roic",
+        "roe",
+        "netDebt",
+        "netDebtToEbitda",
+        "interestCoverage",
+        "debtMaturities",
+        "oneOffs",
+        "shareCountTrend",
+        "epsGrowthDrivers"
+      ],
+      "properties": {
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "historyCoverage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "latestResultsPeriod": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "revenueTrend": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "epsTrend": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fcfTrend": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "revenueCagrPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ebitCagrPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "netIncomeCagrPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "epsCagrPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "fcfCagrPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "cashConversion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "margins": {
+          "$ref": "#/$defs/margins"
+        },
+        "operatingCashFlow": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "capex": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "workingCapital": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "roic": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "roe": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "netDebt": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "netDebtToEbitda": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "interestCoverage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "debtMaturities": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "oneOffs": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "shareCountTrend": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "epsGrowthDrivers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "managementAndOwnership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "forecastAccuracy",
+        "strategyExecution",
+        "capitalAllocation",
+        "acquisitionsAndRoic",
+        "dividendsBuybacksIssuances",
+        "insiderActivity",
+        "dominantOwner",
+        "relatedPartyTransactions",
+        "minorityShareholderProtection",
+        "politicalRisk",
+        "summary"
+      ],
+      "properties": {
+        "forecastAccuracy": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "strategyExecution": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "capitalAllocation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "acquisitionsAndRoic": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dividendsBuybacksIssuances": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "insiderActivity": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dominantOwner": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relatedPartyTransactions": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "minorityShareholderProtection": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "politicalRisk": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "dividend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relevant",
+        "yieldPct",
+        "payoutRatioPct",
+        "fcfCoverage",
+        "history",
+        "growth",
+        "capexAndDebtConstraints",
+        "regulatoryConstraints",
+        "safety",
+        "summary"
+      ],
+      "properties": {
+        "relevant": {
+          "type": "boolean"
+        },
+        "yieldPct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "payoutRatioPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "fcfCoverage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "history": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "growth": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "capexAndDebtConstraints": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "regulatoryConstraints": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "safety": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "longTermTrend",
+        "vs50DayAverage",
+        "vs200DayAverage",
+        "drawdownFromHighPct",
+        "relativeStrength",
+        "supportZones",
+        "resistanceZones",
+        "priceVolumeReactionToResults",
+        "correctionDriver",
+        "summary"
+      ],
+      "properties": {
+        "longTermTrend": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vs50DayAverage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vs200DayAverage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "drawdownFromHighPct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "relativeStrength": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "supportZones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/priceZone"
+          }
+        },
+        "resistanceZones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/priceZone"
+          }
+        },
+        "priceVolumeReactionToResults": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "correctionDriver": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "supplyAnomaly": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "summary",
+        "identifiedSource",
+        "evidence",
+        "fadeSignals"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "CONFIRMED",
+            "PROBABLE",
+            "NO_EVIDENCE",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "identifiedSource": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fadeSignals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "smallMidCapRisk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "applicable",
+        "medianDailyTurnover",
+        "freeFloatPct",
+        "spread",
+        "volatility",
+        "ownershipConcentration",
+        "dominantOwnerRisk",
+        "customerAndContractConcentration",
+        "auditorAndReportingQuality",
+        "issuanceHistory",
+        "relatedPartyTransactions",
+        "dataAvailabilityAndCoverage",
+        "plannedPositionVsLiquidity",
+        "requiredMarginOfSafety",
+        "summary"
+      ],
+      "properties": {
+        "applicable": {
+          "type": "boolean"
+        },
+        "medianDailyTurnover": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "freeFloatPct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "spread": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "volatility": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ownershipConcentration": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dominantOwnerRisk": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "customerAndContractConcentration": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "auditorAndReportingQuality": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "issuanceHistory": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relatedPartyTransactions": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dataAvailabilityAndCoverage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "plannedPositionVsLiquidity": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "requiredMarginOfSafety": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "screeningAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hardFilterBreaches",
+        "riskFlags",
+        "summary"
+      ],
+      "properties": {
+        "hardFilterBreaches": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "UNINTELLIGIBLE_BUSINESS_MODEL",
+              "PERSISTENT_NEGATIVE_CASH_FLOW",
+              "LIQUIDITY_OR_REFINANCING_RISK",
+              "FREQUENT_DILUTION",
+              "EARNINGS_CASH_DIVERGENCE",
+              "AGGRESSIVE_ACCOUNTING_OR_AUDITOR_CONCERNS",
+              "OPAQUE_OWNERSHIP",
+              "CRITICAL_CONCENTRATION",
+              "UNRELIABLE_MANAGEMENT_COMMUNICATION",
+              "NARRATIVE_OR_MULTIPLE_DEPENDENT_THESIS",
+              "EXTREME_OPTIMISM_REQUIRED_BY_VALUATION",
+              "INADEQUATE_LIQUIDITY",
+              "INSUFFICIENT_DATA"
+            ]
+          }
+        },
+        "riskFlags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "riskAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "summary",
+        "permanentCapitalLossRisks"
+      ],
+      "properties": {
+        "level": {
+          "enum": [
+            "LOW",
+            "MODERATE",
+            "ELEVATED",
+            "HIGH",
+            "UNKNOWN"
+          ]
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "permanentCapitalLossRisks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "killCriterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "condition",
+        "metricOrEvent",
+        "threshold",
+        "reviewSource"
+      ],
+      "properties": {
+        "condition": {
+          "type": "string"
+        },
+        "metricOrEvent": {
+          "type": "string"
+        },
+        "threshold": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "reviewSource": {
+          "type": "string"
+        }
+      }
+    },
+    "thesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "growthDrivers",
+        "epsFcfGrowthDrivers",
+        "catalysts",
+        "pros",
+        "risks",
+        "killCriteria"
+      ],
+      "properties": {
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "growthDrivers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "epsFcfGrowthDrivers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "catalysts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "killCriteria": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/killCriterion"
+          }
+        }
+      }
+    },
+    "tranche": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "number",
+        "triggerPrice",
+        "currency",
+        "condition",
+        "sizeGuidance"
+      ],
+      "properties": {
+        "number": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "triggerPrice": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "condition": {
+          "type": "string"
+        },
+        "sizeGuidance": {
+          "enum": [
+            "SMALL_INITIAL",
+            "ADD",
+            "ADD_ON_CONFIRMATION",
+            "TACTICAL_SMALL",
+            "HOLD_FIRE",
+            "CUSTOM"
+          ]
+        }
+      }
+    },
+    "positionPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attractiveEntryZone",
+        "tranches",
+        "summary"
+      ],
+      "properties": {
+        "attractiveEntryZone": {
+          "$ref": "#/$defs/moneyRange"
+        },
+        "tranches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tranche"
+          }
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "watchCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "condition",
+        "desiredOutcome",
+        "impactIfMet"
+      ],
+      "properties": {
+        "condition": {
+          "type": "string"
+        },
+        "desiredOutcome": {
+          "type": "string"
+        },
+        "impactIfMet": {
+          "type": "string"
+        }
+      }
+    },
+    "monitoringPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nextReviewDate",
+        "nextExpectedReportDate",
+        "nextReviewTriggers",
+        "watchConditions"
+      ],
+      "properties": {
+        "nextReviewDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nextExpectedReportDate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nextReviewTriggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "watchConditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/watchCondition"
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "title",
+        "publisher",
+        "publishedAt",
+        "url",
+        "accessedAt"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "ANNUAL_REPORT",
+            "PERIODIC_REPORT",
+            "ESPI",
+            "EBI",
+            "INVESTOR_PRESENTATION",
+            "REGULATOR",
+            "MARKET_DATA",
+            "MACRO_DATA",
+            "OTHER"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "publisher": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "publishedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "accessedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "dataQuality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "confidence",
+        "missingCriticalData",
+        "conflictingData",
+        "notes"
+      ],
+      "properties": {
+        "confidence": {
+          "enum": [
+            "HIGH",
+            "MEDIUM",
+            "LOW"
+          ]
+        },
+        "missingCriticalData": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "conflictingData": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "company": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "externalId",
+        "identity",
+        "decision",
+        "classification",
+        "score",
+        "marketData",
+        "valuation",
+        "scenarios",
+        "expectedReturn",
+        "screeningAssessment",
+        "narrativeToNumbers",
+        "businessQuality",
+        "financialQuality",
+        "managementAndOwnership",
+        "dividend",
+        "timing",
+        "supplyAnomaly",
+        "smallMidCapRisk",
+        "riskAssessment",
+        "thesis",
+        "positionPlan",
+        "monitoringPlan",
+        "sources",
+        "dataQuality"
+      ],
+      "properties": {
+        "externalId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "decision": {
+          "$ref": "#/$defs/decision"
+        },
+        "classification": {
+          "$ref": "#/$defs/classification"
+        },
+        "score": {
+          "$ref": "#/$defs/score"
+        },
+        "marketData": {
+          "$ref": "#/$defs/marketData"
+        },
+        "valuation": {
+          "$ref": "#/$defs/valuation"
+        },
+        "scenarios": {
+          "$ref": "#/$defs/scenarios"
+        },
+        "expectedReturn": {
+          "$ref": "#/$defs/expectedReturn"
+        },
+        "screeningAssessment": {
+          "$ref": "#/$defs/screeningAssessment"
+        },
+        "narrativeToNumbers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/narrativeBridge"
+          }
+        },
+        "businessQuality": {
+          "$ref": "#/$defs/businessQuality"
+        },
+        "financialQuality": {
+          "$ref": "#/$defs/financialQuality"
+        },
+        "managementAndOwnership": {
+          "$ref": "#/$defs/managementAndOwnership"
+        },
+        "dividend": {
+          "$ref": "#/$defs/dividend"
+        },
+        "timing": {
+          "$ref": "#/$defs/timing"
+        },
+        "supplyAnomaly": {
+          "$ref": "#/$defs/supplyAnomaly"
+        },
+        "smallMidCapRisk": {
+          "$ref": "#/$defs/smallMidCapRisk"
+        },
+        "riskAssessment": {
+          "$ref": "#/$defs/riskAssessment"
+        },
+        "thesis": {
+          "$ref": "#/$defs/thesis"
+        },
+        "positionPlan": {
+          "$ref": "#/$defs/positionPlan"
+        },
+        "monitoringPlan": {
+          "$ref": "#/$defs/monitoringPlan"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "dataQuality": {
+          "$ref": "#/$defs/dataQuality"
+        }
+      }
+    }
+  }
+}
+

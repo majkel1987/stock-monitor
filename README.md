@@ -3,6 +3,8 @@
 Stock Monitor is a private, single-user investment research workspace for monitoring GPW and
 US-listed companies. It preserves watchlist context, price freshness, price levels, monitoring
 history, thesis revisions, and notes. It is not a trading platform or a real-time market terminal.
+It also imports manually exported `Monitoruj GPW Okazje` JSON files through a validated draft,
+review, and selective-commit workflow; the application does not generate the analysis.
 
 ## Stack
 
@@ -139,6 +141,10 @@ They run in a transaction and roll back their synthetic Auth and application dat
 - M4 uses the narrow `create_monitoring_with_thesis` RPC to insert the immutable monitoring
   snapshot, optionally insert its thesis revision, and update the current watchlist status in one
   transaction. The function derives ownership from `auth.uid()` and never accepts a client user ID.
+- GPW opportunity imports preserve the raw batch and per-company draft before any domain write.
+  `commit_gpw_monitoring_import_item` atomically resolves the stock and status, restores or creates
+  the watchlist item, and writes an immutable monitoring/thesis snapshot. `score.total` is the
+  imported Investment Score; legacy manual score fields are not synthesized.
 
 On 2026-09-04, the M2 privilege migration was applied to `stock-monitor-dev`. The 229 M2 pgTAP
 assertions passed remotely and their fixtures were rolled back. They cover anonymous denial,
@@ -174,25 +180,25 @@ user-owned default status records have been created by M1.
 
 ## Scripts
 
-| Script                | Purpose                                    |
-| --------------------- | ------------------------------------------ |
-| `pnpm dev`            | Start the local Next.js development server |
-| `pnpm build`          | Create a production build                  |
-| `pnpm start`          | Run the production build                   |
-| `pnpm lint`           | Run ESLint                                 |
-| `pnpm typecheck`      | Run TypeScript without emitting files      |
-| `pnpm test`           | Run Vitest once                            |
-| `pnpm test:watch`     | Run Vitest in watch mode                   |
-| `pnpm test:e2e`       | Run the Playwright smoke test              |
-| `pnpm test:e2e:local` | Provision a local user and run full E2E    |
+| Script                | Purpose                                               |
+| --------------------- | ----------------------------------------------------- |
+| `pnpm dev`            | Start the local Next.js development server            |
+| `pnpm build`          | Create a production build                             |
+| `pnpm start`          | Run the production build                              |
+| `pnpm lint`           | Run ESLint                                            |
+| `pnpm typecheck`      | Run TypeScript without emitting files                 |
+| `pnpm test`           | Run Vitest once                                       |
+| `pnpm test:watch`     | Run Vitest in watch mode                              |
+| `pnpm test:e2e`       | Run the Playwright smoke test                         |
+| `pnpm test:e2e:local` | Provision a local user and run full E2E               |
 | `pnpm provider:spike` | Run the development-only provider coverage diagnostic |
-| `pnpm db:start`       | Start local Supabase                       |
-| `pnpm db:stop`        | Stop local Supabase                        |
-| `pnpm db:reset`       | Recreate, migrate, and seed the local DB   |
-| `pnpm db:test`        | Run PostgreSQL/pgTAP tests                 |
-| `pnpm db:types`       | Regenerate Supabase TypeScript DB types    |
-| `pnpm format`         | Format supported files with Prettier       |
-| `pnpm format:check`   | Check formatting without changing files    |
+| `pnpm db:start`       | Start local Supabase                                  |
+| `pnpm db:stop`        | Stop local Supabase                                   |
+| `pnpm db:reset`       | Recreate, migrate, and seed the local DB              |
+| `pnpm db:test`        | Run PostgreSQL/pgTAP tests                            |
+| `pnpm db:types`       | Regenerate Supabase TypeScript DB types               |
+| `pnpm format`         | Format supported files with Prettier                  |
+| `pnpm format:check`   | Check formatting without changing files               |
 
 ## Architecture
 

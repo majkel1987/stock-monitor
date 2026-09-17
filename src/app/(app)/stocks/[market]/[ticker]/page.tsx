@@ -42,7 +42,8 @@ const dateTimeFormatter = new Intl.DateTimeFormat("en-GB", {
   timeZone: "Europe/Warsaw",
 });
 
-function formatNumber(value: string, maximumFractionDigits = 6) {
+function formatNumber(value: string | null, maximumFractionDigits = 6) {
+  if (value === null) return "—";
   return new Intl.NumberFormat("en-US", { maximumFractionDigits }).format(
     Number(value),
   );
@@ -141,7 +142,10 @@ function HistoryRow({ item }: { item: MonitoringHistoryItem }) {
         <span className="text-[9px] text-[var(--text-muted)]">
           Source: {item.sourceType.replaceAll("_", " ")}
           {item.sourceReference ? ` · ${item.sourceReference}` : ""} · Price as
-          of {dateTimeFormatter.format(new Date(item.priceAsOf))}
+          of{" "}
+          {item.priceAsOf
+            ? dateTimeFormatter.format(new Date(item.priceAsOf))
+            : "unavailable"}
         </span>
       </div>
     </article>
@@ -309,6 +313,70 @@ export default async function StockPage({ params }: StockPageProps) {
           )}
         </Surface>
       </div>
+
+      {latestMonitoring?.analysisDetails ? (
+        <Surface>
+          <SectionHeader
+            meta={
+              <Link
+                className="font-semibold text-[var(--accent-primary)] hover:text-[var(--accent-hover)]"
+                href={`/monitoring/${latestMonitoring.id}`}
+              >
+                Open full analysis →
+              </Link>
+            }
+            title="Latest imported analysis"
+          />
+          <div className="grid grid-cols-2 gap-px bg-[var(--border-subtle)] lg:grid-cols-6">
+            {[
+              [
+                "DECISION",
+                latestMonitoring.decisionAction?.replaceAll("_", " ") ?? "—",
+              ],
+              [
+                "INVESTMENT SCORE",
+                latestMonitoring.scores.investment?.toString() ?? "—",
+              ],
+              [
+                "BASE FAIR VALUE",
+                latestMonitoring.baseFairValue
+                  ? `${formatNumber(latestMonitoring.baseFairValue)} ${detail.stock.currency}`
+                  : "—",
+              ],
+              [
+                "ENTRY ZONE",
+                latestMonitoring.entryZoneFrom || latestMonitoring.entryZoneTo
+                  ? `${latestMonitoring.entryZoneFrom ?? "—"}–${latestMonitoring.entryZoneTo ?? "—"} ${latestMonitoring.entryZoneCurrency ?? detail.stock.currency}`
+                  : "—",
+              ],
+              [
+                "BASE POTENTIAL",
+                latestMonitoring.baseTotalReturnPct
+                  ? `${latestMonitoring.baseTotalReturnPct}%`
+                  : "—",
+              ],
+              [
+                "ASYMMETRY",
+                latestMonitoring.asymmetryRatio
+                  ? `${latestMonitoring.asymmetryRatio}×`
+                  : "—",
+              ],
+            ].map(([label, value]) => (
+              <div
+                className="flex min-h-[68px] flex-col gap-1 bg-[var(--surface-default)] p-3"
+                key={label}
+              >
+                <span className="text-[8px] font-bold tracking-[0.5px] text-[var(--text-muted)]">
+                  {label}
+                </span>
+                <strong className="font-mono text-[12px] text-[var(--text-primary)]">
+                  {value}
+                </strong>
+              </div>
+            ))}
+          </div>
+        </Surface>
+      ) : null}
 
       <div className="grid min-h-[328px] grid-cols-[490px_1fr] gap-4 max-xl:grid-cols-1">
         <Surface>

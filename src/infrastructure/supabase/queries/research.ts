@@ -3,6 +3,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { MonitoringWriter } from "@/application/monitoring/types";
+import type { GpwImportCompany } from "@/application/imports/gpw-monitoring-schema";
 import type { NoteWriter } from "@/application/notes/types";
 import type { PriceLevelWriter } from "@/application/price-levels/types";
 import type {
@@ -52,6 +53,16 @@ function stringArray(value: Json): string[] {
 
 function sourceType(value: string) {
   return value === "json_import" || value === "api_import" ? value : "manual";
+}
+
+function importedCompany(value: Json): GpwImportCompany | null {
+  if (typeof value !== "object" || value === null || Array.isArray(value))
+    return null;
+  return typeof value.externalId === "string" &&
+    typeof value.identity === "object" &&
+    value.identity !== null
+    ? (value as GpwImportCompany)
+    : null;
 }
 
 function thesisView(row: ThesisRow): ThesisSummary {
@@ -110,13 +121,40 @@ function monitoringHistory(
       summary: row.summary,
       pros: stringArray(row.pros),
       risks: stringArray(row.risks),
-      price: String(row.price),
+      price: row.price === null ? null : String(row.price),
       currency: row.currency,
       priceAsOf: row.price_as_of,
       fxUsdPln: row.fx_usd_pln === null ? null : String(row.fx_usd_pln),
       pricePln: row.price_pln === null ? null : String(row.price_pln),
       sourceType: sourceType(row.source_type),
       sourceReference: row.source_reference,
+      analysisDate: row.analysis_date,
+      decisionAction: row.decision_action,
+      decisionReason: row.decision_reason,
+      opportunityCategory: row.opportunity_category,
+      analysisDetails: importedCompany(row.analysis_details),
+      baseFairValue:
+        row.base_fair_value === null ? null : String(row.base_fair_value),
+      entryZoneFrom:
+        row.entry_zone_from === null ? null : String(row.entry_zone_from),
+      entryZoneTo:
+        row.entry_zone_to === null ? null : String(row.entry_zone_to),
+      entryZoneCurrency: row.entry_zone_currency,
+      baseTotalReturnPct:
+        row.base_total_return_pct === null
+          ? null
+          : String(row.base_total_return_pct),
+      baseAnnualizedReturnPct:
+        row.base_annualized_return_pct === null
+          ? null
+          : String(row.base_annualized_return_pct),
+      bearDownsidePct:
+        row.bear_downside_pct === null ? null : String(row.bear_downside_pct),
+      asymmetryRatio:
+        row.asymmetry_ratio === null ? null : String(row.asymmetry_ratio),
+      dataConfidence: row.data_confidence,
+      nextReviewDate: row.next_review_date,
+      nextExpectedReportDate: row.next_expected_report_date,
       supersedesId: row.supersedes_id,
       isSuperseded: supersededIds.has(row.id),
       comparison:
@@ -124,7 +162,10 @@ function monitoringHistory(
           ? {
               previousId: previous.id,
               previousStatus,
-              priceDelta: Number(row.price) - Number(previous.price),
+              priceDelta:
+                row.price === null || previous.price === null
+                  ? null
+                  : Number(row.price) - Number(previous.price),
               scoreDeltas: compareMonitoringScores(
                 monitoringScores(row),
                 monitoringScores(previous),

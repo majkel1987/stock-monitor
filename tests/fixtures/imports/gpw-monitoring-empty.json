@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "1.0",
+  "exportType": "gpw_opportunity_monitoring",
+  "externalId": "gpw-monitoring-2026-09-16-empty-example",
+  "generatedAt": "2026-09-16T18:00:00Z",
+  "analysisDate": "2026-09-16",
+  "market": "GPW",
+  "profile": {
+    "baseCurrency": "PLN",
+    "horizon": "1-3Y",
+    "riskTolerance": "MODERATE",
+    "capitalProtectionPriority": true,
+    "gradualEntry": true,
+    "dividendPreference": true,
+    "maxDeepDiveCandidates": 5,
+    "accountTypes": [
+      "IKE",
+      "IKZE"
+    ],
+    "preferredSectors": [],
+    "excludedSectors": [],
+    "customConstraints": [
+      "Dane demonstracyjne — nie są realnym screeningiem GPW."
+    ],
+    "portfolioContext": null
+  },
+  "marketRegime": {
+    "valuationRegime": "ABOVE_HISTORICAL_AVERAGE",
+    "marketPhase": "SELECTIVE_MARKET",
+    "opportunityBreadth": "NONE",
+    "summary": "Przykład poprawnego monitoringu bez kandydatów spełniających kryteria.",
+    "keyRisks": [
+      "Wyceny nie zapewniają wystarczającego marginesu bezpieczeństwa — przykład."
+    ],
+    "implicationsForScreening": [
+      "Zachować gotówkę i listę obserwacyjną — przykład."
+    ]
+  },
+  "scanSummary": {
+    "companiesScreened": null,
+    "companiesConsidered": 18,
+    "companiesExported": 0,
+    "deepDiveCandidates": 0,
+    "buyCandidates": 0,
+    "watchCandidates": 0,
+    "avoidCandidates": 0,
+    "summary": "Brak spółek eksportowanych jest prawidłowym wynikiem."
+  },
+  "marketSources": [
+    {
+      "type": "MACRO_DATA",
+      "title": "Przykładowe dane makro",
+      "publisher": "Przykładowe źródło",
+      "publishedAt": "2026-08-30",
+      "url": "https://example.com/source",
+      "accessedAt": "2026-09-16T17:30:00Z"
+    }
+  ],
+  "companies": []
+}

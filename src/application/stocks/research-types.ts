@@ -5,6 +5,7 @@ import type {
   MonitoringScores,
 } from "@/domain/monitoring/calculations";
 import type { PriceLevelTriggerDirection } from "@/domain/price-levels/calculations";
+import type { GpwImportCompany } from "@/application/imports/gpw-monitoring-schema";
 
 export type ResearchStatus = {
   id: string;
@@ -25,19 +26,35 @@ export type MonitoringHistoryItem = {
   summary: string | null;
   pros: string[];
   risks: string[];
-  price: string;
+  price: string | null;
   currency: string;
-  priceAsOf: string;
+  priceAsOf: string | null;
   fxUsdPln: string | null;
   pricePln: string | null;
   sourceType: "manual" | "json_import" | "api_import";
   sourceReference: string | null;
+  analysisDate: string | null;
+  decisionAction: string | null;
+  decisionReason: string | null;
+  opportunityCategory: string | null;
+  analysisDetails: GpwImportCompany | null;
+  baseFairValue: string | null;
+  entryZoneFrom: string | null;
+  entryZoneTo: string | null;
+  entryZoneCurrency: string | null;
+  baseTotalReturnPct: string | null;
+  baseAnnualizedReturnPct: string | null;
+  bearDownsidePct: string | null;
+  asymmetryRatio: string | null;
+  dataConfidence: string | null;
+  nextReviewDate: string | null;
+  nextExpectedReportDate: string | null;
   supersedesId: string | null;
   isSuperseded: boolean;
   comparison: {
     previousId: string;
     previousStatus: ResearchStatus;
-    priceDelta: number;
+    priceDelta: number | null;
     scoreDeltas: MonitoringScoreDeltas;
   } | null;
 };

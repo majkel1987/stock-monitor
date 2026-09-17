@@ -16,7 +16,7 @@
 4. **Częstotliwość cen:** po jednej synchronizacji EOD po zamknięciu GPW i USA; odległości od poziomów są obliczane przy odczycie, a nie osobnym zadaniem.
 5. **Statusy:** edytowalne przez użytkownika. Domyślne statusy są seedem danych, nie enumem zaszytym w interfejsie.
 6. **Historia:** wyniki monitoringu i wersje thesis są niezmienne; korekta tworzy nową rewizję albo jawnie oznaczoną poprawkę, nigdy ciche nadpisanie.
-7. **MVP:** watchlista, klasyfikacja, ceny, poziomy, monitoring history, notatki, dashboard i ręczny formularz. Import JSON, fundamenty, alerty oraz portfolio są V1/V2.
+7. **MVP:** watchlista, klasyfikacja, ceny, poziomy, monitoring history, notatki, dashboard, ręczny formularz oraz zatwierdzony ręczny import JSON `Monitoruj GPW Okazje`. Pozostałe importy/API, fundamenty, alerty oraz portfolio są V1/V2.
 
 ---
 
@@ -452,9 +452,16 @@ AI jest niezaufanym producentem danych. Import nigdy nie zapisuje bezpośrednio 
 
 ### MVP
 
-Ręczny formularz monitoringu. Można wkleić tekst podsumowania, ale nie ma parsera AI.
+Ręczny formularz monitoringu pozostaje dostępny. Dodatkowo zatwierdzony jest ręczny import pliku
+`Monitoruj GPW Okazje` zgodnego z kanonicznym schema `1.0` i
+`exportType = gpw_opportunity_monitoring`. Import tworzy batch i elementy draft, wymaga review oraz
+pozwala na selektywny, atomowy commit spółek. Aplikacja nie uruchamia skilla i nie generuje analizy.
 
-### V1 — JSON jako draft
+### V1 — ogólny JSON/API jako draft
+
+Poniższy historyczny przykład opisuje przyszły, ogólny kontrakt API. Nie jest kontraktem ręcznego
+importu MVP `Monitoruj GPW Okazje`. Jego jedynym kanonicznym schema jest
+`docs/schemas/gpw-monitoring-import.schema.json`.
 
 Endpoint kanoniczny:
 
@@ -987,7 +994,7 @@ Lewy rail: `Dashboard`, `Watchlist`, `Monitoring`, `Settings`. Globalny command/
 
 ### Poza MVP, mimo przygotowanego modelu
 
-- JSON import i tokeny API;
+- osobiste tokeny API (ręczny JSON import `Monitoruj GPW Okazje` jest już w zakresie);
 - fundamenty i wykresy;
 - alerty/e-mail;
 - portfolio quantities/cost basis;

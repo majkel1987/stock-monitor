@@ -81,10 +81,13 @@ export type Database = {
           bull_case: string | null
           catalysts: Json
           created_at: string
+          eps_fcf_growth_drivers: Json
+          growth_drivers: Json
           id: string
           key_risks: Json
           kill_criteria: Json
           monitoring_result_id: string
+          pros: Json
           stock_id: string
           summary: string | null
         }
@@ -94,10 +97,13 @@ export type Database = {
           bull_case?: string | null
           catalysts?: Json
           created_at?: string
+          eps_fcf_growth_drivers?: Json
+          growth_drivers?: Json
           id?: string
           key_risks?: Json
           kill_criteria?: Json
           monitoring_result_id: string
+          pros?: Json
           stock_id: string
           summary?: string | null
         }
@@ -107,10 +113,13 @@ export type Database = {
           bull_case?: string | null
           catalysts?: Json
           created_at?: string
+          eps_fcf_growth_drivers?: Json
+          growth_drivers?: Json
           id?: string
           key_risks?: Json
           kill_criteria?: Json
           monitoring_result_id?: string
+          pros?: Json
           stock_id?: string
           summary?: string | null
         }
@@ -217,18 +226,192 @@ export type Database = {
         }
         Relationships: []
       }
+      monitoring_import_batches: {
+        Row: {
+          analysis_date: string
+          created_at: string
+          export_type: string
+          external_id: string
+          file_name: string
+          generated_at: string
+          id: string
+          raw_payload: Json
+          raw_size_bytes: number
+          schema_version: string
+          state: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_date: string
+          created_at?: string
+          export_type: string
+          external_id: string
+          file_name: string
+          generated_at: string
+          id?: string
+          raw_payload: Json
+          raw_size_bytes: number
+          schema_version: string
+          state?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_date?: string
+          created_at?: string
+          export_type?: string
+          external_id?: string
+          file_name?: string
+          generated_at?: string
+          id?: string
+          raw_payload?: Json
+          raw_size_bytes?: number
+          schema_version?: string
+          state?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      monitoring_import_items: {
+        Row: {
+          batch_id: string
+          committed_at: string | null
+          committed_monitoring_result_id: string | null
+          company_name: string | null
+          confidence: string | null
+          created_at: string
+          current_price: number | null
+          decision_action: string | null
+          errors: Json
+          existing_status_slug: string | null
+          external_id: string
+          id: string
+          imported_status_slug: string | null
+          include_in_commit: boolean
+          normalized_payload: Json
+          ordinal: number
+          price_level_actions: Json
+          resolved_status_id: string | null
+          resolved_stock_id: string | null
+          state: string
+          ticker: string | null
+          user_id: string
+          warnings: Json
+          warnings_accepted: boolean
+        }
+        Insert: {
+          batch_id: string
+          committed_at?: string | null
+          committed_monitoring_result_id?: string | null
+          company_name?: string | null
+          confidence?: string | null
+          created_at?: string
+          current_price?: number | null
+          decision_action?: string | null
+          errors?: Json
+          existing_status_slug?: string | null
+          external_id: string
+          id?: string
+          imported_status_slug?: string | null
+          include_in_commit?: boolean
+          normalized_payload: Json
+          ordinal: number
+          price_level_actions?: Json
+          resolved_status_id?: string | null
+          resolved_stock_id?: string | null
+          state: string
+          ticker?: string | null
+          user_id: string
+          warnings?: Json
+          warnings_accepted?: boolean
+        }
+        Update: {
+          batch_id?: string
+          committed_at?: string | null
+          committed_monitoring_result_id?: string | null
+          company_name?: string | null
+          confidence?: string | null
+          created_at?: string
+          current_price?: number | null
+          decision_action?: string | null
+          errors?: Json
+          existing_status_slug?: string | null
+          external_id?: string
+          id?: string
+          imported_status_slug?: string | null
+          include_in_commit?: boolean
+          normalized_payload?: Json
+          ordinal?: number
+          price_level_actions?: Json
+          resolved_status_id?: string | null
+          resolved_stock_id?: string | null
+          state?: string
+          ticker?: string | null
+          user_id?: string
+          warnings?: Json
+          warnings_accepted?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitoring_import_items_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "monitoring_import_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "monitoring_import_items_monitoring_id_fkey"
+            columns: ["committed_monitoring_result_id"]
+            isOneToOne: false
+            referencedRelation: "monitoring_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "monitoring_import_items_status_owner_fkey"
+            columns: ["resolved_status_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "status_definitions"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "monitoring_import_items_stock_id_fkey"
+            columns: ["resolved_stock_id"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       monitoring_results: {
         Row: {
+          analysis_date: string | null
+          analysis_details: Json
           analyzed_at: string
+          asymmetry_ratio: number | null
+          base_annualized_return_pct: number | null
+          base_fair_value: number | null
+          base_total_return_pct: number | null
+          bear_downside_pct: number | null
           created_at: string
           currency: string
+          data_confidence: string | null
+          decision_action: string | null
+          decision_reason: string | null
           deleted_at: string | null
+          entry_zone_currency: string | null
+          entry_zone_from: number | null
+          entry_zone_to: number | null
           fx_usd_pln: number | null
           id: string
           investment_score: number | null
           momentum_score: number | null
-          price: number
-          price_as_of: string
+          next_expected_report_date: string | null
+          next_review_date: string | null
+          opportunity_category: string | null
+          price: number | null
+          price_as_of: string | null
           price_pln: number | null
           pros: Json
           quality_score: number | null
@@ -245,16 +428,32 @@ export type Database = {
           valuation_score: number | null
         }
         Insert: {
+          analysis_date?: string | null
+          analysis_details?: Json
           analyzed_at?: string
+          asymmetry_ratio?: number | null
+          base_annualized_return_pct?: number | null
+          base_fair_value?: number | null
+          base_total_return_pct?: number | null
+          bear_downside_pct?: number | null
           created_at?: string
           currency: string
+          data_confidence?: string | null
+          decision_action?: string | null
+          decision_reason?: string | null
           deleted_at?: string | null
+          entry_zone_currency?: string | null
+          entry_zone_from?: number | null
+          entry_zone_to?: number | null
           fx_usd_pln?: number | null
           id?: string
           investment_score?: number | null
           momentum_score?: number | null
-          price: number
-          price_as_of: string
+          next_expected_report_date?: string | null
+          next_review_date?: string | null
+          opportunity_category?: string | null
+          price?: number | null
+          price_as_of?: string | null
           price_pln?: number | null
           pros?: Json
           quality_score?: number | null
@@ -271,16 +470,32 @@ export type Database = {
           valuation_score?: number | null
         }
         Update: {
+          analysis_date?: string | null
+          analysis_details?: Json
           analyzed_at?: string
+          asymmetry_ratio?: number | null
+          base_annualized_return_pct?: number | null
+          base_fair_value?: number | null
+          base_total_return_pct?: number | null
+          bear_downside_pct?: number | null
           created_at?: string
           currency?: string
+          data_confidence?: string | null
+          decision_action?: string | null
+          decision_reason?: string | null
           deleted_at?: string | null
+          entry_zone_currency?: string | null
+          entry_zone_from?: number | null
+          entry_zone_to?: number | null
           fx_usd_pln?: number | null
           id?: string
           investment_score?: number | null
           momentum_score?: number | null
-          price?: number
-          price_as_of?: string
+          next_expected_report_date?: string | null
+          next_review_date?: string | null
+          opportunity_category?: string | null
+          price?: number | null
+          price_as_of?: string | null
           price_pln?: number | null
           pros?: Json
           quality_score?: number | null
@@ -821,6 +1036,29 @@ export type Database = {
       configure_market_sync_cron: { Args: never; Returns: number }
       disable_market_sync_cron: { Args: never; Returns: boolean }
       enqueue_market_sync: { Args: never; Returns: number }
+      commit_gpw_monitoring_import_item: {
+        Args: { p_item_id: string; p_price_level_actions?: Json }
+        Returns: {
+          monitoring_result_id: string | null
+          outcome: string
+          stock_id: string | null
+        }[]
+      }
+      create_gpw_monitoring_import_draft: {
+        Args: {
+          p_analysis_date: string
+          p_external_id: string
+          p_file_name: string
+          p_generated_at: string
+          p_items: Json
+          p_raw_payload: Json
+          p_raw_size_bytes: number
+        }
+        Returns: {
+          batch_id: string
+          outcome: string
+        }[]
+      }
       create_monitoring_with_thesis: {
         Args: {
           p_analyzed_at: string

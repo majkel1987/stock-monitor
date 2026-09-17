@@ -335,6 +335,7 @@ Core MVP responsibilities include:
 - price levels,
 - monitoring history,
 - immutable investment analysis history,
+- manual JSON import of `Monitoruj GPW Okazje` schema `1.0` through draft, review and selective commit,
 - thesis revisions,
 - notes,
 - dashboard aggregations,
@@ -945,9 +946,8 @@ docs/runbooks/
 
 Implement ONLY what is required for MVP unless the user explicitly requests otherwise.
 
-Do not pre-build:
+Do not pre-build, except for the explicitly approved manual `Monitoruj GPW Okazje` JSON import:
 
-- JSON AI import,
 - AI orchestration,
 - public API tokens,
 - fundamentals,

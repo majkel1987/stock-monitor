@@ -1,0 +1,1154 @@
+{
+  "schemaVersion": "1.0",
+  "exportType": "gpw_opportunity_monitoring",
+  "externalId": "gpw-monitoring-2026-09-16-example",
+  "generatedAt": "2026-09-16T18:00:00Z",
+  "analysisDate": "2026-09-16",
+  "market": "GPW",
+  "profile": {
+    "baseCurrency": "PLN",
+    "horizon": "1-3Y",
+    "riskTolerance": "MODERATE",
+    "capitalProtectionPriority": true,
+    "gradualEntry": true,
+    "dividendPreference": true,
+    "maxDeepDiveCandidates": 5,
+    "accountTypes": [
+      "IKE",
+      "IKZE"
+    ],
+    "preferredSectors": [],
+    "excludedSectors": [],
+    "customConstraints": [
+      "Dane demonstracyjne — nie są realnym screeningiem GPW."
+    ],
+    "portfolioContext": null
+  },
+  "marketRegime": {
+    "valuationRegime": "NEAR_HISTORICAL_AVERAGE",
+    "marketPhase": "SELECTIVE_MARKET",
+    "opportunityBreadth": "SELECTIVE",
+    "summary": "Przykładowy reżim wyłącznie do testu kontraktu.",
+    "keyRisks": [
+      "Ryzyko makro — przykład"
+    ],
+    "implicationsForScreening": [
+      "Wyższy nacisk na jakość i wycenę — przykład"
+    ]
+  },
+  "scanSummary": {
+    "companiesScreened": null,
+    "companiesConsidered": 12,
+    "companiesExported": 3,
+    "deepDiveCandidates": 1,
+    "buyCandidates": 1,
+    "watchCandidates": 1,
+    "avoidCandidates": 1,
+    "summary": "Eksport demonstracyjny z trzema fikcyjnymi spółkami."
+  },
+  "marketSources": [
+    {
+      "type": "MACRO_DATA",
+      "title": "Przykładowe dane makro",
+      "publisher": "Przykładowe źródło",
+      "publishedAt": "2026-08-30",
+      "url": "https://example.com/source",
+      "accessedAt": "2026-09-16T17:30:00Z"
+    }
+  ],
+  "companies": [
+    {
+      "externalId": "gpw-DEMQ-2026-09-16-example",
+      "identity": {
+        "ticker": "DEMQ",
+        "name": "Spółka demonstracyjna Quality SA (fikcyjna)",
+        "market": "GPW",
+        "currency": "PLN",
+        "isin": null
+      },
+      "decision": {
+        "action": "BUY_GRADUALLY",
+        "reason": "Dane wyłącznie demonstracyjne do testu kontraktu; nie stanowią analizy rzeczywistego emitenta.",
+        "watchReason": null
+      },
+      "classification": {
+        "status": "BUY_CANDIDATE",
+        "opportunityCategory": "QUALITY_COMPOUNDER"
+      },
+      "score": {
+        "total": 84,
+        "components": {
+          "businessModelAndRecurringRevenue": 9,
+          "competitiveAdvantage": 8,
+          "earningsQualityAndCashConversion": 8,
+          "epsFcfGrowthVisibility": 10,
+          "balanceSheetAndFinancialResilience": 7,
+          "managementOwnershipCapitalAllocation": 7,
+          "industryOutlookAndTargetMarket": 6,
+          "narrativeToNumbers": 8,
+          "valuationAndMarginOfSafety": 8,
+          "riskRewardAsymmetry": 7,
+          "trendTimingSupplyAnomaly": 3,
+          "liquidityGovernanceRiskDataQuality": 3
+        }
+      },
+      "marketData": {
+        "price": 25,
+        "currency": "PLN",
+        "asOf": "2026-09-16T15:00:00Z",
+        "source": "Przykładowe dane rynkowe"
+      },
+      "valuation": {
+        "summary": "Dane wyłącznie demonstracyjne do testu kontraktu; nie stanowią analizy rzeczywistego emitenta.",
+        "methods": [
+          {
+            "method": "DCF",
+            "fairValue": 32,
+            "currency": "PLN",
+            "summary": "Ilustracyjny DCF."
+          },
+          {
+            "method": "PE",
+            "fairValue": 30.72,
+            "currency": "PLN",
+            "summary": "Ilustracyjne porównanie P/E."
+          }
+        ],
+        "fairValueBase": 32,
+        "attractiveEntryZone": {
+          "from": 22,
+          "to": 24,
+          "currency": "PLN"
+        },
+        "marginOfSafetySummary": "Ilustracyjny opis marginesu bezpieczeństwa."
+      },
+      "scenarios": {
+        "bear": {
+          "revenueGrowthAssumption": "Niski wzrost.",
+          "marginAssumption": "Presja na marżę.",
+          "epsOrFcfAssumption": "Słabszy EPS/FCF.",
+          "sectorMetricAssumption": null,
+          "terminalAssumption": "Niższy mnożnik.",
+          "dividendsExpected": 1,
+          "fairValue": 20,
+          "currency": "PLN",
+          "totalReturnPct": -20,
+          "annualizedReturnPct": -8,
+          "probabilityPct": 25
+        },
+        "base": {
+          "revenueGrowthAssumption": "Umiarkowany wzrost.",
+          "marginAssumption": "Stabilna lub lekko rosnąca marża.",
+          "epsOrFcfAssumption": "Wzrost EPS/FCF.",
+          "sectorMetricAssumption": null,
+          "terminalAssumption": "Mnożnik zbliżony do średniej.",
+          "dividendsExpected": 2.5,
+          "fairValue": 32,
+          "currency": "PLN",
+          "totalReturnPct": 36,
+          "annualizedReturnPct": 10.8,
+          "probabilityPct": 55
+        },
+        "bull": {
+          "revenueGrowthAssumption": "Wyższy wzrost.",
+          "marginAssumption": "Poprawa marży.",
+          "epsOrFcfAssumption": "Silniejszy wzrost EPS/FCF.",
+          "sectorMetricAssumption": null,
+          "terminalAssumption": "Umiarkowany rerating.",
+          "dividendsExpected": 3,
+          "fairValue": 40,
+          "currency": "PLN",
+          "totalReturnPct": 60,
+          "annualizedReturnPct": 16.9,
+          "probabilityPct": 20
+        }
+      },
+      "expectedReturn": {
+        "horizonYears": 3,
+        "baseTotalReturnPct": 36,
+        "baseAnnualizedReturnPct": 10.8,
+        "bullTotalReturnPct": 60,
+        "bearDownsidePct": -20,
+        "weightedExpectedReturnPct": 27,
+        "returnDrivers": {
+          "epsFcfGrowthPct": 22,
+          "dividendPct": 9,
+          "multipleChangePct": 5
+        },
+        "asymmetryRatio": 1.8,
+        "summary": "Ilustracyjny rozkład oczekiwanej stopy zwrotu."
+      },
+      "screeningAssessment": {
+        "hardFilterBreaches": [],
+        "riskFlags": [],
+        "summary": "Ilustracyjny wynik twardych filtrów."
+      },
+      "narrativeToNumbers": [
+        {
+          "catalyst": "Przykładowy katalizator",
+          "economicMechanism": "Większy wolumen lub lepszy mix.",
+          "operationalImpact": "Wzrost wykorzystania mocy.",
+          "revenueImpact": "Potencjalny wzrost przychodów.",
+          "marginOrEbitImpact": "Możliwa poprawa dźwigni operacyjnej.",
+          "epsFcfImpact": "Potencjalny wzrost EPS/FCF.",
+          "workingCapitalAndCapexImpact": "Umiarkowane zapotrzebowanie na kapitał.",
+          "expectedTiming": "12–24 miesiące",
+          "probability": 60,
+          "alreadyPricedIn": "PARTLY"
+        }
+      ],
+      "businessQuality": {
+        "businessModel": "Model demonstracyjny.",
+        "revenueAndProfitSources": "Przykładowe źródła przychodów i marży.",
+        "recurringRevenue": "Częściowo powtarzalne.",
+        "customerSegmentsAndGeography": "Zdywersyfikowane demonstracyjnie.",
+        "cyclicality": "Umiarkowana.",
+        "pricingPower": "Umiarkowany.",
+        "competitiveAdvantages": [
+          "Przykładowa przewaga"
+        ],
+        "advantageDurability": "Średnia.",
+        "advantageThreats": [
+          "Konkurencja cenowa"
+        ],
+        "marketOpportunity": "Umiarkowany wzrost rynku.",
+        "managementAndCapitalAllocation": "Ilustracyjnie neutralna ocena."
+      },
+      "financialQuality": {
+        "summary": "Ilustracyjny profil finansowy.",
+        "historyCoverage": "5 pełnych lat + ostatni okres.",
+        "latestResultsPeriod": "H1 2026 (przykład)",
+        "revenueTrend": "Rosnący w przykładzie.",
+        "epsTrend": "Rosnący w przykładzie.",
+        "fcfTrend": "Dodatni, ale zmienny.",
+        "revenueCagrPct": 8,
+        "ebitCagrPct": 10,
+        "netIncomeCagrPct": 9,
+        "epsCagrPct": 9,
+        "fcfCagrPct": 7,
+        "cashConversion": "Akceptowalna.",
+        "margins": {
+          "grossMarginPct": null,
+          "operatingMarginPct": 12,
+          "netMarginPct": 8,
+          "trend": "Stabilny."
+        },
+        "operatingCashFlow": "Dodatni.",
+        "capex": "Umiarkowany.",
+        "workingCapital": "Kontrolowany.",
+        "roic": 15,
+        "roe": 17,
+        "netDebt": 20,
+        "netDebtToEbitda": 0.8,
+        "interestCoverage": 8,
+        "debtMaturities": "Brak istotnej koncentracji w przykładzie.",
+        "oneOffs": "Brak istotnych pozycji w przykładzie.",
+        "shareCountTrend": "Stabilny.",
+        "epsGrowthDrivers": [
+          "Wolumen",
+          "Marża"
+        ]
+      },
+      "managementAndOwnership": {
+        "forecastAccuracy": "Neutralna/pozytywna w przykładzie.",
+        "strategyExecution": "Zgodna z planem w przykładzie.",
+        "capitalAllocation": "Umiarkowanie konserwatywna.",
+        "acquisitionsAndRoic": "Brak istotnych akwizycji w przykładzie.",
+        "dividendsBuybacksIssuances": "Regularna polityka w przykładzie.",
+        "insiderActivity": "Brak istotnego sygnału.",
+        "dominantOwner": "Brak problemu w przykładzie.",
+        "relatedPartyTransactions": "Brak istotnych uwag.",
+        "minorityShareholderProtection": "Akceptowalna.",
+        "politicalRisk": "Niskie w przykładzie.",
+        "summary": "Ilustracyjna ocena zarządu i akcjonariatu."
+      },
+      "dividend": {
+        "relevant": true,
+        "yieldPct": 3.2,
+        "payoutRatioPct": 45,
+        "fcfCoverage": "Pokryta FCF w przykładzie.",
+        "history": "Regularne wypłaty w przykładzie.",
+        "growth": "Umiarkowany wzrost.",
+        "capexAndDebtConstraints": "Brak istotnego ograniczenia.",
+        "regulatoryConstraints": "Brak istotnego ograniczenia.",
+        "safety": "Umiarkowanie wysoka w przykładzie.",
+        "summary": "Dywidenda jest dodatkiem do całkowitej stopy zwrotu."
+      },
+      "timing": {
+        "longTermTrend": "Neutralny/wzrostowy w przykładzie.",
+        "vs50DayAverage": "W pobliżu średniej.",
+        "vs200DayAverage": "Powyżej średniej.",
+        "drawdownFromHighPct": 12,
+        "relativeStrength": "Neutralna.",
+        "supportZones": [
+          {
+            "from": 22,
+            "to": 24,
+            "currency": "PLN",
+            "note": "Ilustracyjna strefa wsparcia."
+          }
+        ],
+        "resistanceZones": [],
+        "priceVolumeReactionToResults": "Neutralna.",
+        "correctionDriver": "Wycena/sentyment, bez potwierdzonego pogorszenia fundamentów.",
+        "summary": "Timing pomocniczy."
+      },
+      "supplyAnomaly": {
+        "status": "NO_EVIDENCE",
+        "summary": "Brak potwierdzonej anomalii podażowej.",
+        "identifiedSource": null,
+        "evidence": [],
+        "fadeSignals": []
+      },
+      "smallMidCapRisk": {
+        "applicable": true,
+        "medianDailyTurnover": 1500000,
+        "freeFloatPct": 35,
+        "spread": "Umiarkowany.",
+        "volatility": "Umiarkowana.",
+        "ownershipConcentration": "Średnia.",
+        "dominantOwnerRisk": "Niskie/umiarkowane.",
+        "customerAndContractConcentration": "Umiarkowana.",
+        "auditorAndReportingQuality": "Akceptowalna.",
+        "issuanceHistory": "Brak częstych emisji.",
+        "relatedPartyTransactions": "Brak istotnych sygnałów.",
+        "dataAvailabilityAndCoverage": "Wystarczająca.",
+        "plannedPositionVsLiquidity": "Mała pozycja względem obrotu.",
+        "requiredMarginOfSafety": "Wyższy niż dla dużej spółki.",
+        "summary": "Zastosowano reżim ostrożności small/mid cap."
+      },
+      "riskAssessment": {
+        "level": "MODERATE",
+        "summary": "Ilustracyjna ocena ryzyka.",
+        "permanentCapitalLossRisks": [
+          "Trwała erozja marży",
+          "Błędna alokacja kapitału"
+        ]
+      },
+      "thesis": {
+        "summary": "Dane wyłącznie demonstracyjne do testu kontraktu; nie stanowią analizy rzeczywistego emitenta.",
+        "growthDrivers": [
+          "Wzrost rynku",
+          "Poprawa mixu"
+        ],
+        "epsFcfGrowthDrivers": [
+          "Wzrost wolumenu",
+          "Dźwignia operacyjna"
+        ],
+        "catalysts": [
+          "Kolejne wyniki okresowe"
+        ],
+        "pros": [
+          "Jakość biznesu"
+        ],
+        "risks": [
+          "Wycena",
+          "Cykliczność"
+        ],
+        "killCriteria": [
+          {
+            "condition": "Trwały spadek rentowności.",
+            "metricOrEvent": "Marża operacyjna",
+            "threshold": "< 8% przez 2 okresy",
+            "reviewSource": "Raport okresowy"
+          }
+        ]
+      },
+      "positionPlan": {
+        "attractiveEntryZone": {
+          "from": 22,
+          "to": 24,
+          "currency": "PLN"
+        },
+        "tranches": [
+          {
+            "number": 1,
+            "triggerPrice": 24,
+            "currency": "PLN",
+            "condition": "Wejście w strefę atrakcyjnej wyceny.",
+            "sizeGuidance": "SMALL_INITIAL"
+          },
+          {
+            "number": 2,
+            "triggerPrice": 22,
+            "currency": "PLN",
+            "condition": "Pogłębienie dyskonta bez naruszenia tezy.",
+            "sizeGuidance": "ADD"
+          }
+        ],
+        "summary": "Budowanie pozycji etapami."
+      },
+      "monitoringPlan": {
+        "nextReviewDate": "2026-11-20",
+        "nextExpectedReportDate": "2026-11-20",
+        "nextReviewTriggers": [
+          "Publikacja kolejnego raportu",
+          "Istotny ESPI"
+        ],
+        "watchConditions": [
+          {
+            "condition": "Potwierdzenie wzrostu EPS/FCF",
+            "desiredOutcome": "Utrzymanie dodatniej dynamiki",
+            "impactIfMet": "Wzmocnienie tezy"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "type": "PERIODIC_REPORT",
+          "title": "Przykładowy raport okresowy",
+          "publisher": "Przykładowe źródło",
+          "publishedAt": "2026-08-30",
+          "url": "https://example.com/source",
+          "accessedAt": "2026-09-16T17:30:00Z"
+        },
+        {
+          "type": "MARKET_DATA",
+          "title": "Przykładowe dane rynkowe",
+          "publisher": "Przykładowe źródło",
+          "publishedAt": "2026-08-30",
+          "url": "https://example.com/source",
+          "accessedAt": "2026-09-16T17:30:00Z"
+        }
+      ],
+      "dataQuality": {
+        "confidence": "MEDIUM",
+        "missingCriticalData": [],
+        "conflictingData": [],
+        "notes": [
+          "Plik demonstracyjny; wartości nie są danymi inwestycyjnymi."
+        ]
+      }
+    },
+    {
+      "externalId": "gpw-DEMW-2026-09-16-example",
+      "identity": {
+        "ticker": "DEMW",
+        "name": "Spółka demonstracyjna Watch SA (fikcyjna)",
+        "market": "GPW",
+        "currency": "PLN",
+        "isin": null
+      },
+      "decision": {
+        "action": "WATCH",
+        "reason": "Dane wyłącznie demonstracyjne do testu kontraktu; nie stanowią analizy rzeczywistego emitenta.",
+        "watchReason": "Oczekiwanie na lepszą relację ceny do wartości."
+      },
+      "classification": {
+        "status": "WAIT_FOR_CORRECTION",
+        "opportunityCategory": "DIVIDEND_QUALITY"
+      },
+      "score": {
+        "total": 72,
+        "components": {
+          "businessModelAndRecurringRevenue": 8,
+          "competitiveAdvantage": 7,
+          "earningsQualityAndCashConversion": 7,
+          "epsFcfGrowthVisibility": 8,
+          "balanceSheetAndFinancialResilience": 6,
+          "managementOwnershipCapitalAllocation": 6,
+          "industryOutlookAndTargetMarket": 5,
+          "narrativeToNumbers": 7,
+          "valuationAndMarginOfSafety": 6,
+          "riskRewardAsymmetry": 6,
+          "trendTimingSupplyAnomaly": 3,
+          "liquidityGovernanceRiskDataQuality": 3
+        }
+      },
+      "marketData": {
+        "price": 48,
+        "currency": "PLN",
+        "asOf": "2026-09-16T15:00:00Z",
+        "source": "Przykładowe dane rynkowe"
+      },
+      "valuation": {
+        "summary": "Dane wyłącznie demonstracyjne do testu kontraktu; nie stanowią analizy rzeczywistego emitenta.",
+        "methods": [
+          {
+            "method": "DCF",
+            "fairValue": 52,
+            "currency": "PLN",
+            "summary": "Ilustracyjny DCF."
+          },
+          {
+            "method": "PE",
+            "fairValue": 49.92,
+            "currency": "PLN",
+            "summary": "Ilustracyjne porównanie P/E."
+          }
+        ],
+        "fairValueBase": 52,
+        "attractiveEntryZone": {
+          "from": 40,
+          "to": 43,
+          "currency": "PLN"
+        },
+        "marginOfSafetySummary": "Ilustracyjny opis marginesu bezpieczeństwa."
+      },
+      "scenarios": {
+        "bear": {
+          "revenueGrowthAssumption": "Niski wzrost.",
+          "marginAssumption": "Presja na marżę.",
+          "epsOrFcfAssumption": "Słabszy EPS/FCF.",
+          "sectorMetricAssumption": null,
+          "terminalAssumption": "Niższy mnożnik.",
+          "dividendsExpected": 1,
+          "fairValue": 36,
+          "currency": "PLN",
+          "totalReturnPct": -25,
+          "annualizedReturnPct": -8,
+          "probabilityPct": 25
+        },
+        "base": {
+          "revenueGrowthAssumption": "Umiarkowany wzrost.",
+          "marginAssumption": "Stabilna lub lekko rosnąca marża.",
+          "epsOrFcfAssumption": "Wzrost EPS/FCF.",
+          "sectorMetricAssumption": null,
+          "terminalAssumption": "Mnożnik zbliżony do średniej.",
+          "dividendsExpected": 2.5,
+          "fairValue": 52,
+          "currency": "PLN",
+          "totalReturnPct": 15,
+          "annualizedReturnPct": 4.8,
+          "probabilityPct": 55
+        },
+        "bull": {
+          "revenueGrowthAssumption": "Wyższy wzrost.",
+          "marginAssumption": "Poprawa marży.",
+          "epsOrFcfAssumption": "Silniejszy wzrost EPS/FCF.",
+          "sectorMetricAssumption": null,
+          "terminalAssumption": "Umiarkowany rerating.",
+          "dividendsExpected": 3,
+          "fairValue": 64.8,
+          "currency": "PLN",
+          "totalReturnPct": 35,
+          "annualizedReturnPct": 10.5,
+          "probabilityPct": 20
+        }
+      },
+      "expectedReturn": {
+        "horizonYears": 3,
+        "baseTotalReturnPct": 15,
+        "baseAnnualizedReturnPct": 4.8,
+        "bullTotalReturnPct": 35,
+        "bearDownsidePct": -25,
+        "weightedExpectedReturnPct": 10,
+        "returnDrivers": {
+          "epsFcfGrowthPct": 12,
+          "dividendPct": 8,
+          "multipleChangePct": -5
+        },
+        "asymmetryRatio": 0.6,
+        "summary": "Ilustracyjny rozkład oczekiwanej stopy zwrotu."
+      },
+      "screeningAssessment": {
+        "hardFilterBreaches": [],
+        "riskFlags": [],
+        "summary": "Ilustracyjny wynik twardych filtrów."
+      },
+      "narrativeToNumbers": [
+        {
+          "catalyst": "Przykładowy katalizator",
+          "economicMechanism": "Większy wolumen lub lepszy mix.",
+          "operationalImpact": "Wzrost wykorzystania mocy.",
+          "revenueImpact": "Potencjalny wzrost przychodów.",
+          "marginOrEbitImpact": "Możliwa poprawa dźwigni operacyjnej.",
+          "epsFcfImpact": "Potencjalny wzrost EPS/FCF.",
+          "workingCapitalAndCapexImpact": "Umiarkowane zapotrzebowanie na kapitał.",
+          "expectedTiming": "12–24 miesiące",
+          "probability": 60,
+          "alreadyPricedIn": "PARTLY"
+        }
+      ],
+      "businessQuality": {
+        "businessModel": "Model demonstracyjny.",
+        "revenueAndProfitSources": "Przykładowe źródła przychodów i marży.",
+        "recurringRevenue": "Częściowo powtarzalne.",
+        "customerSegmentsAndGeography": "Zdywersyfikowane demonstracyjnie.",
+        "cyclicality": "Umiarkowana.",
+        "pricingPower": "Umiarkowany.",
+        "competitiveAdvantages": [
+          "Przykładowa przewaga"
+        ],
+        "advantageDurability": "Średnia.",
+        "advantageThreats": [
+          "Konkurencja cenowa"
+        ],
+        "marketOpportunity": "Umiarkowany wzrost rynku.",
+        "managementAndCapitalAllocation": "Ilustracyjnie neutralna ocena."
+      },
+      "financialQuality": {
+        "summary": "Ilustracyjny profil finansowy.",
+        "historyCoverage": "5 pełnych lat + ostatni okres.",
+        "latestResultsPeriod": "H1 2026 (przykład)",
+        "revenueTrend": "Rosnący w przykładzie.",
+        "epsTrend": "Rosnący w przykładzie.",
+        "fcfTrend": "Dodatni, ale zmienny.",
+        "revenueCagrPct": 8,
+        "ebitCagrPct": 10,
+        "netIncomeCagrPct": 9,
+        "epsCagrPct": 9,
+        "fcfCagrPct": 7,
+        "cashConversion": "Akceptowalna.",
+        "margins": {
+          "grossMarginPct": null,
+          "operatingMarginPct": 12,
+          "netMarginPct": 8,
+          "trend": "Stabilny."
+        },
+        "operatingCashFlow": "Dodatni.",
+        "capex": "Umiarkowany.",
+        "workingCapital": "Kontrolowany.",
+        "roic": 15,
+        "roe": 17,
+        "netDebt": 20,
+        "netDebtToEbitda": 0.8,
+        "interestCoverage": 8,
+        "debtMaturities": "Brak istotnej koncentracji w przykładzie.",
+        "oneOffs": "Brak istotnych pozycji w przykładzie.",
+        "shareCountTrend": "Stabilny.",
+        "epsGrowthDrivers": [
+          "Wolumen",
+          "Marża"
+        ]
+      },
+      "managementAndOwnership": {
+        "forecastAccuracy": "Neutralna/pozytywna w przykładzie.",
+        "strategyExecution": "Zgodna z planem w przykładzie.",
+        "capitalAllocation": "Umiarkowanie konserwatywna.",
+        "acquisitionsAndRoic": "Brak istotnych akwizycji w przykładzie.",
+        "dividendsBuybacksIssuances": "Regularna polityka w przykładzie.",
+        "insiderActivity": "Brak istotnego sygnału.",
+        "dominantOwner": "Brak problemu w przykładzie.",
+        "relatedPartyTransactions": "Brak istotnych uwag.",
+        "minorityShareholderProtection": "Akceptowalna.",
+        "politicalRisk": "Niskie w przykładzie.",
+        "summary": "Ilustracyjna ocena zarządu i akcjonariatu."
+      },
+      "dividend": {
+        "relevant": true,
+        "yieldPct": 3.2,
+        "payoutRatioPct": 45,
+        "fcfCoverage": "Pokryta FCF w przykładzie.",
+        "history": "Regularne wypłaty w przykładzie.",
+        "growth": "Umiarkowany wzrost.",
+        "capexAndDebtConstraints": "Brak istotnego ograniczenia.",
+        "regulatoryConstraints": "Brak istotnego ograniczenia.",
+        "safety": "Umiarkowanie wysoka w przykładzie.",
+        "summary": "Dywidenda jest dodatkiem do całkowitej stopy zwrotu."
+      },
+      "timing": {
+        "longTermTrend": "Neutralny/wzrostowy w przykładzie.",
+        "vs50DayAverage": "W pobliżu średniej.",
+        "vs200DayAverage": "Powyżej średniej.",
+        "drawdownFromHighPct": 12,
+        "relativeStrength": "Neutralna.",
+        "supportZones": [
+          {
+            "from": 40,
+            "to": 43,
+            "currency": "PLN",
+            "note": "Ilustracyjna strefa wsparcia."
+          }
+        ],
+        "resistanceZones": [],
+        "priceVolumeReactionToResults": "Neutralna.",
+        "correctionDriver": "Wycena/sentyment, bez potwierdzonego pogorszenia fundamentów.",
+        "summary": "Timing pomocniczy."
+      },
+      "supplyAnomaly": {
+        "status": "NO_EVIDENCE",
+        "summary": "Brak potwierdzonej anomalii podażowej.",
+        "identifiedSource": null,
+        "evidence": [],
+        "fadeSignals": []
+      },
+      "smallMidCapRisk": {
+        "applicable": true,
+        "medianDailyTurnover": 1500000,
+        "freeFloatPct": 35,
+        "spread": "Umiarkowany.",
+        "volatility": "Umiarkowana.",
+        "ownershipConcentration": "Średnia.",
+        "dominantOwnerRisk": "Niskie/umiarkowane.",
+        "customerAndContractConcentration": "Umiarkowana.",
+        "auditorAndReportingQuality": "Akceptowalna.",
+        "issuanceHistory": "Brak częstych emisji.",
+        "relatedPartyTransactions": "Brak istotnych sygnałów.",
+        "dataAvailabilityAndCoverage": "Wystarczająca.",
+        "plannedPositionVsLiquidity": "Mała pozycja względem obrotu.",
+        "requiredMarginOfSafety": "Wyższy niż dla dużej spółki.",
+        "summary": "Zastosowano reżim ostrożności small/mid cap."
+      },
+      "riskAssessment": {
+        "level": "ELEVATED",
+        "summary": "Ilustracyjna ocena ryzyka.",
+        "permanentCapitalLossRisks": [
+          "Trwała erozja marży",
+          "Błędna alokacja kapitału"
+        ]
+      },
+      "thesis": {
+        "summary": "Dane wyłącznie demonstracyjne do testu kontraktu; nie stanowią analizy rzeczywistego emitenta.",
+        "growthDrivers": [
+          "Wzrost rynku",
+          "Poprawa mixu"
+        ],
+        "epsFcfGrowthDrivers": [
+          "Wzrost wolumenu",
+          "Dźwignia operacyjna"
+        ],
+        "catalysts": [
+          "Kolejne wyniki okresowe"
+        ],
+        "pros": [
+          "Jakość biznesu"
+        ],
+        "risks": [
+          "Wycena",
+          "Cykliczność"
+        ],
+        "killCriteria": [
+          {
+            "condition": "Trwały spadek rentowności.",
+            "metricOrEvent": "Marża operacyjna",
+            "threshold": "< 8% przez 2 okresy",
+            "reviewSource": "Raport okresowy"
+          }
+        ]
+      },
+      "positionPlan": {
+        "attractiveEntryZone": {
+          "from": 40,
+          "to": 43,
+          "currency": "PLN"
+        },
+        "tranches": [
+          {
+            "number": 1,
+            "triggerPrice": 43,
+            "currency": "PLN",
+            "condition": "Wejście w strefę atrakcyjnej wyceny.",
+            "sizeGuidance": "SMALL_INITIAL"
+          },
+          {
+            "number": 2,
+            "triggerPrice": 40,
+            "currency": "PLN",
+            "condition": "Pogłębienie dyskonta bez naruszenia tezy.",
+            "sizeGuidance": "ADD"
+          }
+        ],
+        "summary": "Budowanie pozycji etapami."
+      },
+      "monitoringPlan": {
+        "nextReviewDate": "2026-11-20",
+        "nextExpectedReportDate": "2026-11-20",
+        "nextReviewTriggers": [
+          "Publikacja kolejnego raportu",
+          "Istotny ESPI"
+        ],
+        "watchConditions": [
+          {
+            "condition": "Potwierdzenie wzrostu EPS/FCF",
+            "desiredOutcome": "Utrzymanie dodatniej dynamiki",
+            "impactIfMet": "Wzmocnienie tezy"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "type": "PERIODIC_REPORT",
+          "title": "Przykładowy raport okresowy",
+          "publisher": "Przykładowe źródło",
+          "publishedAt": "2026-08-30",
+          "url": "https://example.com/source",
+          "accessedAt": "2026-09-16T17:30:00Z"
+        },
+        {
+          "type": "MARKET_DATA",
+          "title": "Przykładowe dane rynkowe",
+          "publisher": "Przykładowe źródło",
+          "publishedAt": "2026-08-30",
+          "url": "https://example.com/source",
+          "accessedAt": "2026-09-16T17:30:00Z"
+        }
+      ],
+      "dataQuality": {
+        "confidence": "MEDIUM",
+        "missingCriticalData": [],
+        "conflictingData": [],
+        "notes": [
+          "Plik demonstracyjny; wartości nie są danymi inwestycyjnymi."
+        ]
+      }
+    },
+    {
+      "externalId": "gpw-DEMA-2026-09-16-example",
+      "identity": {
+        "ticker": "DEMA",
+        "name": "Spółka demonstracyjna Avoid SA (fikcyjna)",
+        "market": "GPW",
+        "currency": "PLN",
+        "isin": null
+      },
+      "decision": {
+        "action": "AVOID",
+        "reason": "Dane wyłącznie demonstracyjne do testu kontraktu; nie stanowią analizy rzeczywistego emitenta.",
+        "watchReason": null
+      },
+      "classification": {
+        "status": "AVOID",
+        "opportunityCategory": "SPECIAL_SITUATION"
+      },
+      "score": {
+        "total": 46,
+        "components": {
+          "businessModelAndRecurringRevenue": 5,
+          "competitiveAdvantage": 4,
+          "earningsQualityAndCashConversion": 4,
+          "epsFcfGrowthVisibility": 5,
+          "balanceSheetAndFinancialResilience": 4,
+          "managementOwnershipCapitalAllocation": 4,
+          "industryOutlookAndTargetMarket": 4,
+          "narrativeToNumbers": 4,
+          "valuationAndMarginOfSafety": 4,
+          "riskRewardAsymmetry": 3,
+          "trendTimingSupplyAnomaly": 2,
+          "liquidityGovernanceRiskDataQuality": 3
+        }
+      },
+      "marketData": {
+        "price": 10,
+        "currency": "PLN",
+        "asOf": "2026-09-16T15:00:00Z",
+        "source": "Przykładowe dane rynkowe"
+      },
+      "valuation": {
+        "summary": "Dane wyłącznie demonstracyjne do testu kontraktu; nie stanowią analizy rzeczywistego emitenta.",
+        "methods": [
+          {
+            "method": "DCF",
+            "fairValue": 9,
+            "currency": "PLN",
+            "summary": "Ilustracyjny DCF."
+          },
+          {
+            "method": "PE",
+            "fairValue": 8.64,
+            "currency": "PLN",
+            "summary": "Ilustracyjne porównanie P/E."
+          }
+        ],
+        "fairValueBase": 9,
+        "attractiveEntryZone": {
+          "from": 7,
+          "to": 8,
+          "currency": "PLN"
+        },
+        "marginOfSafetySummary": "Ilustracyjny opis marginesu bezpieczeństwa."
+      },
+      "scenarios": {
+        "bear": {
+          "revenueGrowthAssumption": "Niski wzrost.",
+          "marginAssumption": "Presja na marżę.",
+          "epsOrFcfAssumption": "Słabszy EPS/FCF.",
+          "sectorMetricAssumption": null,
+          "terminalAssumption": "Niższy mnożnik.",
+          "dividendsExpected": 1,
+          "fairValue": 6,
+          "currency": "PLN",
+          "totalReturnPct": -40,
+          "annualizedReturnPct": -8,
+          "probabilityPct": 25
+        },
+        "base": {
+          "revenueGrowthAssumption": "Umiarkowany wzrost.",
+          "marginAssumption": "Stabilna lub lekko rosnąca marża.",
+          "epsOrFcfAssumption": "Wzrost EPS/FCF.",
+          "sectorMetricAssumption": null,
+          "terminalAssumption": "Mnożnik zbliżony do średniej.",
+          "dividendsExpected": 2.5,
+          "fairValue": 9,
+          "currency": "PLN",
+          "totalReturnPct": -5,
+          "annualizedReturnPct": -1.7,
+          "probabilityPct": 55
+        },
+        "bull": {
+          "revenueGrowthAssumption": "Wyższy wzrost.",
+          "marginAssumption": "Poprawa marży.",
+          "epsOrFcfAssumption": "Silniejszy wzrost EPS/FCF.",
+          "sectorMetricAssumption": null,
+          "terminalAssumption": "Umiarkowany rerating.",
+          "dividendsExpected": 3,
+          "fairValue": 12,
+          "currency": "PLN",
+          "totalReturnPct": 20,
+          "annualizedReturnPct": 6.3,
+          "probabilityPct": 20
+        }
+      },
+      "expectedReturn": {
+        "horizonYears": 3,
+        "baseTotalReturnPct": -5,
+        "baseAnnualizedReturnPct": -1.7,
+        "bullTotalReturnPct": 20,
+        "bearDownsidePct": -40,
+        "weightedExpectedReturnPct": -8,
+        "returnDrivers": {
+          "epsFcfGrowthPct": null,
+          "dividendPct": null,
+          "multipleChangePct": null
+        },
+        "asymmetryRatio": 0,
+        "summary": "Ilustracyjny rozkład oczekiwanej stopy zwrotu."
+      },
+      "screeningAssessment": {
+        "hardFilterBreaches": [
+          "FREQUENT_DILUTION"
+        ],
+        "riskFlags": [
+          "Przykładowy risk flag"
+        ],
+        "summary": "Ilustracyjny wynik twardych filtrów."
+      },
+      "narrativeToNumbers": [
+        {
+          "catalyst": "Przykładowy katalizator",
+          "economicMechanism": "Większy wolumen lub lepszy mix.",
+          "operationalImpact": "Wzrost wykorzystania mocy.",
+          "revenueImpact": "Potencjalny wzrost przychodów.",
+          "marginOrEbitImpact": "Możliwa poprawa dźwigni operacyjnej.",
+          "epsFcfImpact": "Potencjalny wzrost EPS/FCF.",
+          "workingCapitalAndCapexImpact": "Umiarkowane zapotrzebowanie na kapitał.",
+          "expectedTiming": "12–24 miesiące",
+          "probability": 60,
+          "alreadyPricedIn": "PARTLY"
+        }
+      ],
+      "businessQuality": {
+        "businessModel": "Model demonstracyjny.",
+        "revenueAndProfitSources": "Przykładowe źródła przychodów i marży.",
+        "recurringRevenue": "Częściowo powtarzalne.",
+        "customerSegmentsAndGeography": "Zdywersyfikowane demonstracyjnie.",
+        "cyclicality": "Umiarkowana.",
+        "pricingPower": "Umiarkowany.",
+        "competitiveAdvantages": [
+          "Przykładowa przewaga"
+        ],
+        "advantageDurability": "Średnia.",
+        "advantageThreats": [
+          "Konkurencja cenowa"
+        ],
+        "marketOpportunity": "Umiarkowany wzrost rynku.",
+        "managementAndCapitalAllocation": "Ilustracyjnie neutralna ocena."
+      },
+      "financialQuality": {
+        "summary": "Ilustracyjny profil finansowy.",
+        "historyCoverage": "5 pełnych lat + ostatni okres.",
+        "latestResultsPeriod": "H1 2026 (przykład)",
+        "revenueTrend": "Rosnący w przykładzie.",
+        "epsTrend": "Rosnący w przykładzie.",
+        "fcfTrend": "Dodatni, ale zmienny.",
+        "revenueCagrPct": 8,
+        "ebitCagrPct": 10,
+        "netIncomeCagrPct": 9,
+        "epsCagrPct": 9,
+        "fcfCagrPct": 7,
+        "cashConversion": "Akceptowalna.",
+        "margins": {
+          "grossMarginPct": null,
+          "operatingMarginPct": 12,
+          "netMarginPct": 8,
+          "trend": "Stabilny."
+        },
+        "operatingCashFlow": "Dodatni.",
+        "capex": "Umiarkowany.",
+        "workingCapital": "Kontrolowany.",
+        "roic": 15,
+        "roe": 17,
+        "netDebt": 20,
+        "netDebtToEbitda": 0.8,
+        "interestCoverage": 8,
+        "debtMaturities": "Brak istotnej koncentracji w przykładzie.",
+        "oneOffs": "Brak istotnych pozycji w przykładzie.",
+        "shareCountTrend": "Wzrost liczby akcji.",
+        "epsGrowthDrivers": [
+          "Wolumen",
+          "Marża"
+        ]
+      },
+      "managementAndOwnership": {
+        "forecastAccuracy": "Neutralna/pozytywna w przykładzie.",
+        "strategyExecution": "Zgodna z planem w przykładzie.",
+        "capitalAllocation": "Umiarkowanie konserwatywna.",
+        "acquisitionsAndRoic": "Brak istotnych akwizycji w przykładzie.",
+        "dividendsBuybacksIssuances": "Przykładowe rozwodnienie.",
+        "insiderActivity": "Brak istotnego sygnału.",
+        "dominantOwner": "Brak problemu w przykładzie.",
+        "relatedPartyTransactions": "Brak istotnych uwag.",
+        "minorityShareholderProtection": "Akceptowalna.",
+        "politicalRisk": "Niskie w przykładzie.",
+        "summary": "Ilustracyjna ocena zarządu i akcjonariatu."
+      },
+      "dividend": {
+        "relevant": true,
+        "yieldPct": 3.2,
+        "payoutRatioPct": 45,
+        "fcfCoverage": "Pokryta FCF w przykładzie.",
+        "history": "Regularne wypłaty w przykładzie.",
+        "growth": "Umiarkowany wzrost.",
+        "capexAndDebtConstraints": "Brak istotnego ograniczenia.",
+        "regulatoryConstraints": "Brak istotnego ograniczenia.",
+        "safety": "Umiarkowanie wysoka w przykładzie.",
+        "summary": "Dywidenda jest dodatkiem do całkowitej stopy zwrotu."
+      },
+      "timing": {
+        "longTermTrend": "Neutralny/wzrostowy w przykładzie.",
+        "vs50DayAverage": "W pobliżu średniej.",
+        "vs200DayAverage": "Powyżej średniej.",
+        "drawdownFromHighPct": 12,
+        "relativeStrength": "Neutralna.",
+        "supportZones": [
+          {
+            "from": 7,
+            "to": 8,
+            "currency": "PLN",
+            "note": "Ilustracyjna strefa wsparcia."
+          }
+        ],
+        "resistanceZones": [],
+        "priceVolumeReactionToResults": "Neutralna.",
+        "correctionDriver": "Wycena/sentyment, bez potwierdzonego pogorszenia fundamentów.",
+        "summary": "Timing pomocniczy."
+      },
+      "supplyAnomaly": {
+        "status": "NO_EVIDENCE",
+        "summary": "Brak potwierdzonej anomalii podażowej.",
+        "identifiedSource": null,
+        "evidence": [],
+        "fadeSignals": []
+      },
+      "smallMidCapRisk": {
+        "applicable": true,
+        "medianDailyTurnover": 1500000,
+        "freeFloatPct": 35,
+        "spread": "Umiarkowany.",
+        "volatility": "Umiarkowana.",
+        "ownershipConcentration": "Średnia.",
+        "dominantOwnerRisk": "Niskie/umiarkowane.",
+        "customerAndContractConcentration": "Umiarkowana.",
+        "auditorAndReportingQuality": "Akceptowalna.",
+        "issuanceHistory": "Częstsze emisje w przykładzie.",
+        "relatedPartyTransactions": "Brak istotnych sygnałów.",
+        "dataAvailabilityAndCoverage": "Wystarczająca.",
+        "plannedPositionVsLiquidity": "Mała pozycja względem obrotu.",
+        "requiredMarginOfSafety": "Wyższy niż dla dużej spółki.",
+        "summary": "Zastosowano reżim ostrożności small/mid cap."
+      },
+      "riskAssessment": {
+        "level": "HIGH",
+        "summary": "Ilustracyjna ocena ryzyka.",
+        "permanentCapitalLossRisks": [
+          "Trwała erozja marży",
+          "Błędna alokacja kapitału"
+        ]
+      },
+      "thesis": {
+        "summary": "Dane wyłącznie demonstracyjne do testu kontraktu; nie stanowią analizy rzeczywistego emitenta.",
+        "growthDrivers": [
+          "Wzrost rynku",
+          "Poprawa mixu"
+        ],
+        "epsFcfGrowthDrivers": [
+          "Wzrost wolumenu",
+          "Dźwignia operacyjna"
+        ],
+        "catalysts": [
+          "Kolejne wyniki okresowe"
+        ],
+        "pros": [
+          "Jakość biznesu"
+        ],
+        "risks": [
+          "Wycena",
+          "Cykliczność"
+        ],
+        "killCriteria": [
+          {
+            "condition": "Trwały spadek rentowności.",
+            "metricOrEvent": "Marża operacyjna",
+            "threshold": "< 8% przez 2 okresy",
+            "reviewSource": "Raport okresowy"
+          }
+        ]
+      },
+      "positionPlan": {
+        "attractiveEntryZone": {
+          "from": 7,
+          "to": 8,
+          "currency": "PLN"
+        },
+        "tranches": [
+          {
+            "number": 1,
+            "triggerPrice": 8,
+            "currency": "PLN",
+            "condition": "Wejście w strefę atrakcyjnej wyceny.",
+            "sizeGuidance": "SMALL_INITIAL"
+          },
+          {
+            "number": 2,
+            "triggerPrice": 7,
+            "currency": "PLN",
+            "condition": "Pogłębienie dyskonta bez naruszenia tezy.",
+            "sizeGuidance": "ADD"
+          }
+        ],
+        "summary": "Budowanie pozycji etapami."
+      },
+      "monitoringPlan": {
+        "nextReviewDate": "2026-11-20",
+        "nextExpectedReportDate": "2026-11-20",
+        "nextReviewTriggers": [
+          "Publikacja kolejnego raportu",
+          "Istotny ESPI"
+        ],
+        "watchConditions": [
+          {
+            "condition": "Potwierdzenie wzrostu EPS/FCF",
+            "desiredOutcome": "Utrzymanie dodatniej dynamiki",
+            "impactIfMet": "Wzmocnienie tezy"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "type": "PERIODIC_REPORT",
+          "title": "Przykładowy raport okresowy",
+          "publisher": "Przykładowe źródło",
+          "publishedAt": "2026-08-30",
+          "url": "https://example.com/source",
+          "accessedAt": "2026-09-16T17:30:00Z"
+        },
+        {
+          "type": "MARKET_DATA",
+          "title": "Przykładowe dane rynkowe",
+          "publisher": "Przykładowe źródło",
+          "publishedAt": "2026-08-30",
+          "url": "https://example.com/source",
+          "accessedAt": "2026-09-16T17:30:00Z"
+        }
+      ],
+      "dataQuality": {
+        "confidence": "MEDIUM",
+        "missingCriticalData": [],
+        "conflictingData": [],
+        "notes": [
+          "Plik demonstracyjny; wartości nie są danymi inwestycyjnymi."
+        ]
+      }
+    }
+  ]
+}

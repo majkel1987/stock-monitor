@@ -102,8 +102,8 @@ values
 
 select is(
   public.initialize_default_statuses('11111111-1111-1111-1111-111111111111'),
-  8,
-  'status initializer creates all eight defaults'
+  9,
+  'status initializer creates all nine defaults'
 );
 
 select is(
@@ -580,7 +580,7 @@ select set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111
 
 select is(
   (select count(*)::integer from public.status_definitions),
-  8,
+  9,
   'RLS exposes the current user statuses'
 );
 

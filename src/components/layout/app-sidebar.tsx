@@ -29,7 +29,7 @@ const navigation: ReadonlyArray<{
     href: "/monitoring",
     label: "Monitoring",
     icon: History,
-    matches: (path) => path === "/monitoring",
+    matches: (path) => path.startsWith("/monitoring"),
   },
   {
     href: "/settings/statuses",
