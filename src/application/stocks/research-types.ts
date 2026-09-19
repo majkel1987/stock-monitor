@@ -5,7 +5,7 @@ import type {
   MonitoringScores,
 } from "@/domain/monitoring/calculations";
 import type { PriceLevelTriggerDirection } from "@/domain/price-levels/calculations";
-import type { GpwImportCompany } from "@/application/imports/gpw-monitoring-schema";
+import type { MonitoringImportCompany } from "@/application/imports/types";
 
 export type ResearchStatus = {
   id: string;
@@ -37,7 +37,7 @@ export type MonitoringHistoryItem = {
   decisionAction: string | null;
   decisionReason: string | null;
   opportunityCategory: string | null;
-  analysisDetails: GpwImportCompany | null;
+  analysisDetails: MonitoringImportCompany | null;
   baseFairValue: string | null;
   entryZoneFrom: string | null;
   entryZoneTo: string | null;

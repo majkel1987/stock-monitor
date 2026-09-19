@@ -1,0 +1,382 @@
+{
+  "schemaVersion": "1.0",
+  "exportType": "usa_opportunity_monitoring",
+  "externalId": "usa-monitoring-2026-09-19-demo-full",
+  "generatedAt": "2026-09-19T10:01:23Z",
+  "analysisDate": "2026-09-19",
+  "market": "USA",
+  "profile": { "baseCurrency": "PLN", "resultCurrencies": ["USD", "PLN"] },
+  "marketRegime": { "marketPhase": "SELECTIVE_MARKET" },
+  "scanSummary": { "companiesExported": 3, "companiesScreened": 15 },
+  "marketSources": [
+    {
+      "type": "FEDERAL_RESERVE",
+      "title": "FOMC statement",
+      "publisher": "Federal Reserve",
+      "publishedAt": "2026-09-16",
+      "url": "https://www.federalreserve.gov/example",
+      "accessedAt": "2026-09-19T10:01:23Z"
+    }
+  ],
+  "fxContext": { "pair": "USD/PLN", "currentUsdPln": 3.7998 },
+  "companies": [
+    {
+      "externalId": "usa-EME-2026-09-19",
+      "identity": {
+        "ticker": "EME",
+        "name": "EMCOR Group, Inc.",
+        "legalName": "EMCOR Group, Inc.",
+        "market": "USA",
+        "exchange": "NYSE",
+        "currency": "USD",
+        "cik": "0000105634",
+        "isin": null
+      },
+      "decision": {
+        "action": "WATCH",
+        "reason": "Wait for valuation.",
+        "watchReason": "Entry zone."
+      },
+      "classification": {
+        "status": "WATCH",
+        "opportunityCategory": "QUALITY_COMPOUNDER"
+      },
+      "score": {
+        "total": 72,
+        "components": { "quality": 52, "opportunity": 20 }
+      },
+      "marketData": {
+        "price": 750.09,
+        "currency": "USD",
+        "asOf": "2026-09-18T23:15:00Z",
+        "source": "Market snapshot",
+        "marketCapUsd": 33086000000,
+        "averageDailyDollarVolumeUsd": null
+      },
+      "valuation": {
+        "summary": "Demanding valuation.",
+        "methods": [
+          { "method": "REVERSE_DCF", "fairValue": 750.09, "currency": "USD" },
+          { "method": "PE", "fairValue": 985, "currency": "USD" }
+        ],
+        "fairValueBase": 985,
+        "attractiveEntryZone": { "from": 570, "to": 610, "currency": "USD" },
+        "marginOfSafetySummary": "Low at current price.",
+        "reverseDcf": {
+          "applicable": true,
+          "currentPrice": 750.09,
+          "currency": "USD",
+          "impliedFcfCagrPct": 13.62
+        },
+        "entryZones": {
+          "starter": { "from": 640, "to": 680, "currency": "USD" },
+          "attractive": { "from": 570, "to": 610, "currency": "USD" },
+          "highMarginOfSafety": { "from": 500, "to": 540, "currency": "USD" }
+        }
+      },
+      "scenarios": {
+        "bear": {
+          "fairValue": 610,
+          "currency": "USD",
+          "totalReturnPct": -17.74,
+          "annualizedReturnPct": -4.77,
+          "probabilityPct": 25,
+          "revenueCagrPct": 4,
+          "targetOperatingMarginPct": 8.5,
+          "targetFcfMarginPct": 6
+        },
+        "base": {
+          "fairValue": 985,
+          "currency": "USD",
+          "totalReturnPct": 32.25,
+          "annualizedReturnPct": 7.24,
+          "probabilityPct": 50,
+          "revenueCagrPct": 10,
+          "targetOperatingMarginPct": 10,
+          "targetFcfMarginPct": 7.5
+        },
+        "bull": {
+          "fairValue": 1300,
+          "currency": "USD",
+          "totalReturnPct": 74.24,
+          "annualizedReturnPct": 14.94,
+          "probabilityPct": 25,
+          "revenueCagrPct": 13.5,
+          "targetOperatingMarginPct": 10.8,
+          "targetFcfMarginPct": 8.5
+        }
+      },
+      "expectedReturn": {
+        "horizonYears": 4,
+        "baseTotalReturnPct": 32.25,
+        "baseAnnualizedReturnPct": 7.24,
+        "bullTotalReturnPct": 74.24,
+        "bearDownsidePct": -17.74,
+        "weightedExpectedReturnPct": 30.25,
+        "asymmetryRatio": 1.82,
+        "baseAnnualizedReturnPctPln": 7.25,
+        "weightedExpectedReturnPctPln": 32.38,
+        "fxContributionAnnualizedPct": 0,
+        "benchmarkComparison": [
+          { "benchmarkType": "SP500", "name": "S&P 500", "currency": "USD" },
+          {
+            "benchmarkType": "NASDAQ100",
+            "name": "Nasdaq 100",
+            "currency": "USD"
+          },
+          {
+            "benchmarkType": "US_TREASURY",
+            "name": "US Treasury 10Y",
+            "currency": "USD"
+          }
+        ]
+      },
+      "screeningAssessment": { "passed": true },
+      "narrativeToNumbers": { "summary": "Backlog to cash flow." },
+      "businessQuality": { "businessModel": "Specialist contractor." },
+      "financialQuality": { "summary": "Strong growth." },
+      "managementAndOwnership": { "summary": "Disciplined allocation." },
+      "dividend": { "relevant": false },
+      "timing": { "summary": "Wait for price." },
+      "supplyAnomaly": { "status": "NO_EVIDENCE" },
+      "smallMidCapRisk": { "applicable": false },
+      "riskAssessment": { "summary": "Valuation risk." },
+      "thesis": {
+        "summary": "High-quality operator with demanding valuation.",
+        "growthDrivers": ["Data centers"],
+        "epsFcfGrowthDrivers": ["Organic growth"],
+        "catalysts": ["Backlog conversion"],
+        "pros": ["Execution"],
+        "risks": ["Valuation"],
+        "killCriteria": [
+          {
+            "condition": "Backlog quality falls.",
+            "metricOrEvent": "RPO",
+            "threshold": "Down 10%",
+            "reviewSource": "10-Q"
+          }
+        ],
+        "whyMarketMayBeWrong": "Backlog may be more durable.",
+        "keyKpis": ["RPO", "FCF"]
+      },
+      "positionPlan": {
+        "attractiveEntryZone": { "from": 570, "to": 610, "currency": "USD" },
+        "tranches": [
+          {
+            "number": 1,
+            "triggerPrice": 670,
+            "currency": "USD",
+            "condition": "Guidance intact.",
+            "sizeGuidance": "SMALL_INITIAL"
+          }
+        ],
+        "summary": "Wait for a better price.",
+        "entryZones": {
+          "starter": { "from": 640, "to": 680, "currency": "USD" }
+        }
+      },
+      "monitoringPlan": {
+        "nextReviewDate": "2026-11-01",
+        "nextExpectedReportDate": "2026-10-29",
+        "nextReviewTriggers": ["Quarterly results"],
+        "watchConditions": [{ "condition": "Price below 680" }]
+      },
+      "sources": [
+        {
+          "type": "SEC_10_Q",
+          "title": "Form 10-Q",
+          "publisher": "EMCOR",
+          "publishedAt": "2026-07-30",
+          "url": "https://www.sec.gov/example",
+          "accessedAt": "2026-09-19T10:01:23Z"
+        }
+      ],
+      "dataQuality": {
+        "confidence": "MEDIUM",
+        "missingCriticalData": [],
+        "conflictingData": [],
+        "notes": ["Own estimates."]
+      },
+      "dilutionAndBuybacks": {
+        "shareCountActuallyDeclined": true,
+        "netBuybackSpend": null
+      }
+    },
+    {
+      "externalId": "usa-CDW-2026-09-19",
+      "identity": {
+        "ticker": "CDW",
+        "name": "CDW Corporation",
+        "legalName": "CDW Corporation",
+        "market": "USA",
+        "exchange": "NASDAQ",
+        "currency": "USD",
+        "cik": "0001402057",
+        "isin": null
+      },
+      "decision": {
+        "action": "BUY_GRADUALLY",
+        "reason": "Reasonable valuation.",
+        "watchReason": null
+      },
+      "classification": {
+        "status": "BUY_CANDIDATE",
+        "opportunityCategory": "GROWTH_AT_REASONABLE_PRICE"
+      },
+      "score": {
+        "total": 75,
+        "components": { "quality": 45, "opportunity": 30 }
+      },
+      "marketData": {
+        "price": 146.19,
+        "currency": "USD",
+        "asOf": "2026-09-19T00:15:00Z",
+        "source": "Market snapshot",
+        "marketCapUsd": 18625000000,
+        "averageDailyDollarVolumeUsd": null
+      },
+      "valuation": {
+        "summary": "Reasonable.",
+        "methods": [{ "method": "P_FCF", "fairValue": 205, "currency": "USD" }],
+        "fairValueBase": 205,
+        "attractiveEntryZone": { "from": 125, "to": 135, "currency": "USD" },
+        "marginOfSafetySummary": "Moderate.",
+        "entryZones": {
+          "starter": { "from": 140, "to": 150, "currency": "USD" }
+        }
+      },
+      "scenarios": {
+        "bear": { "fairValue": 115, "currency": "USD" },
+        "base": { "fairValue": 205, "currency": "USD" },
+        "bull": { "fairValue": 275, "currency": "USD" }
+      },
+      "expectedReturn": {
+        "horizonYears": 4,
+        "baseTotalReturnPct": 47.75,
+        "baseAnnualizedReturnPct": 10.26,
+        "bullTotalReturnPct": 95.64,
+        "bearDownsidePct": -13.81,
+        "weightedExpectedReturnPct": 44.44,
+        "asymmetryRatio": 3.46
+      },
+      "thesis": {
+        "summary": "IT integrator.",
+        "growthDrivers": [],
+        "epsFcfGrowthDrivers": [],
+        "catalysts": [],
+        "pros": [],
+        "risks": [],
+        "killCriteria": []
+      },
+      "positionPlan": {
+        "attractiveEntryZone": { "from": 125, "to": 135, "currency": "USD" },
+        "tranches": [
+          {
+            "number": 1,
+            "triggerPrice": 146,
+            "currency": "USD",
+            "condition": "Debt stable.",
+            "sizeGuidance": "SMALL_INITIAL"
+          }
+        ],
+        "summary": "Buy gradually."
+      },
+      "monitoringPlan": {
+        "nextReviewDate": null,
+        "nextExpectedReportDate": null,
+        "nextReviewTriggers": [],
+        "watchConditions": []
+      },
+      "sources": [],
+      "dataQuality": {
+        "confidence": "MEDIUM",
+        "missingCriticalData": [],
+        "conflictingData": [],
+        "notes": []
+      }
+    },
+    {
+      "externalId": "usa-SYK-2026-09-19",
+      "identity": {
+        "ticker": "SYK",
+        "name": "Stryker Corporation",
+        "legalName": "Stryker Corporation",
+        "market": "USA",
+        "exchange": "NYSE",
+        "currency": "USD",
+        "cik": "0000310764",
+        "isin": null
+      },
+      "decision": {
+        "action": "BUY_GRADUALLY",
+        "reason": "Strong compounding.",
+        "watchReason": null
+      },
+      "classification": {
+        "status": "BUY_CANDIDATE",
+        "opportunityCategory": "QUALITY_COMPOUNDER"
+      },
+      "score": {
+        "total": 80,
+        "components": { "quality": 49, "opportunity": 31 }
+      },
+      "marketData": {
+        "price": 275.12,
+        "currency": "USD",
+        "asOf": "2026-09-18T23:15:00Z",
+        "source": null,
+        "marketCapUsd": 106196000000,
+        "averageDailyDollarVolumeUsd": null
+      },
+      "valuation": {
+        "summary": null,
+        "methods": [],
+        "fairValueBase": 440,
+        "attractiveEntryZone": { "from": 245, "to": 260, "currency": "USD" },
+        "marginOfSafetySummary": null,
+        "reverseDcf": null
+      },
+      "scenarios": {
+        "bear": { "fairValue": 230, "currency": "USD" },
+        "base": { "fairValue": 440, "currency": "USD" },
+        "bull": { "fairValue": 560, "currency": "USD" }
+      },
+      "expectedReturn": {
+        "horizonYears": 4,
+        "baseTotalReturnPct": 65.74,
+        "baseAnnualizedReturnPct": 13.47,
+        "bullTotalReturnPct": 109.36,
+        "bearDownsidePct": -10.59,
+        "weightedExpectedReturnPct": 57.56,
+        "asymmetryRatio": 6.21
+      },
+      "thesis": {
+        "summary": null,
+        "growthDrivers": [],
+        "epsFcfGrowthDrivers": [],
+        "catalysts": [],
+        "pros": [],
+        "risks": [],
+        "killCriteria": []
+      },
+      "positionPlan": {
+        "attractiveEntryZone": { "from": 245, "to": 260, "currency": "USD" },
+        "tranches": [],
+        "summary": null
+      },
+      "monitoringPlan": {
+        "nextReviewDate": null,
+        "nextExpectedReportDate": null,
+        "nextReviewTriggers": [],
+        "watchConditions": []
+      },
+      "sources": [],
+      "dataQuality": {
+        "confidence": "MEDIUM",
+        "missingCriticalData": [],
+        "conflictingData": [],
+        "notes": []
+      }
+    }
+  ]
+}

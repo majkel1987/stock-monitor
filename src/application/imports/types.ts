@@ -3,6 +3,9 @@ import type {
   JsonValue,
   ValidationIssue,
 } from "./gpw-monitoring-schema";
+import type { UsaImportCompany } from "./usa-monitoring-schema";
+
+export type MonitoringImportCompany = GpwImportCompany | UsaImportCompany;
 
 export type ImportItemState =
   "READY" | "WARNING" | "ERROR" | "ALREADY_IMPORTED" | "COMMITTED" | "EXCLUDED";
@@ -52,6 +55,7 @@ export type CreateImportDraftInput = {
 export type ImportBatchSummary = {
   id: string;
   externalId: string;
+  exportType: "gpw_opportunity_monitoring" | "usa_opportunity_monitoring";
   analysisDate: string;
   generatedAt: string;
   fileName: string;
@@ -77,7 +81,7 @@ export type ImportReviewItem = {
   currentPrice: number | null;
   warnings: string[];
   errors: ValidationIssue[];
-  company: GpwImportCompany | null;
+  company: MonitoringImportCompany | null;
   committedMonitoringResultId: string | null;
 };
 

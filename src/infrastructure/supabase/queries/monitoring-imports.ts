@@ -5,11 +5,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   ImportBatchSummary,
   ImportCandidateInspection,
+  MonitoringImportCompany,
   ImportReviewItem,
   MonitoringImportRepository,
 } from "@/application/imports/types";
 import type {
-  GpwImportCompany,
   JsonValue,
   ValidationIssue,
 } from "@/application/imports/gpw-monitoring-schema";
@@ -39,18 +39,19 @@ function validationIssues(value: unknown): ValidationIssue[] {
   });
 }
 
-function importCompany(value: unknown): GpwImportCompany | null {
+function importCompany(value: unknown): MonitoringImportCompany | null {
   if (typeof value !== "object" || value === null || Array.isArray(value))
     return null;
   const record = value as Record<string, unknown>;
   return typeof record.externalId === "string" &&
     typeof record.identity === "object"
-    ? (record as GpwImportCompany)
+    ? (record as unknown as MonitoringImportCompany)
     : null;
 }
 
 export function createSupabaseMonitoringImportRepository(
   client: SupabaseClient,
+  marketCode: "GPW" | "USA" = "GPW",
 ): MonitoringImportRepository {
   return {
     async inspectCandidates(
@@ -66,7 +67,7 @@ export function createSupabaseMonitoringImportRepository(
         ...new Set(candidates.map((item) => item.externalId)),
       ];
       const [marketResult, statusesResult, existingResult] = await Promise.all([
-        client.from("markets").select("id").eq("code", "GPW").single(),
+        client.from("markets").select("id").eq("code", marketCode).single(),
         client
           .from("status_definitions")
           .select("id,slug,is_active")
@@ -173,18 +174,19 @@ export function createSupabaseMonitoringImportRepository(
     },
 
     async saveDraft(_userId, input) {
-      const { data, error } = await client.rpc(
-        "create_gpw_monitoring_import_draft",
-        {
-          p_analysis_date: input.analysisDate,
-          p_external_id: input.externalId,
-          p_file_name: input.fileName,
-          p_generated_at: input.generatedAt,
-          p_items: input.items as unknown as JsonValue,
-          p_raw_payload: input.rawPayload,
-          p_raw_size_bytes: input.rawSizeBytes,
-        },
-      );
+      const args = {
+        p_analysis_date: input.analysisDate,
+        p_external_id: input.externalId,
+        p_file_name: input.fileName,
+        p_generated_at: input.generatedAt,
+        p_items: input.items as unknown as JsonValue,
+        p_raw_payload: input.rawPayload,
+        p_raw_size_bytes: input.rawSizeBytes,
+      };
+      const { data, error } =
+        marketCode === "USA"
+          ? await client.rpc("create_usa_monitoring_import_draft", args)
+          : await client.rpc("create_gpw_monitoring_import_draft", args);
       const row = data?.[0];
       if (
         error ||
@@ -204,7 +206,7 @@ export function createSupabaseMonitoringImportRepository(
         client
           .from("monitoring_import_batches")
           .select(
-            "id,external_id,analysis_date,generated_at,file_name,state,created_at",
+            "id,external_id,export_type,analysis_date,generated_at,file_name,state,created_at",
           )
           .eq("id", batchId)
           .eq("user_id", userId)
@@ -243,6 +245,8 @@ export function createSupabaseMonitoringImportRepository(
       return {
         id: batchResult.data.id,
         externalId: batchResult.data.external_id,
+        exportType: batchResult.data
+          .export_type as ImportBatchSummary["exportType"],
         analysisDate: batchResult.data.analysis_date,
         generatedAt: batchResult.data.generated_at,
         fileName: batchResult.data.file_name,
@@ -272,13 +276,14 @@ export function createSupabaseMonitoringImportRepository(
     },
 
     async commitItem(_userId, itemId, priceLevelActions) {
-      const { data, error } = await client.rpc(
-        "commit_gpw_monitoring_import_item",
-        {
-          p_item_id: itemId,
-          p_price_level_actions: priceLevelActions,
-        },
-      );
+      const args = {
+        p_item_id: itemId,
+        p_price_level_actions: priceLevelActions,
+      };
+      const { data, error } =
+        marketCode === "USA"
+          ? await client.rpc("commit_usa_monitoring_import_item", args)
+          : await client.rpc("commit_gpw_monitoring_import_item", args);
       const row = data?.[0];
       const outcomes = [
         "committed",

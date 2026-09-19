@@ -187,6 +187,7 @@ describe("GPW monitoring selective commit", () => {
         return {
           id: "batch-id",
           externalId: "batch-external-id",
+          exportType: "gpw_opportunity_monitoring",
           analysisDate: "2026-09-16",
           generatedAt: "2026-09-16T18:00:00Z",
           fileName: "scan.json",

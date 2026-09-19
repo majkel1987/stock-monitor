@@ -1,4 +1,4 @@
-import type { GpwImportCompany } from "@/application/imports/gpw-monitoring-schema";
+import type { MonitoringImportCompany } from "@/application/imports/types";
 
 export type MonitoringTimelineItem = {
   id: string;
@@ -24,5 +24,5 @@ export type MonitoringDetail = MonitoringTimelineItem & {
   opportunityCategory: string | null;
   analysisDate: string | null;
   sourceReference: string | null;
-  analysis: GpwImportCompany | null;
+  analysis: MonitoringImportCompany | null;
 };

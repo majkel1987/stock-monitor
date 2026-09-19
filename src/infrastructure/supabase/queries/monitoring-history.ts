@@ -2,7 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { GpwImportCompany } from "@/application/imports/gpw-monitoring-schema";
+import type { MonitoringImportCompany } from "@/application/imports/types";
 import type {
   MonitoringDetail,
   MonitoringTimelineItem,
@@ -19,13 +19,13 @@ export class MonitoringHistoryInfrastructureError extends Error {
   }
 }
 
-function companySnapshot(value: Json): GpwImportCompany | null {
+function companySnapshot(value: Json): MonitoringImportCompany | null {
   if (typeof value !== "object" || value === null || Array.isArray(value))
     return null;
   return typeof value.externalId === "string" &&
     typeof value.identity === "object" &&
     value.identity !== null
-    ? (value as GpwImportCompany)
+    ? (value as unknown as MonitoringImportCompany)
     : null;
 }
 

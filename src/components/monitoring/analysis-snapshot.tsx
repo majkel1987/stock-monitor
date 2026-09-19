@@ -1,9 +1,7 @@
 import type { ReactNode } from "react";
 
-import type {
-  GpwImportCompany,
-  JsonValue,
-} from "@/application/imports/gpw-monitoring-schema";
+import type { JsonValue } from "@/application/imports/gpw-monitoring-schema";
+import type { MonitoringImportCompany } from "@/application/imports/types";
 import { SectionHeader, StatusBadge, Surface } from "@/components/ui/terminal";
 
 function title(value: string) {
@@ -123,7 +121,11 @@ function safeHttpUrl(value: unknown) {
   }
 }
 
-export function AnalysisSnapshot({ company }: { company: GpwImportCompany }) {
+export function AnalysisSnapshot({
+  company,
+}: {
+  company: MonitoringImportCompany;
+}) {
   const zone = company.valuation.attractiveEntryZone;
   const sections: Array<[string, JsonValue]> = [
     ["Narrative → Numbers", company.narrativeToNumbers ?? null],

@@ -3,6 +3,8 @@
 import { redirect } from "next/navigation";
 
 import { createGpwMonitoringImportDraft } from "@/application/imports/create-import-draft";
+import { createUsaMonitoringImportDraft } from "@/application/imports/create-usa-import-draft";
+import { detectMonitoringImportKind } from "@/application/imports/detect-monitoring-import";
 import { GPW_IMPORT_MAX_BYTES } from "@/application/imports/gpw-monitoring-schema";
 import {
   createSupabaseMonitoringImportRepository,
@@ -36,15 +38,29 @@ export async function createImportDraftAction(
   }
 
   const user = await requireAllowedUser();
+  const payload = await file.text();
+  const importKind = detectMonitoringImportKind(payload) ?? "GPW";
   let result: Awaited<ReturnType<typeof createGpwMonitoringImportDraft>>;
   try {
     const client = await createClient("writable");
-    result = await createGpwMonitoringImportDraft({
-      repository: createSupabaseMonitoringImportRepository(client),
-      userId: user.id,
-      payload: await file.text(),
-      fileName: file.name,
-    });
+    const repository = createSupabaseMonitoringImportRepository(
+      client,
+      importKind,
+    );
+    result =
+      importKind === "USA"
+        ? await createUsaMonitoringImportDraft({
+            repository,
+            userId: user.id,
+            payload,
+            fileName: file.name,
+          })
+        : await createGpwMonitoringImportDraft({
+            repository,
+            userId: user.id,
+            payload,
+            fileName: file.name,
+          });
   } catch (error) {
     if (error instanceof MonitoringImportInfrastructureError) {
       return {
@@ -58,7 +74,7 @@ export async function createImportDraftAction(
   if (result.status === "invalid_file") {
     return {
       status: "error",
-      message: "The file does not match the GPW monitoring contract.",
+      message: `The file does not match the ${importKind} monitoring contract.`,
       issues: result.issues.slice(0, 20),
     };
   }

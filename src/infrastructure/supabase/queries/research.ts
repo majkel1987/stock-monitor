@@ -3,7 +3,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { MonitoringWriter } from "@/application/monitoring/types";
-import type { GpwImportCompany } from "@/application/imports/gpw-monitoring-schema";
+import type { MonitoringImportCompany } from "@/application/imports/types";
 import type { NoteWriter } from "@/application/notes/types";
 import type { PriceLevelWriter } from "@/application/price-levels/types";
 import type {
@@ -55,13 +55,13 @@ function sourceType(value: string) {
   return value === "json_import" || value === "api_import" ? value : "manual";
 }
 
-function importedCompany(value: Json): GpwImportCompany | null {
+function importedCompany(value: Json): MonitoringImportCompany | null {
   if (typeof value !== "object" || value === null || Array.isArray(value))
     return null;
   return typeof value.externalId === "string" &&
     typeof value.identity === "object" &&
     value.identity !== null
-    ? (value as GpwImportCompany)
+    ? (value as unknown as MonitoringImportCompany)
     : null;
 }
 

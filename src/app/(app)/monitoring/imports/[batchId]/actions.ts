@@ -32,9 +32,13 @@ export async function commitImportReviewAction(
   const user = await requireAllowedUser();
   try {
     const client = await createClient("writable");
-    const repository = createSupabaseMonitoringImportRepository(client);
-    const batch = await repository.readBatch(user.id, batchId.data);
+    const lookupRepository = createSupabaseMonitoringImportRepository(client);
+    const batch = await lookupRepository.readBatch(user.id, batchId.data);
     if (!batch) return { status: "error", message: "Import batch not found." };
+    const repository = createSupabaseMonitoringImportRepository(
+      client,
+      batch.exportType === "usa_opportunity_monitoring" ? "USA" : "GPW",
+    );
 
     const selected = new Set(
       formData

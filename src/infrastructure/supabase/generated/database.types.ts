@@ -1044,7 +1044,30 @@ export type Database = {
           stock_id: string | null
         }[]
       }
+      commit_usa_monitoring_import_item: {
+        Args: { p_item_id: string; p_price_level_actions?: Json }
+        Returns: {
+          monitoring_result_id: string | null
+          outcome: string
+          stock_id: string | null
+        }[]
+      }
       create_gpw_monitoring_import_draft: {
+        Args: {
+          p_analysis_date: string
+          p_external_id: string
+          p_file_name: string
+          p_generated_at: string
+          p_items: Json
+          p_raw_payload: Json
+          p_raw_size_bytes: number
+        }
+        Returns: {
+          batch_id: string
+          outcome: string
+        }[]
+      }
+      create_usa_monitoring_import_draft: {
         Args: {
           p_analysis_date: string
           p_external_id: string
