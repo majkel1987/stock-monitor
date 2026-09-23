@@ -4,10 +4,8 @@ import { Trash2 } from "lucide-react";
 import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
-import {
-  deletePortfolioTransactionAction,
-  idlePortfolioActionState,
-} from "@/app/(app)/portfolio/actions";
+import { deletePortfolioTransactionAction } from "@/app/(app)/portfolio/actions";
+import { idlePortfolioActionState } from "@/application/portfolio/action-state";
 
 export function DeleteInvestmentButton({
   transactionId,

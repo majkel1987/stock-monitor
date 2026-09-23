@@ -6,9 +6,9 @@ import { toast } from "sonner";
 
 import {
   createPortfolioTransactionAction,
-  idlePortfolioActionState,
   updatePortfolioTransactionAction,
 } from "@/app/(app)/portfolio/actions";
+import { idlePortfolioActionState } from "@/application/portfolio/action-state";
 import type {
   PortfolioStock,
   PortfolioTransaction,

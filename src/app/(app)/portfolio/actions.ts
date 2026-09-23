@@ -2,32 +2,23 @@
 
 import { revalidatePath } from "next/cache";
 
-import {
-  createPortfolioTransactionSchema,
-  deletePortfolioTransactionSchema,
-  updatePortfolioTransactionSchema,
-} from "@/application/portfolio/schemas";
+import type { PortfolioActionState } from "@/application/portfolio/action-state";
 import {
   createPortfolioTransaction,
   deletePortfolioTransaction,
   updatePortfolioTransaction,
 } from "@/application/portfolio/manage-transactions";
 import {
+  createPortfolioTransactionSchema,
+  deletePortfolioTransactionSchema,
+  updatePortfolioTransactionSchema,
+} from "@/application/portfolio/schemas";
+import {
   createSupabasePortfolioWriter,
   PortfolioInfrastructureError,
 } from "@/infrastructure/supabase/queries/portfolio";
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
 import { createClient } from "@/infrastructure/supabase/server/create-client";
-
-export type PortfolioActionState = {
-  status: "idle" | "success" | "error";
-  message?: string;
-  fieldErrors?: Record<string, string[] | undefined>;
-};
-
-export const idlePortfolioActionState: PortfolioActionState = {
-  status: "idle",
-};
 
 function validationError(
   result: Exclude<
