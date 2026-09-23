@@ -20,9 +20,13 @@ test("critical MVP journey with provider-unavailable manual fallback", async ({
   await expect(page).toHaveURL(/\/dashboard$/);
 
   await page.goto("/watchlist");
-  await page.getByRole("button", { name: "+ Add stock" }).first().click();
+  await page.getByRole("button", { name: "Add stock" }).first().click();
   const addDialog = page.getByRole("dialog", { name: "Add stock" });
-  await expect(addDialog.getByText("EODHD is not configured.")).toBeVisible();
+  await expect(
+    addDialog.getByText(
+      "Massive is not configured. Manual entry remains available.",
+    ),
+  ).toBeVisible();
   await addDialog.getByLabel("Ticker").fill(runTicker);
   await addDialog.getByLabel("Company name").fill("M7 E2E Company");
   await addDialog.getByRole("button", { name: "Add manually" }).click();
@@ -44,8 +48,9 @@ test("critical MVP journey with provider-unavailable manual fallback", async ({
     ),
   });
   await importDialog.getByRole("button", { name: "Import CSV" }).click();
+  await expect(importDialog).not.toBeVisible();
   await expect(
-    importDialog.getByText(
+    page.getByText(
       "2 historical rows imported; the 2020-01-01 quote is now current.",
     ),
   ).toBeVisible();
@@ -60,7 +65,7 @@ test("critical MVP journey with provider-unavailable manual fallback", async ({
   await quoteDialog.getByLabel("As of").fill("2020-01-02T12:00");
   await quoteDialog.getByRole("button", { name: "Save quote" }).click();
   await expect(quoteDialog).not.toBeVisible();
-  await expect(page.getByText("STALE", { exact: true })).toBeVisible();
+  await expect(page.getByText("Stale", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Edit levels" }).click();
   const levelDialog = page.getByRole("dialog", { name: "Edit price levels" });
