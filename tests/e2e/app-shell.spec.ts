@@ -3,9 +3,8 @@ import { expect, test } from "@playwright/test";
 test("anonymous user is redirected from the dashboard", async ({ page }) => {
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/login$/);
-  await expect(
-    page.getByRole("heading", { name: "Stock Monitor" }),
-  ).toBeVisible();
+  await expect(page.getByText("Stock Monitor")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 });
 
 test("anonymous user is redirected from a protected deep link", async ({

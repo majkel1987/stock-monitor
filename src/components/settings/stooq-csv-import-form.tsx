@@ -1,13 +1,14 @@
 "use client";
 
-import { Upload } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { useActionState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 
 import {
   importStooqCsvAction,
   type ImportStooqCsvActionState,
 } from "@/app/(app)/market-data-actions";
-import { ActionButton, controlClass } from "@/components/ui/terminal";
+import { ActionButton, Field, controlClass } from "@/components/ui/terminal";
 import { cn } from "@/lib/utils/cn";
 
 const initialState: ImportStooqCsvActionState = { status: "idle" };
@@ -29,16 +30,31 @@ export function StooqCsvImportForm({
     importStooqCsvAction,
     initialState,
   );
+  const wasPendingRef = useRef(false);
 
   useEffect(() => {
-    if (state.status === "success") formRef.current?.reset();
-  }, [state.status]);
+    if (pending) {
+      wasPendingRef.current = true;
+      return;
+    }
+    if (!wasPendingRef.current) return;
+    wasPendingRef.current = false;
+    if (state.status !== "success") return;
+
+    formRef.current?.reset();
+    toast.success("CSV imported", {
+      description: state.message,
+      duration: 3500,
+    });
+    dialogRef.current?.close();
+  }, [pending, state.message, state.status]);
 
   const disabled = pending || targets.length === 0;
 
   return (
     <>
       <ActionButton
+        className="w-full sm:w-auto"
         onClick={() => dialogRef.current?.showModal()}
         type="button"
         variant="secondary"
@@ -48,86 +64,83 @@ export function StooqCsvImportForm({
 
       <dialog
         aria-labelledby="stooq-csv-dialog-title"
-        className="m-auto w-[360px] rounded-[10px] border border-[var(--border-strong)] bg-[var(--surface-elevated)] p-0 text-[var(--text-primary)] backdrop:bg-black/60"
+        className="m-auto max-h-[min(640px,90vh)] w-[min(100%,28rem)] overflow-y-auto rounded-[var(--radius-dialog)] border border-border bg-popover p-0 text-popover-foreground shadow-[var(--shadow-lg)] backdrop:bg-black/70"
         ref={dialogRef}
       >
-        <form
-          action={action}
-          className="flex flex-col gap-[14px] p-4"
-          ref={formRef}
-        >
-          <div className="flex flex-col gap-1">
-            <h2
-              className="text-[15px] font-semibold"
-              id="stooq-csv-dialog-title"
+        <form action={action} className="flex flex-col" ref={formRef}>
+          <div className="flex items-start justify-between gap-3 border-b border-[var(--border-subtle)] px-4 py-4">
+            <div className="min-w-0">
+              <h2
+                className="text-base font-semibold"
+                id="stooq-csv-dialog-title"
+              >
+                Import GPW prices
+              </h2>
+              <p className="pt-1 text-sm leading-relaxed text-muted-foreground">
+                Select an active GPW stock and a Stooq CSV file with daily
+                OHLCV data. Maximum file size is 5 MB.
+              </p>
+            </div>
+            <button
+              aria-label="Close CSV import"
+              className="grid size-9 shrink-0 place-items-center rounded-[var(--radius-sm)] text-muted-foreground hover:bg-secondary hover:text-foreground"
+              onClick={() => dialogRef.current?.close()}
+              type="button"
             >
-              Import GPW prices
-            </h2>
-            <p className="text-xs leading-4 text-[var(--text-secondary)]">
-              Select an active GPW stock and a Stooq CSV file with daily OHLCV
-              data. Maximum file size is 5 MB.
-            </p>
+              <X aria-hidden="true" className="size-4" />
+            </button>
           </div>
 
-          <label className="flex min-w-0 flex-col gap-[5px]">
-            <span className="text-[11px] leading-[14px] font-semibold text-[var(--text-secondary)]">
-              GPW stock
-            </span>
-            <select
-              className={controlClass}
-              disabled={disabled}
-              name="stockId"
-              required
-            >
-              {targets.length ? (
-                targets.map((target) => (
-                  <option key={target.stockId} value={target.stockId}>
-                    {target.ticker} · {target.name}
-                  </option>
-                ))
-              ) : (
-                <option value="">No active GPW stocks</option>
-              )}
-            </select>
-          </label>
+          <div className="flex flex-col gap-5 p-4 sm:p-5">
+            <Field label="GPW stock">
+              <select
+                className={controlClass}
+                disabled={disabled}
+                name="stockId"
+                required
+              >
+                {targets.length ? (
+                  targets.map((target) => (
+                    <option key={target.stockId} value={target.stockId}>
+                      {target.ticker} · {target.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="">No active GPW stocks</option>
+                )}
+              </select>
+            </Field>
 
-          <label className="flex min-w-0 flex-col gap-[5px]">
-            <span className="text-[11px] leading-[14px] font-semibold text-[var(--text-secondary)]">
-              Stooq CSV file
-            </span>
-            <input
-              accept=".csv,text/csv"
-              className={cn(
-                controlClass,
-                "cursor-pointer p-0 pr-2 font-mono text-[10px] file:mr-3 file:h-8 file:border-0 file:border-r file:border-[var(--border-default)] file:bg-[var(--surface-default)] file:px-3 file:text-[10px] file:font-semibold file:text-[var(--text-primary)] hover:file:bg-[var(--surface-hover)]",
-              )}
-              disabled={disabled}
-              name="file"
-              required
-              type="file"
-            />
-          </label>
+            <Field label="Stooq CSV file">
+              <input
+                accept=".csv,text/csv"
+                className={cn(
+                  controlClass,
+                  "cursor-pointer py-2 font-mono text-sm file:mr-3 file:h-11 file:border-0 file:border-r file:border-border file:bg-muted file:px-3 file:text-sm file:font-semibold file:text-foreground hover:file:bg-secondary",
+                )}
+                disabled={disabled}
+                name="file"
+                required
+                type="file"
+              />
+            </Field>
 
-          {state.status !== "idle" && state.message ? (
-            <p
-              aria-live="polite"
-              className={cn(
-                "text-[10px]",
-                state.status === "error"
-                  ? "text-[var(--negative)]"
-                  : "text-[var(--positive)]",
-              )}
-              role="status"
-            >
-              {state.message}
-            </p>
-          ) : targets.length === 0 ? (
-            <p className="text-[10px] text-[var(--warning)]">
-              Add or restore a GPW stock before importing a Stooq file.
-            </p>
-          ) : null}
+            {state.status === "error" && state.message ? (
+              <p
+                aria-live="polite"
+                className="rounded-[var(--radius-sm)] border border-negative bg-[var(--negative-subtle)] p-3 text-sm text-negative"
+                role="alert"
+              >
+                {state.message}
+              </p>
+            ) : targets.length === 0 ? (
+              <p className="text-sm text-warning">
+                Add or restore a GPW stock before importing a Stooq file.
+              </p>
+            ) : null}
+          </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-col-reverse gap-2 border-t border-border p-4 sm:flex-row sm:justify-end sm:p-5">
             <ActionButton
               disabled={pending}
               onClick={() => dialogRef.current?.close()}
@@ -137,7 +150,7 @@ export function StooqCsvImportForm({
               Cancel
             </ActionButton>
             <ActionButton disabled={disabled} type="submit" variant="primary">
-              <Upload aria-hidden="true" className="mr-2 size-[14px]" />
+              <Upload aria-hidden="true" className="size-4" />
               {pending ? "Importing…" : "Import CSV"}
             </ActionButton>
           </div>

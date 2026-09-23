@@ -1,8 +1,9 @@
 "use client";
 
 import { Archive, Pencil, Pin, PinOff, X } from "lucide-react";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import type { ReactNode } from "react";
+import { toast } from "sonner";
 
 import {
   archiveNoteAction,
@@ -15,7 +16,13 @@ import {
   type ResearchActionState,
 } from "@/application/research/action-state";
 import type { NoteView } from "@/application/stocks/research-types";
-import { textareaClass } from "@/components/ui/terminal";
+import {
+  ActionButton,
+  SectionHeader,
+  Surface,
+  textareaClass,
+} from "@/components/ui/terminal";
+import { cn } from "@/lib/utils/cn";
 
 function dateLabel(value: string) {
   return new Intl.DateTimeFormat("en-GB", {
@@ -36,10 +43,23 @@ function NoteMutationButton({
   label: string;
   values: Record<string, string>;
 }) {
-  const [, formAction, pending] = useActionState(
+  const [state, formAction, pending] = useActionState(
     action,
     idleResearchActionState,
   );
+  const wasPendingRef = useRef(false);
+
+  useEffect(() => {
+    if (pending) {
+      wasPendingRef.current = true;
+      return;
+    }
+    if (!wasPendingRef.current) return;
+    wasPendingRef.current = false;
+    if (state.status !== "success" || !state.message) return;
+    toast.success(state.message);
+  }, [pending, state.message, state.status]);
+
   return (
     <form action={formAction}>
       {Object.entries(values).map(([name, value]) => (
@@ -47,7 +67,7 @@ function NoteMutationButton({
       ))}
       <button
         aria-label={label}
-        className="grid size-6 place-items-center rounded-[4px] text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)] disabled:opacity-50"
+        className="grid size-9 place-items-center rounded-[var(--radius-sm)] text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-50"
         disabled={pending}
         title={label}
         type="submit"
@@ -71,94 +91,93 @@ export function NoteDialog({
   triggerClassName?: string;
   triggerContent?: ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const serverAction = note ? updateNoteAction : createNoteAction;
   const [state, action, pending] = useActionState(
     async (previousState: ResearchActionState, formData: FormData) => {
       const result = await serverAction(previousState, formData);
-      if (result.status === "success") setOpen(false);
+      if (result.status === "success") {
+        toast.success(note ? "Note updated" : "Note added", {
+          description: note
+            ? "The note was saved."
+            : "The note was added successfully.",
+        });
+        formRef.current?.reset();
+        dialogRef.current?.close();
+      }
       return result;
     },
     idleResearchActionState,
   );
+
+  const closeDialog = () => dialogRef.current?.close();
 
   return (
     <>
       <button
         className={
           triggerClassName ??
-          "flex h-8 items-center justify-center rounded-[5px] border border-[var(--border-default)] bg-[var(--surface-elevated)] px-3 text-xs font-semibold hover:bg-[var(--surface-hover)]"
+          "ui-button ui-button-secondary w-full justify-center lg:w-auto"
         }
-        onClick={() => setOpen(true)}
+        onClick={() => dialogRef.current?.showModal()}
         type="button"
       >
         {triggerContent ?? triggerLabel}
       </button>
-      {open ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/55">
-          <dialog
-            aria-label={note ? "Edit note" : "Add note"}
-            className="m-0 flex w-[360px] max-w-[calc(100vw-32px)] flex-col gap-3 rounded-[10px] border border-[var(--border-strong)] bg-[var(--surface-elevated)] p-4 text-[var(--text-primary)]"
-            open
+      <dialog
+        aria-labelledby={note ? "edit-note-title" : "add-note-title"}
+        className="m-auto w-[min(100%-1.5rem,24rem)] rounded-[var(--radius-dialog)] border border-border bg-popover p-0 text-popover-foreground shadow-[var(--shadow-lg)] backdrop:bg-black/70"
+        ref={dialogRef}
+      >
+        <header className="flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] px-4 py-3">
+          <h2
+            className="text-base font-semibold"
+            id={note ? "edit-note-title" : "add-note-title"}
           >
-            <header className="flex items-center justify-between">
-              <h2 className="text-[15px] font-semibold">
-                {note ? "Edit note" : "Add note"}
-              </h2>
-              <button
-                aria-label="Close"
-                onClick={() => setOpen(false)}
-                type="button"
-              >
-                <X className="size-4 text-[var(--text-muted)]" />
-              </button>
-            </header>
-            <form action={action} className="flex flex-col gap-3">
-              <input name="stockId" type="hidden" value={stockId} />
-              {note ? (
-                <input name="noteId" type="hidden" value={note.id} />
-              ) : null}
-              <textarea
-                autoFocus
-                className={textareaClass}
-                defaultValue={note?.content ?? ""}
-                maxLength={10_000}
-                name="content"
-                placeholder="Write concise analytical notes…"
-                required
-              />
-              {state.message ? (
-                <p
-                  className={
-                    state.status === "error"
-                      ? "text-[10px] text-[var(--negative)]"
-                      : "text-[10px] text-[var(--positive)]"
-                  }
-                  role={state.status === "error" ? "alert" : "status"}
-                >
-                  {state.message}
-                </p>
-              ) : null}
-              <div className="flex justify-end gap-2">
-                <button
-                  className="h-8 rounded-[5px] px-3 text-xs font-semibold text-[var(--text-secondary)]"
-                  onClick={() => setOpen(false)}
-                  type="button"
-                >
-                  Cancel
-                </button>
-                <button
-                  className="h-8 rounded-[5px] bg-[var(--accent-primary)] px-3 text-xs font-semibold text-[var(--bg-primary)] disabled:opacity-50"
-                  disabled={pending}
-                  type="submit"
-                >
-                  {pending ? "Saving…" : note ? "Save note" : "Add note"}
-                </button>
-              </div>
-            </form>
-          </dialog>
-        </div>
-      ) : null}
+            {note ? "Edit note" : "Add note"}
+          </h2>
+          <button
+            aria-label="Close"
+            className="grid size-9 place-items-center rounded-[var(--radius-sm)] text-muted-foreground hover:bg-secondary"
+            onClick={closeDialog}
+            type="button"
+          >
+            <X aria-hidden="true" className="size-4" />
+          </button>
+        </header>
+        <form
+          action={action}
+          className="flex flex-col gap-4 p-4"
+          ref={formRef}
+        >
+          <input name="stockId" type="hidden" value={stockId} />
+          {note ? (
+            <input name="noteId" type="hidden" value={note.id} />
+          ) : null}
+          <textarea
+            className={cn(textareaClass, "min-h-32 text-base")}
+            defaultValue={note?.content ?? ""}
+            maxLength={10_000}
+            name="content"
+            placeholder="Write concise analytical notes…"
+            required
+          />
+          {state.message && state.status === "error" ? (
+            <p className="text-sm text-destructive" role="alert">
+              {state.message}
+            </p>
+          ) : null}
+          <div className="flex justify-end gap-2">
+            <ActionButton onClick={closeDialog} type="button" variant="ghost">
+              Cancel
+            </ActionButton>
+            <ActionButton disabled={pending} type="submit" variant="primary">
+              {pending ? "Saving…" : note ? "Save note" : "Add note"}
+            </ActionButton>
+          </div>
+        </form>
+      </dialog>
     </>
   );
 }
@@ -166,47 +185,54 @@ export function NoteDialog({
 export function NotesPanel({
   stockId,
   notes,
+  className,
 }: {
   stockId: string;
   notes: NoteView[];
+  className?: string;
 }) {
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xs font-semibold">Notes</h2>
-        <NoteDialog
-          stockId={stockId}
-          triggerClassName="text-[10px] font-semibold text-[var(--accent-primary)]"
-          triggerLabel="+ Quick add"
-        />
-      </div>
-      <div className="mt-2 min-h-0 flex-1 overflow-y-auto">
+    <Surface className={cn("min-w-0", className)}>
+      <SectionHeader
+        action={
+          <NoteDialog
+            stockId={stockId}
+            triggerClassName="inline-flex min-h-9 items-center text-sm font-semibold text-primary hover:underline"
+            triggerLabel="+ Quick add"
+          />
+        }
+        title="Notes"
+      />
+      <div className="px-4 sm:px-5">
         {notes.length ? (
           notes.map((note) => (
             <article
-              className="group flex items-start gap-2 border-b border-[var(--border-subtle)] py-2"
+              className="group flex items-start gap-2 border-b border-[var(--border-subtle)] py-3.5 last:border-b-0"
               key={note.id}
             >
               {note.isPinned ? (
-                <Pin className="mt-0.5 size-3 text-[var(--warning)]" />
+                <Pin
+                  aria-hidden="true"
+                  className="mt-1 size-4 shrink-0 text-warning"
+                />
               ) : null}
               <div className="min-w-0 flex-1">
-                <p className="whitespace-pre-wrap break-words text-[10px] leading-[14px] text-[var(--text-secondary)]">
+                <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary-foreground">
                   {note.content}
                 </p>
-                <span className="mt-1 block font-mono text-[9px] text-[var(--text-muted)]">
-                  {note.isPinned ? "PINNED · " : ""}
+                <span className="mt-1.5 block font-mono text-[0.8125rem] text-muted-foreground">
+                  {note.isPinned ? "Pinned · " : ""}
                   {dateLabel(note.createdAt)}
                 </span>
               </div>
-              <div className="flex opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+              <div className="flex shrink-0 sm:opacity-0 sm:transition-opacity sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
                 <NoteDialog
                   note={note}
                   stockId={stockId}
-                  triggerClassName="grid size-6 place-items-center rounded-[4px] text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]"
+                  triggerClassName="grid size-9 place-items-center rounded-[var(--radius-sm)] text-muted-foreground hover:bg-secondary hover:text-foreground"
                   triggerContent={
                     <>
-                      <Pencil className="size-3.5" />
+                      <Pencil aria-hidden="true" className="size-4" />
                       <span className="sr-only">Edit note</span>
                     </>
                   }
@@ -222,9 +248,9 @@ export function NotesPanel({
                   }}
                 >
                   {note.isPinned ? (
-                    <PinOff className="size-3.5" />
+                    <PinOff aria-hidden="true" className="size-4" />
                   ) : (
-                    <Pin className="size-3.5" />
+                    <Pin aria-hidden="true" className="size-4" />
                   )}
                 </NoteMutationButton>
                 <NoteMutationButton
@@ -232,15 +258,17 @@ export function NotesPanel({
                   label="Archive note"
                   values={{ stockId, noteId: note.id }}
                 >
-                  <Archive className="size-3.5" />
+                  <Archive aria-hidden="true" className="size-4" />
                 </NoteMutationButton>
               </div>
             </article>
           ))
         ) : (
-          <p className="py-3 text-[10px] text-[var(--text-muted)]">No notes</p>
+          <p className="py-4 text-sm leading-relaxed text-muted-foreground">
+            No notes yet.
+          </p>
         )}
       </div>
-    </div>
+    </Surface>
   );
 }

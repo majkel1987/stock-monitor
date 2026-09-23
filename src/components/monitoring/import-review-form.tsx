@@ -11,7 +11,15 @@ import type {
   ImportBatchSummary,
   ImportReviewItem,
 } from "@/application/imports/types";
-import { ActionButton, StatusBadge, Surface } from "@/components/ui/terminal";
+import {
+  ActionButton,
+  MetricCard,
+  SectionHeader,
+  StatusBadge,
+  Surface,
+  controlClass,
+} from "@/components/ui/terminal";
+import { cn } from "@/lib/utils/cn";
 
 function number(value: number | null | undefined, suffix = "") {
   return value === null || value === undefined ? "—" : `${value}${suffix}`;
@@ -90,7 +98,7 @@ export function ImportReviewForm({ batch }: { batch: ImportBatchSummary }) {
   }
 
   return (
-    <form action={action} className="flex flex-1 flex-col gap-[14px]">
+    <form action={action} className="flex flex-1 flex-col gap-4">
       <input name="batchId" type="hidden" value={batch.id} />
       {[...includedItemIds].map((itemId) => (
         <input key={itemId} name="includeItem" type="hidden" value={itemId} />
@@ -106,107 +114,166 @@ export function ImportReviewForm({ batch }: { batch: ImportBatchSummary }) {
           value={value}
         />
       ))}
-      <div className="grid grid-cols-5 gap-[10px]">
-        {[
-          ["COMPANIES", batch.items.length, "in batch"],
-          ["READY", metrics.ready, "can commit"],
-          ["WARNINGS", metrics.warnings, "needs acceptance"],
-          ["ERRORS", metrics.errors, "excluded"],
-          ["SELECTED", metrics.selected, `of ${batch.items.length}`],
-        ].map(([label, value, detail]) => (
-          <Surface
-            className="flex h-[60px] flex-col gap-1 px-3 py-[9px]"
-            key={label}
-          >
-            <span className="text-[8px] font-bold tracking-[0.5px] text-[var(--text-muted)]">
-              {label}
-            </span>
-            <span className="flex items-baseline gap-2">
-              <strong className="font-mono text-[17px]">{value}</strong>
-              <span className="text-[9px] text-[var(--text-muted)]">
-                {detail}
-              </span>
-            </span>
-          </Surface>
-        ))}
+
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+        <MetricCard
+          hint="in batch"
+          label="Companies"
+          value={batch.items.length}
+        />
+        <MetricCard
+          hint="can commit"
+          label="Ready"
+          tone="positive"
+          value={metrics.ready}
+        />
+        <MetricCard
+          hint="needs acceptance"
+          label="Warnings"
+          tone={metrics.warnings > 0 ? "warning" : "default"}
+          value={metrics.warnings}
+        />
+        <MetricCard
+          hint="excluded"
+          label="Errors"
+          tone={metrics.errors > 0 ? "negative" : "default"}
+          value={metrics.errors}
+        />
+        <MetricCard
+          hint={`of ${batch.items.length}`}
+          label="Selected"
+          value={metrics.selected}
+        />
       </div>
 
       <Surface>
-        <div className="grid h-[34px] grid-cols-[34px_58px_140px_90px_138px_54px_74px_74px_76px_70px_66px_1fr] items-center border-b border-[var(--border-subtle)] bg-[var(--bg-tertiary)] px-[7px] text-[8px] font-semibold text-[var(--text-muted)]">
-          {[
-            "",
-            "TICKER",
-            "COMPANY",
-            "DECISION",
-            "STATUS",
-            "SCORE",
-            "PRICE",
-            "CURRENT",
-            "FAIR VALUE",
-            "BASE %",
-            "ASYM.",
-            "IMPORT STATE",
-          ].map((label, index) => (
-            <span key={`${label}-${index}`}>{label}</span>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="data-table min-w-[72rem]">
+            <thead>
+              <tr>
+                <th className="w-10" scope="col">
+                  <span className="sr-only">Include</span>
+                </th>
+                <th scope="col">Ticker</th>
+                <th scope="col">Company</th>
+                <th scope="col">Decision</th>
+                <th scope="col">Status</th>
+                <th className="text-right" scope="col">
+                  Score
+                </th>
+                <th className="text-right" scope="col">
+                  Price
+                </th>
+                <th className="text-right" scope="col">
+                  Current
+                </th>
+                <th className="text-right" scope="col">
+                  Fair value
+                </th>
+                <th className="text-right" scope="col">
+                  Base %
+                </th>
+                <th className="text-right" scope="col">
+                  Asym.
+                </th>
+                <th scope="col">Import state</th>
+              </tr>
+            </thead>
+            <tbody>
+              {batch.items.map((item) => {
+                const company = item.company;
+                const disabled = !["READY", "WARNING"].includes(item.state);
+                return (
+                  <tr
+                    className={cn(
+                      "cursor-pointer",
+                      selectedId === item.id && "bg-[var(--accent-subtle)]",
+                    )}
+                    data-import-item-id={item.id}
+                    data-import-item-state={item.state}
+                    key={item.id}
+                    onClick={() => setSelectedId(item.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        setSelectedId(item.id);
+                      }
+                    }}
+                    tabIndex={0}
+                  >
+                    <td>
+                      <input
+                        aria-label={`Include ${item.ticker ?? item.externalId}`}
+                        checked={includedItemIds.has(item.id)}
+                        disabled={disabled}
+                        onChange={(event) =>
+                          toggleIncluded(item.id, event.currentTarget.checked)
+                        }
+                        onClick={(event) => event.stopPropagation()}
+                        type="checkbox"
+                      />
+                    </td>
+                    <td className="font-mono font-semibold">
+                      {item.ticker ?? "—"}
+                    </td>
+                    <td className="max-w-[12rem] truncate">
+                      {item.companyName ?? "Invalid company"}
+                    </td>
+                    <td>
+                      {item.decisionAction?.replaceAll("_", " ") ?? "—"}
+                    </td>
+                    <td className="truncate text-primary">
+                      {item.importedStatusSlug?.replaceAll("_", " ") ?? "—"}
+                    </td>
+                    <td className="text-right font-mono font-semibold">
+                      {company?.score.total ?? "—"}
+                    </td>
+                    <td className="text-right font-mono">
+                      {number(company?.marketData.price)}
+                    </td>
+                    <td className="text-right font-mono">
+                      {number(item.currentPrice)}
+                    </td>
+                    <td className="text-right font-mono">
+                      {number(company?.valuation.fairValueBase)}
+                    </td>
+                    <td className="text-right font-mono">
+                      {number(
+                        company?.expectedReturn.baseTotalReturnPct,
+                        "%",
+                      )}
+                    </td>
+                    <td className="text-right font-mono">
+                      {number(company?.expectedReturn.asymmetryRatio, "×")}
+                    </td>
+                    <td>
+                      <StatusBadge tone={stateTone(item.state)}>
+                        {item.state}
+                      </StatusBadge>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-        {batch.items.map((item) => {
-          const company = item.company;
-          const disabled = !["READY", "WARNING"].includes(item.state);
-          return (
-            <div
-              className={`grid h-[50px] w-full grid-cols-[34px_58px_140px_90px_138px_54px_74px_74px_76px_70px_66px_1fr] items-center border-b border-[var(--border-subtle)] px-[7px] text-left font-mono text-[9px] hover:bg-[var(--surface-hover)] ${selectedId === item.id ? "bg-[var(--surface-selected)]" : ""}`}
-              data-import-item-id={item.id}
-              data-import-item-state={item.state}
-              key={item.id}
-              onClick={() => setSelectedId(item.id)}
-            >
-              <input
-                aria-label={`Include ${item.ticker ?? item.externalId}`}
-                checked={includedItemIds.has(item.id)}
-                disabled={disabled}
-                onChange={(event) =>
-                  toggleIncluded(item.id, event.currentTarget.checked)
-                }
-                onClick={(event) => event.stopPropagation()}
-                type="checkbox"
-              />
-              <strong>{item.ticker ?? "—"}</strong>
-              <span className="truncate pr-2">
-                {item.companyName ?? "Invalid company"}
-              </span>
-              <span>{item.decisionAction?.replaceAll("_", " ") ?? "—"}</span>
-              <span className="truncate text-[var(--accent-primary)]">
-                {item.importedStatusSlug?.replaceAll("_", " ") ?? "—"}
-              </span>
-              <strong>{company?.score.total ?? "—"}</strong>
-              <span>{number(company?.marketData.price)}</span>
-              <span>{number(item.currentPrice)}</span>
-              <span>{number(company?.valuation.fairValueBase)}</span>
-              <span>
-                {number(company?.expectedReturn.baseTotalReturnPct, "%")}
-              </span>
-              <span>{number(company?.expectedReturn.asymmetryRatio, "×")}</span>
-              <StatusBadge tone={stateTone(item.state)}>
-                {item.state}
-              </StatusBadge>
-            </div>
-          );
-        })}
       </Surface>
 
-      <div className="grid min-h-[220px] flex-1 grid-cols-[1fr_430px] gap-[14px]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,24rem)]">
         <Surface>
-          <header className="flex h-[38px] items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-tertiary)] px-3">
-            <span className="flex items-center gap-2 text-[11px] font-semibold">
-              <AlertTriangle className="size-3.5 text-[var(--warning)]" />
-              {selected?.ticker ?? "Item"} · warnings and validation
-            </span>
-          </header>
-          <div className="space-y-2 p-3">
+          <SectionHeader
+            meta={
+              <AlertTriangle
+                aria-hidden="true"
+                className="size-3.5 text-warning"
+              />
+            }
+            title={`${selected?.ticker ?? "Item"} · warnings and validation`}
+          />
+          <div className="space-y-2 p-4">
             {selected?.warnings.map((warning) => (
               <label
-                className="flex gap-2 rounded-[5px] border-l-[3px] border-[var(--warning)] bg-[var(--warning-subtle)] p-[10px] text-[10px]"
+                className="flex gap-2 rounded-[var(--radius-md)] border border-warning/40 border-l-[3px] border-l-warning bg-[var(--warning-subtle)] p-3 text-sm"
                 key={warning}
               >
                 <input
@@ -224,21 +291,17 @@ export function ImportReviewForm({ batch }: { batch: ImportBatchSummary }) {
             ))}
             {selected?.errors.map((error) => (
               <div
-                className="rounded-[5px] border-l-[3px] border-[var(--negative)] bg-[var(--negative-subtle)] p-[10px] text-[10px]"
+                className="rounded-[var(--radius-md)] border border-negative/40 border-l-[3px] border-l-negative bg-[var(--negative-subtle)] p-3 text-sm"
                 key={`${error.path}-${error.message}`}
               >
-                <span className="font-mono text-[var(--negative)]">
-                  {error.path}
-                </span>
-                <p className="mt-1 text-[var(--text-secondary)]">
-                  {error.message}
-                </p>
+                <span className="font-mono text-negative">{error.path}</span>
+                <p className="mt-1 text-secondary-foreground">{error.message}</p>
               </div>
             ))}
             {selected &&
             selected.warnings.length === 0 &&
             selected.errors.length === 0 ? (
-              <p className="text-[10px] text-[var(--positive)]">
+              <p className="text-sm text-positive">
                 No warnings. This item is ready to commit.
               </p>
             ) : null}
@@ -246,33 +309,29 @@ export function ImportReviewForm({ batch }: { batch: ImportBatchSummary }) {
         </Surface>
 
         <Surface>
-          <header className="flex h-[38px] items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-tertiary)] px-3">
-            <span className="text-[10px] font-bold">
-              PRICE LEVEL RESOLUTION
-            </span>
-            <span className="font-mono text-[9px] text-[var(--text-muted)]">
-              {selected?.company?.positionPlan.tranches.length ?? 0} imported
-            </span>
-          </header>
-          <div className="space-y-[9px] p-3">
+          <SectionHeader
+            meta={`${selected?.company?.positionPlan.tranches.length ?? 0} imported`}
+            title="Price level resolution"
+          />
+          <div className="space-y-2 p-4">
             {selected?.company?.positionPlan.tranches.map((tranche) => (
               <div
-                className="flex h-10 items-center justify-between rounded-[5px] border border-[var(--border-subtle)] bg-[var(--bg-tertiary)] px-[10px]"
+                className="flex min-h-11 items-center justify-between gap-3 rounded-[var(--radius-md)] border border-border bg-muted px-3 py-2"
                 key={tranche.number}
               >
                 <div>
-                  <p className="text-[8px] font-bold text-[var(--text-muted)]">
-                    TRANCHE {tranche.number}
+                  <p className="ui-meta font-semibold tracking-wide uppercase">
+                    Tranche {tranche.number}
                   </p>
-                  <p className="font-mono text-[10px] font-semibold">
+                  <p className="font-mono text-sm font-semibold">
                     {tranche.triggerPrice === null
                       ? "Event condition only"
                       : `${tranche.triggerPrice} ${tranche.currency}`}
                   </p>
                 </div>
-                <label className="relative">
+                <label className="relative shrink-0">
                   <select
-                    className="h-7 appearance-none rounded-[4px] border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-2 pr-7 text-[9px] font-bold"
+                    className={cn(controlClass, "h-9 w-[8.5rem] appearance-none pr-8")}
                     disabled={tranche.triggerPrice === null}
                     onChange={(event) =>
                       setTrancheActions((current) => ({
@@ -290,7 +349,10 @@ export function ImportReviewForm({ batch }: { batch: ImportBatchSummary }) {
                     <option value="ADD">ADD</option>
                     <option value="SUPERSEDE">SUPERSEDE</option>
                   </select>
-                  <ChevronDown className="pointer-events-none absolute top-2 right-2 size-3 text-[var(--text-muted)]" />
+                  <ChevronDown
+                    aria-hidden="true"
+                    className="pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-muted-foreground"
+                  />
                 </label>
               </div>
             ))}
@@ -299,7 +361,7 @@ export function ImportReviewForm({ batch }: { batch: ImportBatchSummary }) {
       </div>
 
       {state.status === "error" ? (
-        <p className="text-[11px] text-[var(--negative)]" role="alert">
+        <p className="text-sm text-negative" role="alert">
           {state.message}
         </p>
       ) : null}

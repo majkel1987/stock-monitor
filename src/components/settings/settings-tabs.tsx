@@ -1,25 +1,36 @@
 import Link from "next/link";
 
+import { cn } from "@/lib/utils/cn";
+
 export function SettingsTabs({ active }: { active: "statuses" | "data" }) {
+  const tabs = [
+    { id: "statuses" as const, href: "/settings/statuses", label: "Statusy" },
+    { id: "data" as const, href: "/settings/data", label: "Dane" },
+  ];
+
   return (
     <nav
-      aria-label="Settings sections"
-      className="flex h-9 gap-5 border-b border-[var(--border-default)]"
+      aria-label="Sekcje ustawień"
+      className="flex w-full max-w-md gap-1 rounded-[var(--radius-md)] border border-border bg-muted/80 p-1"
     >
-      <Link
-        aria-current={active === "statuses" ? "page" : undefined}
-        className={`flex h-9 items-center border-b-2 text-[11px] ${active === "statuses" ? "border-[var(--accent-primary)] font-semibold text-[var(--text-primary)]" : "border-transparent text-[var(--text-muted)]"}`}
-        href="/settings/statuses"
-      >
-        Statuses
-      </Link>
-      <Link
-        aria-current={active === "data" ? "page" : undefined}
-        className={`flex h-9 items-center border-b-2 text-[11px] ${active === "data" ? "border-[var(--accent-primary)] font-semibold text-[var(--text-primary)]" : "border-transparent text-[var(--text-muted)]"}`}
-        href="/settings/data"
-      >
-        Data
-      </Link>
+      {tabs.map((tab) => {
+        const isActive = active === tab.id;
+        return (
+          <Link
+            aria-current={isActive ? "page" : undefined}
+            className={cn(
+              "flex min-h-9 flex-1 items-center justify-center rounded-[var(--radius-sm)] px-3 text-sm font-medium transition-colors",
+              isActive
+                ? "bg-primary font-semibold text-primary-foreground shadow-[var(--shadow-sm)]"
+                : "text-muted-foreground hover:bg-card hover:text-foreground",
+            )}
+            href={tab.href}
+            key={tab.id}
+          >
+            {tab.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

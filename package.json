@@ -22,13 +22,14 @@
     "db:stop": "pnpm dlx supabase@2.116.0 stop",
     "db:reset": "pnpm dlx supabase@2.116.0 db reset --local",
     "db:test": "pnpm dlx supabase@2.116.0 test db",
-    "db:test:linked": "pnpm run db:test:linked:foundation && pnpm run db:test:linked:auth && pnpm run db:test:linked:watchlist && pnpm run db:test:linked:research && pnpm run db:test:linked:dashboard && pnpm run db:test:linked:market-data",
+    "db:test:linked": "pnpm run db:test:linked:foundation && pnpm run db:test:linked:auth && pnpm run db:test:linked:watchlist && pnpm run db:test:linked:research && pnpm run db:test:linked:dashboard && pnpm run db:test:linked:market-data && pnpm run db:test:linked:portfolio",
     "db:test:linked:foundation": "pnpm dlx supabase@2.116.0 db query --linked --file supabase/tests/database_foundation.test.sql",
     "db:test:linked:auth": "pnpm dlx supabase@2.116.0 db query --linked --file supabase/tests/auth_rls.test.sql",
     "db:test:linked:watchlist": "pnpm dlx supabase@2.116.0 db query --linked --file supabase/tests/stocks_watchlist.test.sql",
     "db:test:linked:research": "pnpm dlx supabase@2.116.0 db query --linked --file supabase/tests/research_core.test.sql",
     "db:test:linked:dashboard": "pnpm dlx supabase@2.116.0 db query --linked --file supabase/tests/dashboard_read_models.test.sql",
     "db:test:linked:market-data": "pnpm dlx supabase@2.116.0 db query --linked --file supabase/tests/market_data_integration.test.sql",
+    "db:test:linked:portfolio": "pnpm dlx supabase@2.116.0 db query --linked --file supabase/tests/portfolio_transactions.test.sql",
     "db:types": "node scripts/generate-database-types.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -46,6 +47,7 @@
     "react-dom": "19.2.7",
     "react-hook-form": "^7.87.0",
     "server-only": "^0.0.1",
+    "sonner": "^2.0.8",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.5.4"
   },

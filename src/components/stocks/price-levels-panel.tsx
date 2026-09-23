@@ -1,7 +1,8 @@
 "use client";
 
 import { Pencil, Plus, X } from "lucide-react";
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import {
   createPriceLevelAction,
@@ -13,19 +14,17 @@ import {
   type ResearchActionState,
 } from "@/application/research/action-state";
 import type { PriceLevelView } from "@/application/stocks/research-types";
-import { controlClass, Field, textareaClass } from "@/components/ui/terminal";
+import {
+  ActionButton,
+  controlClass,
+  Field,
+  textareaClass,
+} from "@/components/ui/terminal";
 
 function Message({ state }: { state: ResearchActionState }) {
-  if (!state.message) return null;
+  if (!state.message || state.status !== "error") return null;
   return (
-    <p
-      className={
-        state.status === "error"
-          ? "text-[10px] text-[var(--negative)]"
-          : "text-[10px] text-[var(--positive)]"
-      }
-      role={state.status === "error" ? "alert" : "status"}
-    >
+    <p className="text-sm text-destructive" role="alert">
       {state.message}
     </p>
   );
@@ -39,7 +38,15 @@ function DeactivateLevelButton({
   levelId: string;
 }) {
   const [state, action, pending] = useActionState(
-    deactivatePriceLevelAction,
+    async (previous: ResearchActionState, formData: FormData) => {
+      const result = await deactivatePriceLevelAction(previous, formData);
+      if (result.status === "success") {
+        toast.success("Price level deactivated", {
+          description: result.message,
+        });
+      }
+      return result;
+    },
     idleResearchActionState,
   );
   return (
@@ -47,7 +54,7 @@ function DeactivateLevelButton({
       <input name="stockId" type="hidden" value={stockId} />
       <input name="levelId" type="hidden" value={levelId} />
       <button
-        className="text-[9px] font-semibold text-[var(--negative)] disabled:opacity-50"
+        className="inline-flex min-h-11 items-center text-sm font-semibold text-destructive disabled:opacity-50"
         disabled={pending}
         type="submit"
       >
@@ -75,17 +82,22 @@ function PriceLevelForm({
   const [state, action, pending] = useActionState(
     async (previousState: ResearchActionState, formData: FormData) => {
       const result = await serverAction(previousState, formData);
-      if (result.status === "success") onDone();
+      if (result.status === "success") {
+        toast.success(level ? "Price level updated" : "Price level added", {
+          description: result.message,
+        });
+        onDone();
+      }
       return result;
     },
     idleResearchActionState,
   );
 
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form action={action} className="flex flex-col gap-4">
       <input name="stockId" type="hidden" value={stockId} />
       {level ? <input name="levelId" type="hidden" value={level.id} /> : null}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Label">
           <input
             className={controlClass}
@@ -161,20 +173,12 @@ function PriceLevelForm({
       </Field>
       <Message state={state} />
       <div className="flex justify-end gap-2">
-        <button
-          className="h-8 rounded-[5px] px-3 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]"
-          onClick={onDone}
-          type="button"
-        >
+        <ActionButton onClick={onDone} type="button" variant="ghost">
           Cancel
-        </button>
-        <button
-          className="h-8 rounded-[5px] bg-[var(--accent-primary)] px-3 text-xs font-semibold text-[var(--bg-primary)] disabled:opacity-50"
-          disabled={pending}
-          type="submit"
-        >
+        </ActionButton>
+        <ActionButton disabled={pending} type="submit" variant="primary">
           {pending ? "Saving…" : level ? "Save level" : "Add level"}
-        </button>
+        </ActionButton>
       </div>
     </form>
   );
@@ -184,112 +188,120 @@ export function PriceLevelsEditor({
   stockId,
   currency,
   levels,
+  triggerClassName,
 }: {
   stockId: string;
   currency: "PLN" | "USD";
   levels: PriceLevelView[];
+  triggerClassName?: string;
 }) {
-  const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const [editing, setEditing] = useState<PriceLevelView | null | undefined>(
     undefined,
   );
 
   const close = () => {
     setEditing(undefined);
-    setOpen(false);
+    dialogRef.current?.close();
   };
 
   return (
     <>
       <button
-        className="flex h-8 items-center justify-center rounded-[5px] px-3 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]"
-        onClick={() => setOpen(true)}
+        className={
+          triggerClassName ??
+          "ui-button ui-button-secondary w-full justify-center lg:w-auto"
+        }
+        onClick={() => dialogRef.current?.showModal()}
         type="button"
       >
         Edit levels
       </button>
-      {open ? (
-        <div className="fixed inset-0 z-50 bg-black/55" role="presentation">
-          <dialog
-            aria-label="Edit price levels"
-            className="fixed top-[52px] right-0 m-0 flex h-[calc(100vh-52px)] w-[460px] max-w-full flex-col border-l border-[var(--border-default)] bg-[var(--surface-elevated)] p-4 text-[var(--text-primary)] shadow-2xl"
-            open
+      <dialog
+        aria-label="Edit price levels"
+        className="fixed inset-0 m-0 hidden h-full max-h-none w-full max-w-none flex-col border-0 bg-popover p-4 text-popover-foreground shadow-[var(--shadow-lg)] backdrop:bg-black/70 open:flex sm:inset-y-0 sm:right-0 sm:left-auto sm:w-[min(100%,28.75rem)] sm:border-l sm:border-border"
+        onClose={() => setEditing(undefined)}
+        ref={dialogRef}
+      >
+        <header className="mb-4 flex items-start justify-between gap-3 border-b border-[var(--border-subtle)] pb-3">
+          <div>
+            <h2 className="text-base font-semibold">Edit price levels</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Active levels · currency fixed to {currency}
+            </p>
+          </div>
+          <button
+            aria-label="Close"
+            className="grid size-9 shrink-0 place-items-center rounded-[var(--radius-sm)] text-muted-foreground hover:bg-secondary"
+            onClick={close}
+            type="button"
           >
-            <header className="mb-4 flex items-center justify-between">
-              <div>
-                <h2 className="text-[15px] font-semibold">Edit price levels</h2>
-                <p className="mt-1 text-[10px] text-[var(--text-muted)]">
-                  Active levels · currency fixed to {currency}
-                </p>
-              </div>
-              <button aria-label="Close" onClick={close} type="button">
-                <X className="size-4 text-[var(--text-muted)]" />
-              </button>
-            </header>
+            <X aria-hidden="true" className="size-4" />
+          </button>
+        </header>
 
-            {editing !== undefined ? (
-              <PriceLevelForm
-                currency={currency}
-                key={editing?.id ?? "new"}
-                level={editing}
-                onDone={() => setEditing(undefined)}
-                stockId={stockId}
-              />
-            ) : (
-              <>
-                <button
-                  className="mb-3 flex h-8 items-center justify-center gap-1 rounded-[5px] bg-[var(--accent-primary)] px-3 text-xs font-semibold text-[var(--bg-primary)]"
-                  onClick={() => setEditing(null)}
-                  type="button"
-                >
-                  <Plus className="size-3.5" /> Add level
-                </button>
-                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto rounded-[7px] border border-[var(--border-default)]">
-                  {levels.length ? (
-                    levels.map((level) => (
-                      <div
-                        className="flex items-center justify-between border-b border-[var(--border-subtle)] p-3"
-                        key={level.id}
+        {editing !== undefined ? (
+          <PriceLevelForm
+            currency={currency}
+            key={editing?.id ?? "new"}
+            level={editing}
+            onDone={() => setEditing(undefined)}
+            stockId={stockId}
+          />
+        ) : (
+          <>
+            <ActionButton
+              className="mb-3 w-full"
+              onClick={() => setEditing(null)}
+              type="button"
+              variant="primary"
+            >
+              <Plus aria-hidden="true" className="size-4" /> Add level
+            </ActionButton>
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto rounded-[var(--radius-surface)] border border-border">
+              {levels.length ? (
+                levels.map((level) => (
+                  <div
+                    className="flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] p-3 last:border-b-0"
+                    key={level.id}
+                  >
+                    <div className="min-w-0">
+                      <strong className="block truncate text-sm">
+                        {level.label}
+                      </strong>
+                      <span className="font-mono text-[0.8125rem] text-muted-foreground">
+                        {Number(level.value).toLocaleString("en-US", {
+                          maximumFractionDigits: 6,
+                        })}{" "}
+                        {level.currency} ·{" "}
+                        {level.triggerDirection.toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        aria-label={`Edit ${level.label}`}
+                        className="grid size-9 place-items-center rounded-[var(--radius-sm)] text-primary hover:bg-secondary"
+                        onClick={() => setEditing(level)}
+                        type="button"
                       >
-                        <div className="min-w-0">
-                          <strong className="block truncate text-[11px]">
-                            {level.label}
-                          </strong>
-                          <span className="font-mono text-[10px] text-[var(--text-muted)]">
-                            {Number(level.value).toLocaleString("en-US", {
-                              maximumFractionDigits: 6,
-                            })}{" "}
-                            {level.currency} ·{" "}
-                            {level.triggerDirection.toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <button
-                            aria-label={`Edit ${level.label}`}
-                            className="text-[var(--accent-primary)]"
-                            onClick={() => setEditing(level)}
-                            type="button"
-                          >
-                            <Pencil className="size-3.5" />
-                          </button>
-                          <DeactivateLevelButton
-                            levelId={level.id}
-                            stockId={stockId}
-                          />
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="p-4 text-[11px] text-[var(--text-muted)]">
-                      No price levels
-                    </p>
-                  )}
-                </div>
-              </>
-            )}
-          </dialog>
-        </div>
-      ) : null}
+                        <Pencil aria-hidden="true" className="size-4" />
+                      </button>
+                      <DeactivateLevelButton
+                        levelId={level.id}
+                        stockId={stockId}
+                      />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="p-4 text-sm text-muted-foreground">
+                  No price levels configured.
+                </p>
+              )}
+            </div>
+          </>
+        )}
+      </dialog>
     </>
   );
 }

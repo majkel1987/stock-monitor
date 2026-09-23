@@ -1,12 +1,14 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 
 import {
   refreshMarketDataAction,
   type RefreshMarketDataActionState,
 } from "@/app/(app)/market-data-actions";
+import { useTranslate } from "@/i18n/provider";
 import { cn } from "@/lib/utils/cn";
 
 const initialState: RefreshMarketDataActionState = { status: "idle" };
@@ -18,50 +20,87 @@ export function RefreshMarketDataButton({
   label?: string;
   className?: string;
 }) {
+  const { t } = useTranslate();
   const [state, action, pending] = useActionState(
     refreshMarketDataAction,
     initialState,
   );
+  const toastIdRef = useRef<string | number | undefined>(undefined);
+  const wasPendingRef = useRef(false);
+
+  useEffect(() => {
+    const titleForStatus = (
+      status: Exclude<RefreshMarketDataActionState["status"], "idle">,
+      message: string,
+    ): string => {
+      if (status === "error") {
+        if (message.toLowerCase().includes("not configured")) {
+          return t("marketData.toastUnavailable");
+        }
+        return t("marketData.toastFailed");
+      }
+      if (status === "cooldown") return t("marketData.toastCooldown");
+      if (status === "partial") return t("marketData.toastPartial");
+      return t("marketData.toastUpdated");
+    };
+
+    if (pending) {
+      wasPendingRef.current = true;
+      toastIdRef.current = toast.loading(t("marketData.toastLoading"), {
+        id: toastIdRef.current,
+        description: t("marketData.toastLoadingDescription"),
+      });
+      return;
+    }
+
+    if (!wasPendingRef.current) return;
+    wasPendingRef.current = false;
+    if (state.status === "idle" || !state.message) return;
+
+    const id = toastIdRef.current;
+    const title = titleForStatus(state.status, state.message);
+    const description = state.message;
+
+    if (state.status === "error") {
+      toast.error(title, { id, description, duration: 7000 });
+    } else if (state.status === "partial" || state.status === "cooldown") {
+      toast.warning(title, { id, description, duration: 5500 });
+    } else {
+      toast.success(title, { id, description, duration: 3500 });
+    }
+  }, [pending, state, t]);
+
+  const resolvedLabel = label ?? undefined;
+  const ariaLabel = resolvedLabel ?? t("marketData.refreshAria");
 
   return (
-    <form action={action} className="relative">
+    <form action={action} className="shrink-0">
       <button
-        aria-label={label ?? "Refresh market data"}
+        aria-label={ariaLabel}
         className={cn(
-          label
-            ? "flex h-8 items-center justify-center gap-2 rounded-[5px] bg-[var(--accent-primary)] px-3 text-xs font-semibold text-[var(--bg-primary)] hover:bg-[var(--accent-hover)]"
-            : "grid size-8 place-items-center rounded-[5px] border border-[var(--border-default)] bg-[var(--surface-default)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]",
+          resolvedLabel
+            ? "ui-button ui-button-primary"
+            : "grid size-9 place-items-center rounded-[var(--radius-md)] border border-border bg-card text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
           "disabled:cursor-wait disabled:opacity-50",
           className,
         )}
         disabled={pending}
-        title={
-          state.message ?? "Refresh Massive USA quotes and the NBP USD/PLN rate"
-        }
+        title={state.message ?? t("marketData.refreshTitle")}
         type="submit"
       >
         <RefreshCw
           aria-hidden="true"
-          className={cn("size-[14px]", pending && "animate-spin")}
-        />
-        {label ? (pending ? "Synchronizing…" : label) : null}
-      </button>
-      {state.status !== "idle" && state.message ? (
-        <span
-          aria-live="polite"
           className={cn(
-            "absolute top-10 right-0 z-50 w-72 rounded-[5px] border bg-[var(--surface-elevated)] p-2 text-[10px] shadow-xl",
-            state.status === "error"
-              ? "border-[var(--negative)] text-[var(--negative)]"
-              : state.status === "partial" || state.status === "cooldown"
-                ? "border-[var(--warning)] text-[var(--warning)]"
-                : "border-[var(--positive)] text-[var(--positive)]",
+            resolvedLabel ? "size-4" : "size-3.5",
+            pending && "animate-spin",
           )}
-          role="status"
-        >
-          {state.message}
-        </span>
-      ) : null}
+        />
+        {resolvedLabel
+          ? pending
+            ? t("marketData.refreshing")
+            : resolvedLabel
+          : null}
+      </button>
     </form>
   );
 }

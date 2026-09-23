@@ -8,7 +8,13 @@ import {
   StooqCsvImportForm,
   type StooqCsvImportTarget,
 } from "@/components/settings/stooq-csv-import-form";
-import { PageHeader, SectionHeader, Surface } from "@/components/ui/terminal";
+import {
+  MetricCard,
+  PageHeader,
+  SectionHeader,
+  StatusBadge,
+  Surface,
+} from "@/components/ui/terminal";
 import {
   createSupabaseMarketDataStatusReader,
   MarketDataStatusInfrastructureError,
@@ -20,8 +26,9 @@ import {
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
 import { createClient } from "@/infrastructure/supabase/server/create-client";
 import { getServerEnv } from "@/lib/env/server";
+import { cn } from "@/lib/utils/cn";
 
-const dateTimeFormatter = new Intl.DateTimeFormat("en-GB", {
+const dateTimeFormatter = new Intl.DateTimeFormat("pl-PL", {
   day: "2-digit",
   month: "short",
   hour: "2-digit",
@@ -30,37 +37,116 @@ const dateTimeFormatter = new Intl.DateTimeFormat("en-GB", {
   timeZone: "Europe/Warsaw",
 });
 
-const statusColumns = "grid-cols-[180px_120px_120px_minmax(0,1fr)_90px]";
-const errorColumns = "grid-cols-[115px_110px_90px_minmax(0,1fr)_170px]";
+const dateFormatter = new Intl.DateTimeFormat("pl-PL", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+const polishPlural = (count: number, one: string, few: string, many: string) => {
+  if (count === 1) return one;
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+};
 
 function when(value: string | null) {
-  return value ? `${dateTimeFormatter.format(new Date(value))} CET` : "Never";
+  return value ? `${dateTimeFormatter.format(new Date(value))} CET` : "Nigdy";
+}
+
+function formatEffectiveDate(value: string) {
+  return dateFormatter.format(new Date(`${value}T00:00:00.000Z`));
 }
 
 function runName(run: SyncRunSummary) {
-  if (run.jobType === "scheduled_market_sync") return "Scheduled sync";
-  if (run.jobType === "manual_market_sync") return "Manual sync";
-  if (run.jobType === "stooq_csv_import") return "Stooq CSV import";
-  return run.jobType === "fx_usd_pln" ? "FX · USD/PLN" : "Market quotes";
+  if (run.jobType === "scheduled_market_sync") return "Synchronizacja zaplanowana";
+  if (run.jobType === "manual_market_sync") return "Synchronizacja ręczna";
+  if (run.jobType === "stooq_csv_import") return "Import CSV Stooq";
+  return run.jobType === "fx_usd_pln" ? "FX · USD/PLN" : "Notowania";
 }
 
-function runTone(status: SyncRunSummary["status"]) {
-  if (status === "success") return "text-[var(--positive)]";
-  if (status === "failed" || status === "abandoned")
-    return "text-[var(--negative)]";
-  if (status === "partial") return "text-[var(--warning)]";
-  return "text-[var(--text-secondary)]";
+function runStatusLabel(status: SyncRunSummary["status"]) {
+  if (status === "success") return "SUKCES";
+  if (status === "failed") return "BŁĄD";
+  if (status === "partial") return "CZĘŚCIOWY";
+  if (status === "abandoned") return "PORZUCONY";
+  if (status === "running") return "W TOKU";
+  if (status === "skipped") return "POMINIĘTY";
+  return String(status).toUpperCase();
+}
+
+function runBadgeTone(
+  status: SyncRunSummary["status"],
+): "positive" | "negative" | "warning" | "neutral" | "info" {
+  if (status === "success") return "positive";
+  if (status === "failed" || status === "abandoned") return "negative";
+  if (status === "partial") return "warning";
+  if (status === "running") return "info";
+  return "neutral";
+}
+
+function instrumentCoverageLabel(count: number) {
+  return `${count} ${polishPlural(count, "instrument", "instrumenty", "instrumentów")}`;
+}
+
+function failedCountLabel(count: number) {
+  return `${count} ${polishPlural(count, "nieudany", "nieudane", "nieudanych")}`;
+}
+
+function formatErrorSummary(summary: string | null) {
+  if (!summary) {
+    return "Co najmniej jeden element dostawcy zakończył się błędem.";
+  }
+
+  const quotesMissed = summary.match(
+    /^(\d+) of (\d+) quotes were not updated\.$/,
+  );
+  if (quotesMissed) {
+    const failed = Number(quotesMissed[1]);
+    const total = Number(quotesMissed[2]);
+    return `Nie zaktualizowano ${failed} z ${total} ${polishPlural(total, "notowania", "notowań", "notowań")}.`;
+  }
+
+  const known: Record<string, string> = {
+    provider_not_configured: "Dostawca danych nie jest skonfigurowany.",
+    fx_unavailable: "Kurs walutowy jest niedostępny.",
+    "Uploaded Stooq CSV was invalid.": "Wgrany plik CSV Stooq był nieprawidłowy.",
+    "Uploaded Stooq CSV contains a future EOD quote.":
+      "Wgrany plik CSV Stooq zawiera przyszłe notowanie EOD.",
+    "Stooq CSV persistence failed.": "Nie udało się zapisać danych z CSV Stooq.",
+    "Manual synchronization failed unexpectedly.":
+      "Ręczna synchronizacja zakończyła się nieoczekiwanym błędem.",
+    "Scheduled synchronization failed unexpectedly.":
+      "Zaplanowana synchronizacja zakończyła się nieoczekiwanym błędem.",
+    "One or more manual synchronization operations failed.":
+      "Co najmniej jedna ręczna synchronizacja zakończyła się błędem.",
+    "One or more scheduled synchronization operations failed.":
+      "Co najmniej jedna zaplanowana synchronizacja zakończyła się błędem.",
+  };
+
+  return known[summary] ?? summary;
 }
 
 function DataError() {
   return (
-    <section className="rounded-[7px] border border-[var(--negative)] bg-[var(--negative-subtle)] p-4">
-      <h2 className="text-[13px] font-semibold">Data status unavailable</h2>
-      <p className="mt-1 text-[11px] text-[var(--text-secondary)]">
-        The application and stored research remain available. Refresh and try
-        again.
-      </p>
-    </section>
+    <div className="page-frame flex min-w-0 flex-col gap-5 overflow-x-hidden">
+      <PageHeader
+        description="Stan dostawców danych rynkowych i historia synchronizacji"
+        eyebrow="Settings"
+        index
+        title="Ustawienia"
+      />
+      <SettingsTabs active="data" />
+      <Surface className="border-negative bg-[var(--negative-subtle)] p-4 sm:p-5">
+        <h2 className="text-card-title">Status danych niedostępny</h2>
+        <p className="mt-2 text-sm text-secondary-foreground">
+          Aplikacja i zapisane analizy pozostają dostępne. Odśwież stronę i
+          spróbuj ponownie.
+        </p>
+      </Surface>
+    </div>
   );
 }
 
@@ -90,16 +176,7 @@ export default async function DataSettingsPage() {
       error instanceof MarketDataStatusInfrastructureError ||
       error instanceof WatchlistInfrastructureError
     ) {
-      return (
-        <div className="flex min-h-[1028px] flex-col gap-[18px] p-6">
-          <PageHeader
-            description="Market-data provider health and synchronization history"
-            title="Settings"
-          />
-          <SettingsTabs active="data" />
-          <DataError />
-        </div>
-      );
+      return <DataError />;
     }
     throw error;
   }
@@ -108,165 +185,198 @@ export default async function DataSettingsPage() {
   const failedRuns = status.recentRuns
     .filter((run) => run.status === "failed" || run.status === "partial")
     .slice(0, 4);
+  const configurationLabel = !writesConfigured
+    ? "KONFIGURACJA NIEKOMPLETNA"
+    : massiveConfigured
+      ? "HYBRYDA GOTOWA"
+      : "TYLKO CSV GPW";
+  const configurationTone = !writesConfigured
+    ? "negative"
+    : massiveConfigured
+      ? "positive"
+      : "warning";
 
   return (
-    <div className="flex min-h-[1028px] flex-col gap-[18px] p-6">
+    <div className="page-frame flex min-w-0 flex-col gap-5 overflow-x-hidden sm:gap-6">
       <PageHeader
-        description="Market-data provider health and synchronization history"
-        title="Settings"
+        description="Stan dostawców danych rynkowych i historia synchronizacji"
+        eyebrow="Settings"
+        index
+        title="Ustawienia"
       >
         <StooqCsvImportForm targets={gpwImportTargets} />
-        <RefreshMarketDataButton label="Sync USA + FX" />
+        <RefreshMarketDataButton
+          className="w-full sm:w-auto"
+          label="Synchronizuj USA + FX"
+        />
       </PageHeader>
 
       <SettingsTabs active="data" />
 
-      <div className="flex flex-col gap-4">
-        <Surface className="h-[116px]">
-          <div className="grid h-full grid-cols-[340px_repeat(4,211px)]">
-            <div className="flex h-[82px] flex-col gap-[2px] border-r border-[var(--border-subtle)] px-[14px] pt-[14px]">
-              <span className="text-[9px] font-semibold text-[var(--text-muted)]">
-                MARKET DATA PROVIDER
-              </span>
-              <strong className="text-[13px] leading-[18px]">
-                Stooq CSV + Massive
-              </strong>
-              <span className="mt-[2px] font-mono text-[9px] text-[var(--text-muted)]">
-                {!writesConfigured
-                  ? "Database writes not configured"
-                  : massiveConfigured
-                    ? "GPW manual file · USA API configured"
-                    : "GPW manual file · USA API not configured"}
-              </span>
-            </div>
-            {[
-              [
-                "CONFIGURATION",
-                !writesConfigured
-                  ? "CONFIG INCOMPLETE"
-                  : massiveConfigured
-                    ? "HYBRID READY"
-                    : "GPW CSV ONLY",
-                !writesConfigured
-                  ? "negative"
-                  : massiveConfigured
-                    ? "positive"
-                    : "warning",
-              ],
-              ["LAST SUCCESS", when(status.lastSuccessfulSyncAt), "default"],
-              ["LAST FAILURE", when(status.lastFailureAt), "warning"],
-              [
-                "COVERAGE",
-                `${status.providerCoverageCount} instruments`,
-                "default",
-              ],
-            ].map(([label, value, tone]) => (
-              <div
-                className="flex h-[61px] flex-col gap-[5px] border-r border-[var(--border-subtle)] px-[14px] pt-[14px] last:border-r-0"
-                key={label}
-              >
-                <span className="text-[9px] font-semibold text-[var(--text-muted)]">
-                  {label}
-                </span>
-                <span
-                  className={`font-mono text-[11px] font-semibold ${tone === "positive" ? "text-[var(--positive)]" : tone === "warning" ? "text-[var(--warning)]" : tone === "negative" ? "text-[var(--negative)]" : "text-[var(--text-primary)]"}`}
-                >
-                  {value}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Surface>
-
-        <Surface className="min-h-48">
-          <SectionHeader
-            meta={
-              status.latestFx
-                ? `NBP ${status.latestFx.rate} · effective ${status.latestFx.effectiveDate}`
-                : "NBP reference rate unavailable"
-            }
-            title="Synchronization status"
-          />
-          {recentRuns.length ? (
-            recentRuns.map((run) => (
-              <div
-                className={`grid h-[52px] items-center border-t border-[var(--border-subtle)] px-3 text-[10px] ${statusColumns}`}
-                key={run.id}
-              >
-                <strong>{runName(run)}</strong>
-                <span className="font-mono text-[var(--text-secondary)]">
-                  {run.successCount} / {run.requestedCount}
-                </span>
-                <span className={runTone(run.status)}>
-                  {run.status.toUpperCase()}
-                </span>
-                <span className="font-mono text-[var(--text-secondary)]">
-                  {when(run.finishedAt ?? run.startedAt)}
-                </span>
-                <span
-                  className={
-                    run.failureCount
-                      ? "text-[var(--negative)]"
-                      : "text-[var(--text-muted)]"
-                  }
-                >
-                  {run.failureCount} failed
-                </span>
-              </div>
-            ))
-          ) : (
-            <p className="p-4 text-[11px] text-[var(--text-muted)]">
-              No synchronization attempts yet.
-            </p>
-          )}
-        </Surface>
-
-        <Surface className="min-h-[180px]">
-          <SectionHeader
-            meta="Provider secrets are never displayed"
-            title="Recent synchronization errors"
-          />
-          {failedRuns.length ? (
-            failedRuns.map((run) => (
-              <div
-                className={`grid h-12 items-center border-t border-[var(--border-subtle)] px-3 text-[10px] ${errorColumns}`}
-                key={run.id}
-              >
-                <span className="font-mono text-[var(--text-muted)]">
-                  {when(run.finishedAt ?? run.startedAt)}
-                </span>
-                <strong>{runName(run)}</strong>
-                <span className={runTone(run.status)}>
-                  {run.status.toUpperCase()}
-                </span>
-                <span className="truncate pr-4 text-[var(--negative)]">
-                  {run.errorSummary ?? "One or more provider items failed."}
-                </span>
-                <span className="text-right text-[var(--text-secondary)]">
-                  Stored data retained
-                </span>
-              </div>
-            ))
-          ) : (
-            <p className="p-4 text-[11px] text-[var(--text-muted)]">
-              No recent synchronization errors.
-            </p>
-          )}
-        </Surface>
-
-        <div className="flex h-14 items-center gap-3 rounded-[7px] border border-[var(--warning)] bg-[var(--warning-subtle)] px-4">
-          <AlertTriangle
-            aria-hidden="true"
-            className="size-4 shrink-0 text-[var(--warning)]"
-          />
-          <span className="flex flex-col gap-[2px]">
-            <strong className="text-[10px] text-[var(--warning)]">
-              Historical research remains usable during provider failures
-            </strong>
-            <span className="text-[9px] text-[var(--text-secondary)]">
-              Prices retain their last-known timestamps; manual and unavailable
-              values remain explicitly labeled.
+      <section
+        aria-label="Dostawca danych rynkowych"
+        className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5"
+      >
+        <MetricCard
+          className="sm:col-span-2 xl:col-span-1"
+          hint={
+            !writesConfigured
+              ? "Zapis do bazy nie jest skonfigurowany"
+              : massiveConfigured
+                ? "Plik ręczny GPW · API USA skonfigurowane"
+                : "Plik ręczny GPW · API USA nie skonfigurowane"
+          }
+          label="Dostawca danych rynkowych"
+          value={
+            <span className="text-lg tracking-tight sm:text-xl">
+              Stooq CSV + Massive
             </span>
+          }
+        />
+        <MetricCard
+          label="Konfiguracja"
+          tone={configurationTone}
+          value={
+            <span className="font-mono text-sm tracking-tight sm:text-base">
+              {configurationLabel}
+            </span>
+          }
+        />
+        <MetricCard
+          label="Ostatni sukces"
+          value={
+            <span className="font-mono text-sm tracking-tight sm:text-base">
+              {when(status.lastSuccessfulSyncAt)}
+            </span>
+          }
+        />
+        <MetricCard
+          label="Ostatni błąd"
+          tone="warning"
+          value={
+            <span className="font-mono text-sm tracking-tight sm:text-base">
+              {when(status.lastFailureAt)}
+            </span>
+          }
+        />
+        <MetricCard
+          label="Pokrycie"
+          value={
+            <span className="font-mono text-sm tracking-tight sm:text-base">
+              {instrumentCoverageLabel(status.providerCoverageCount)}
+            </span>
+          }
+        />
+      </section>
+
+      <Surface>
+        <SectionHeader
+          meta={
+            status.latestFx
+              ? `NBP ${status.latestFx.rate} · obowiązuje ${formatEffectiveDate(status.latestFx.effectiveDate)}`
+              : "Kurs referencyjny NBP niedostępny"
+          }
+          title="Status synchronizacji"
+        />
+        {recentRuns.length ? (
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Operacja</th>
+                  <th scope="col">Wynik</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Czas</th>
+                  <th scope="col">Błędy</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentRuns.map((run) => (
+                  <tr key={run.id}>
+                    <td>
+                      <strong className="text-sm font-semibold">
+                        {runName(run)}
+                      </strong>
+                    </td>
+                    <td className="font-mono text-sm tabular-nums text-secondary-foreground">
+                      {run.successCount} / {run.requestedCount}
+                    </td>
+                    <td>
+                      <StatusBadge tone={runBadgeTone(run.status)}>
+                        {runStatusLabel(run.status)}
+                      </StatusBadge>
+                    </td>
+                    <td className="font-mono text-sm text-secondary-foreground">
+                      {when(run.finishedAt ?? run.startedAt)}
+                    </td>
+                    <td
+                      className={cn(
+                        "text-sm",
+                        run.failureCount
+                          ? "text-negative"
+                          : "text-muted-foreground",
+                      )}
+                    >
+                      {failedCountLabel(run.failureCount)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="p-4 text-sm text-muted-foreground">
+            Brak prób synchronizacji.
+          </p>
+        )}
+      </Surface>
+
+      <Surface>
+        <SectionHeader
+          meta="Sekrety dostawców nigdy nie są wyświetlane"
+          title="Ostatnie błędy synchronizacji"
+        />
+        {failedRuns.length ? (
+          <ul className="divide-y divide-[var(--border-subtle)]">
+            {failedRuns.map((run) => (
+              <li className="flex flex-col gap-2 px-4 py-3.5" key={run.id}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <strong className="text-sm font-semibold">{runName(run)}</strong>
+                  <StatusBadge tone={runBadgeTone(run.status)}>
+                    {runStatusLabel(run.status)}
+                  </StatusBadge>
+                </div>
+                <p className="text-sm text-negative">
+                  {formatErrorSummary(run.errorSummary)}
+                </p>
+                <div className="flex flex-wrap items-center justify-between gap-2 ui-meta">
+                  <span className="font-mono">
+                    {when(run.finishedAt ?? run.startedAt)}
+                  </span>
+                  <span>Zapisane dane zachowane</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="p-4 text-sm text-muted-foreground">
+            Brak ostatnich błędów synchronizacji.
+          </p>
+        )}
+      </Surface>
+
+      <div className="flex items-start gap-3 rounded-[var(--radius-surface)] border border-warning/50 bg-[var(--warning-subtle)] px-4 py-3.5">
+        <AlertTriangle
+          aria-hidden="true"
+          className="mt-0.5 size-4 shrink-0 text-warning"
+        />
+        <div className="flex min-w-0 flex-col gap-1">
+          <strong className="text-sm text-warning">
+            Historyczne analizy pozostają dostępne przy awariach dostawcy
+          </strong>
+          <span className="text-[0.8125rem] leading-normal text-secondary-foreground">
+            Ceny zachowują ostatnio znane znaczniki czasu; wartości ręczne i
+            niedostępne pozostają jednoznacznie oznaczone.
           </span>
         </div>
       </div>

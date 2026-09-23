@@ -7,15 +7,12 @@ import {
   createImportDraftAction,
   type ImportUploadState,
 } from "@/app/(app)/monitoring/import/actions";
-import { ActionButton, Surface } from "@/components/ui/terminal";
-
-const safetyRules = [
-  "Schema and semantic validation",
-  "Per-company READY / WARNING / ERROR state",
-  "Selective commit after review",
-  "Immutable monitoring snapshot",
-  "Duplicate protection by externalId",
-];
+import {
+  ActionButton,
+  SectionHeader,
+  Surface,
+} from "@/components/ui/terminal";
+import { useT } from "@/i18n/provider";
 
 const initialImportUploadState: ImportUploadState = {
   status: "idle",
@@ -23,6 +20,7 @@ const initialImportUploadState: ImportUploadState = {
 };
 
 export function ImportUploadForm() {
+  const t = useT();
   const [state, action, pending] = useActionState(
     createImportDraftAction,
     initialImportUploadState,
@@ -30,20 +28,31 @@ export function ImportUploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const safetyRules = [
+    t("monitoring.import.safetyRuleSchema"),
+    t("monitoring.import.safetyRuleCompanyState"),
+    t("monitoring.import.safetyRuleSelectiveCommit"),
+    t("monitoring.import.safetyRuleImmutable"),
+    t("monitoring.import.safetyRuleDuplicates"),
+  ];
+
   return (
-    <form action={action} className="grid flex-1 grid-cols-[1fr_330px] gap-4">
+    <form
+      action={action}
+      className="grid flex-1 grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]"
+    >
       <div className="flex min-w-0 flex-col gap-3">
-        <Surface className="grid h-[304px] place-items-center">
-          <div className="flex flex-col items-center gap-[14px] text-center">
-            <span className="grid size-[52px] place-items-center rounded-[7px] bg-[var(--accent-subtle)]">
-              <FileJson className="size-6 text-[var(--accent-primary)]" />
+        <Surface className="grid min-h-[16rem] place-items-center px-4 py-8 sm:min-h-[19rem]">
+          <div className="flex max-w-md flex-col items-center gap-4 text-center">
+            <span className="grid size-14 place-items-center rounded-[var(--radius-md)] border border-primary/25 bg-[var(--accent-subtle)]">
+              <FileJson aria-hidden="true" className="size-6 text-primary" />
             </span>
-            <div className="space-y-1">
-              <h2 className="text-[15px] font-semibold">
-                Select a GPW monitoring export
+            <div className="space-y-1.5">
+              <h2 className="text-card-title">
+                {t("monitoring.import.selectExportTitle")}
               </h2>
-              <p className="text-[10px] text-[var(--text-muted)]">
-                JSON only · schema 1.0 · up to 1 MB · maximum 50 companies
+              <p className="text-sm text-muted-foreground">
+                {t("monitoring.import.selectExportHint")}
               </p>
             </div>
             <input
@@ -55,30 +64,46 @@ export function ImportUploadForm() {
               required
               type="file"
             />
-            <ActionButton onClick={() => inputRef.current?.click()}>
-              <Upload className="mr-2 size-3.5" /> Select JSON file
+            <ActionButton
+              className="min-h-11"
+              onClick={() => inputRef.current?.click()}
+            >
+              <Upload aria-hidden="true" className="mr-2 size-4" />{" "}
+              {t("monitoring.import.selectJsonFile")}
             </ActionButton>
-            <p className="text-[10px] text-[var(--text-secondary)]">
-              The file is validated on the server before a draft is saved.
+            <p className="ui-meta">
+              {t("monitoring.import.validatedOnServer")}
             </p>
           </div>
         </Surface>
 
         {file ? (
-          <Surface className="flex min-h-[66px] items-center justify-between px-[14px]">
-            <div className="flex items-center gap-[10px]">
-              <FileCheck2 className="size-[18px] text-[var(--positive)]" />
-              <div>
-                <p className="font-mono text-[11px] font-semibold">
+          <Surface className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <FileCheck2
+                aria-hidden="true"
+                className="size-5 shrink-0 text-positive"
+              />
+              <div className="min-w-0">
+                <p className="truncate font-mono text-sm font-semibold">
                   {file.name}
                 </p>
-                <p className="text-[9px] text-[var(--text-muted)]">
-                  {Math.ceil(file.size / 1024)} KB · ready to validate
+                <p className="text-sm text-muted-foreground">
+                  {t("monitoring.import.readyToValidate", {
+                    size: Math.ceil(file.size / 1024),
+                  })}
                 </p>
               </div>
             </div>
-            <ActionButton disabled={pending} type="submit" variant="primary">
-              {pending ? "Validating…" : "Validate & create draft"}
+            <ActionButton
+              className="min-h-11 w-full shrink-0 sm:w-auto"
+              disabled={pending}
+              type="submit"
+              variant="primary"
+            >
+              {pending
+                ? t("monitoring.import.validating")
+                : t("monitoring.import.validateDraft")}
             </ActionButton>
           </Surface>
         ) : null}
@@ -86,16 +111,15 @@ export function ImportUploadForm() {
         {state.status === "error" ? (
           <div
             aria-live="polite"
-            className="rounded-[7px] border border-[var(--negative)] bg-[var(--negative-subtle)] p-3 text-[11px]"
+            className="rounded-[var(--radius-md)] border border-negative bg-[var(--negative-subtle)] p-3 text-sm"
+            role="alert"
           >
             <strong>{state.message}</strong>
             {state.issues?.length ? (
-              <ul className="mt-2 space-y-1 text-[10px] text-[var(--text-secondary)]">
+              <ul className="mt-2 space-y-1 text-sm text-secondary-foreground">
                 {state.issues.map((issue) => (
                   <li key={`${issue.path}-${issue.message}`}>
-                    <span className="font-mono text-[var(--negative)]">
-                      {issue.path}
-                    </span>{" "}
+                    <span className="font-mono text-negative">{issue.path}</span>{" "}
                     — {issue.message}
                   </li>
                 ))}
@@ -106,33 +130,36 @@ export function ImportUploadForm() {
       </div>
 
       <Surface className="flex flex-col">
-        <header className="flex h-[38px] items-center gap-2 border-b border-[var(--border-subtle)] bg-[var(--bg-tertiary)] px-3">
-          <ShieldCheck className="size-3.5 text-[var(--accent-primary)]" />
-          <h2 className="text-[10px] font-bold tracking-[0.5px]">
-            IMPORT SAFETY
-          </h2>
-        </header>
-        <div className="flex flex-col gap-[14px] p-[14px]">
-          <p className="text-[10px] leading-[1.4] text-[var(--text-secondary)]">
-            AI-generated data is treated as untrusted input. Validation errors
-            stay isolated to individual companies.
+        <SectionHeader
+          action={
+            <ShieldCheck aria-hidden="true" className="size-4 text-primary" />
+          }
+          title={t("monitoring.import.safetyTitle")}
+        />
+        <div className="flex flex-col gap-4 p-4">
+          <p className="text-sm leading-relaxed text-secondary-foreground">
+            {t("monitoring.import.safetyDescription")}
           </p>
-          <ul className="space-y-[9px]">
+          <ul className="space-y-2.5">
             {safetyRules.map((rule) => (
               <li
-                className="flex items-center gap-2 text-[10px] text-[var(--text-secondary)]"
+                className="flex items-start gap-2 text-sm text-secondary-foreground"
                 key={rule}
               >
-                <Check className="size-3 text-[var(--positive)]" /> {rule}
+                <Check
+                  aria-hidden="true"
+                  className="mt-0.5 size-3.5 shrink-0 text-positive"
+                />
+                {rule}
               </li>
             ))}
           </ul>
-          <div className="rounded-[5px] border border-[var(--border-subtle)] bg-[var(--bg-tertiary)] p-[10px]">
-            <p className="text-[8px] font-bold tracking-[0.5px] text-[var(--text-muted)]">
-              EXPECTED CONTRACT
+          <div className="rounded-[var(--radius-md)] border border-border bg-muted p-3">
+            <p className="ui-meta font-semibold tracking-wide uppercase">
+              {t("monitoring.import.expectedContract")}
             </p>
-            <p className="mt-1 font-mono text-[10px]">schemaVersion 1.0</p>
-            <p className="font-mono text-[9px] text-[var(--accent-primary)]">
+            <p className="mt-1 font-mono text-sm">schemaVersion 1.0</p>
+            <p className="font-mono text-sm text-primary">
               gpw_opportunity_monitoring
             </p>
           </div>

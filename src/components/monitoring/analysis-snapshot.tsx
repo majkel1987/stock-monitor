@@ -2,7 +2,12 @@ import type { ReactNode } from "react";
 
 import type { JsonValue } from "@/application/imports/gpw-monitoring-schema";
 import type { MonitoringImportCompany } from "@/application/imports/types";
-import { SectionHeader, StatusBadge, Surface } from "@/components/ui/terminal";
+import {
+  MetricCard,
+  SectionHeader,
+  StatusBadge,
+  Surface,
+} from "@/components/ui/terminal";
 
 function title(value: string) {
   return value
@@ -40,7 +45,7 @@ function StructuredValue({
       <ul className="space-y-1">
         {value.filter(hasContent).map((item, index) => (
           <li className="flex gap-2" key={index}>
-            <span className="text-[var(--accent-primary)]">•</span>
+            <span className="text-primary">•</span>
             <div className="min-w-0 flex-1">
               <StructuredValue depth={depth + 1} value={item} />
             </div>
@@ -55,37 +60,18 @@ function StructuredValue({
         .filter(([, item]) => hasContent(item))
         .map(([key, item]) => (
           <div
-            className="rounded-[4px] border-b border-[var(--border-subtle)] py-1.5"
+            className="border-b border-[var(--border-subtle)] py-2"
             key={key}
           >
-            <dt className="text-[8px] font-bold tracking-[0.45px] text-[var(--text-muted)] uppercase">
+            <dt className="ui-meta font-semibold tracking-wide uppercase">
               {title(key)}
             </dt>
-            <dd className="mt-1 text-[10px] leading-[1.45] text-[var(--text-secondary)]">
+            <dd className="mt-1 text-sm leading-relaxed text-secondary-foreground">
               <StructuredValue depth={depth + 1} value={item} />
             </dd>
           </div>
         ))}
     </dl>
-  );
-}
-
-function Metric({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: ReactNode;
-  tone?: string;
-}) {
-  return (
-    <Surface className="flex min-h-[72px] flex-col gap-1 px-3 py-[10px]">
-      <span className="text-[8px] font-bold tracking-[0.5px] text-[var(--text-muted)]">
-        {label}
-      </span>
-      <strong className={`font-mono text-[15px] ${tone ?? ""}`}>{value}</strong>
-    </Surface>
   );
 }
 
@@ -102,7 +88,7 @@ function AnalysisSection({
   return (
     <Surface>
       <SectionHeader meta={meta} title={sectionTitle} />
-      <div className="p-3">
+      <div className="p-4">
         <StructuredValue value={value} />
       </div>
     </Surface>
@@ -144,45 +130,48 @@ export function AnalysisSnapshot({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-6">
-        <Metric
-          label="DECISION"
-          tone="text-[var(--warning)]"
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
+        <MetricCard
+          label="Decision"
+          tone="warning"
           value={company.decision.action.replaceAll("_", " ")}
         />
-        <Metric
-          label="INVESTMENT SCORE"
-          tone="text-[var(--accent-primary)]"
-          value={company.score.total ?? "—"}
+        <MetricCard
+          label="Investment score"
+          value={
+            <span className="font-mono text-primary">
+              {company.score.total ?? "—"}
+            </span>
+          }
         />
-        <Metric
-          label="BASE FAIR VALUE"
-          tone="text-[var(--positive)]"
+        <MetricCard
+          label="Base fair value"
+          tone="positive"
           value={
             company.valuation.fairValueBase === null
               ? "—"
               : `${company.valuation.fairValueBase} ${company.identity.currency}`
           }
         />
-        <Metric
-          label="ENTRY ZONE"
+        <MetricCard
+          label="Entry zone"
           value={
             zone.from === null && zone.to === null
               ? "—"
               : `${zone.from ?? "—"}–${zone.to ?? "—"} ${zone.currency}`
           }
         />
-        <Metric
-          label="BASE POTENTIAL"
-          tone="text-[var(--positive)]"
+        <MetricCard
+          label="Base potential"
+          tone="positive"
           value={
             company.expectedReturn.baseTotalReturnPct === null
               ? "—"
               : `${company.expectedReturn.baseTotalReturnPct}%`
           }
         />
-        <Metric
-          label="ASYMMETRY"
+        <MetricCard
+          label="Asymmetry"
           value={
             company.expectedReturn.asymmetryRatio === null
               ? "—"
@@ -191,22 +180,22 @@ export function AnalysisSnapshot({
         />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[510px_1fr]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(16rem,22rem)_minmax(0,1fr)]">
         <Surface>
           <SectionHeader
             meta={`${company.score.total ?? "—"} / 100`}
             title="Score breakdown"
           />
-          <dl className="grid grid-cols-2 gap-x-4 p-3">
+          <dl className="grid grid-cols-1 gap-x-4 p-4 sm:grid-cols-2">
             {Object.entries(company.score.components).map(([key, value]) => (
               <div
-                className="flex justify-between border-b border-[var(--border-subtle)] py-2"
+                className="flex justify-between gap-3 border-b border-[var(--border-subtle)] py-2"
                 key={key}
               >
-                <dt className="pr-2 text-[9px] text-[var(--text-secondary)]">
+                <dt className="pr-2 text-sm text-secondary-foreground">
                   {title(key)}
                 </dt>
-                <dd className="font-mono text-[10px] font-semibold">
+                <dd className="font-mono text-sm font-semibold">
                   {value ?? "—"}
                 </dd>
               </div>
@@ -218,7 +207,7 @@ export function AnalysisSnapshot({
             meta={company.classification.opportunityCategory ?? undefined}
             title="Investment thesis"
           />
-          <div className="space-y-3 p-3 text-[10px] leading-[1.45] text-[var(--text-secondary)]">
+          <div className="space-y-3 p-4 text-sm leading-relaxed text-secondary-foreground">
             {company.thesis.summary ? <p>{company.thesis.summary}</p> : null}
             <div className="grid gap-4 md:grid-cols-2">
               <StructuredValue
@@ -236,9 +225,9 @@ export function AnalysisSnapshot({
               />
             </div>
             {hasContent(company.thesis.killCriteria) ? (
-              <div className="rounded-[5px] border-l-[3px] border-[var(--negative)] bg-[var(--negative-subtle)] p-3">
-                <strong className="text-[9px] text-[var(--negative)]">
-                  KILL THE THESIS
+              <div className="rounded-[var(--radius-md)] border border-negative/40 border-l-[3px] border-l-negative bg-[var(--negative-subtle)] p-3">
+                <strong className="ui-meta text-negative">
+                  Kill the thesis
                 </strong>
                 <div className="mt-2">
                   <StructuredValue value={company.thesis.killCriteria} />
@@ -265,14 +254,14 @@ export function AnalysisSnapshot({
         ))}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1fr_360px]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(14rem,20rem)]">
         {sources.length ? (
           <Surface>
             <SectionHeader
               meta={`${sources.length} source(s)`}
               title="Sources"
             />
-            <ul className="divide-y divide-[var(--border-subtle)] px-3">
+            <ul className="divide-y divide-[var(--border-subtle)] px-4">
               {sources.map((source, index) => {
                 if (
                   typeof source !== "object" ||
@@ -283,12 +272,12 @@ export function AnalysisSnapshot({
                 const url = safeHttpUrl(source.url);
                 const content = (
                   <>
-                    <strong className="text-[10px] text-[var(--text-primary)]">
+                    <strong className="text-sm text-foreground">
                       {typeof source.title === "string"
                         ? source.title
                         : `Source ${index + 1}`}
                     </strong>
-                    <span className="text-[9px] text-[var(--text-muted)]">
+                    <span className="ui-meta">
                       {typeof source.publisher === "string"
                         ? source.publisher
                         : "Unknown publisher"}
@@ -296,10 +285,10 @@ export function AnalysisSnapshot({
                   </>
                 );
                 return (
-                  <li className="py-2" key={index}>
+                  <li className="py-3" key={index}>
                     {url ? (
                       <a
-                        className="flex flex-col hover:text-[var(--accent-primary)]"
+                        className="flex flex-col hover:text-primary"
                         href={url}
                         rel="noreferrer"
                         target="_blank"
@@ -317,7 +306,7 @@ export function AnalysisSnapshot({
         ) : null}
         <Surface>
           <SectionHeader title="Data quality" />
-          <div className="space-y-3 p-3">
+          <div className="space-y-3 p-4">
             <StatusBadge
               tone={
                 company.dataQuality.confidence === "LOW"

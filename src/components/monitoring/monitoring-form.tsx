@@ -13,12 +13,15 @@ import type {
 } from "@/application/stocks/research-types";
 import type { LatestUsdPlnRate } from "@/application/sync/get-latest-fx-rate";
 import {
+  ActionButton,
   controlClass,
   Field,
   PageHeader,
+  SectionHeader,
   Surface,
   textareaClass,
 } from "@/components/ui/terminal";
+import { cn } from "@/lib/utils/cn";
 
 type ScoreName =
   | "investmentScore"
@@ -60,8 +63,10 @@ function FormSection({
   className?: string;
 }) {
   return (
-    <Surface className={`flex flex-col gap-[10px] p-[14px] ${className ?? ""}`}>
-      <h2 className="text-xs leading-4 font-semibold">{title}</h2>
+    <Surface className={cn("flex flex-col gap-3 p-4", className)}>
+      <h2 className="text-sm font-semibold tracking-tight text-foreground">
+        {title}
+      </h2>
       {children}
     </Surface>
   );
@@ -93,25 +98,23 @@ function ComparisonRow({
     Number.isFinite(after);
   const tone = numeric
     ? after > before
-      ? "text-[var(--positive)]"
+      ? "text-positive"
       : after < before
-        ? "text-[var(--negative)]"
-        : "text-[var(--text-secondary)]"
+        ? "text-negative"
+        : "text-muted-foreground"
     : previous === current
-      ? "text-[var(--text-secondary)]"
-      : "text-[var(--accent-primary)]";
+      ? "text-muted-foreground"
+      : "text-primary";
 
   return (
-    <div className="flex h-[51px] flex-col gap-[5px] border-b border-[var(--border-subtle)] px-[14px] py-[10px]">
-      <span className="text-[9px] leading-3 font-semibold text-[var(--text-muted)]">
+    <div className="flex flex-col gap-1.5 border-b border-[var(--border-subtle)] px-4 py-3">
+      <span className="ui-meta font-semibold tracking-wide uppercase">
         {label}
       </span>
-      <div className="grid grid-cols-[1fr_12px_1fr] items-center gap-2 font-mono text-[11px] leading-[14px]">
-        <span className="truncate text-[var(--text-secondary)]">
-          {previous}
-        </span>
-        <ArrowRight className="size-3 text-[var(--text-muted)]" />
-        <strong className={`truncate ${tone}`}>{current || "—"}</strong>
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-mono text-sm">
+        <span className="truncate text-secondary-foreground">{previous}</span>
+        <ArrowRight aria-hidden="true" className="size-3.5 text-muted-foreground" />
+        <strong className={cn("truncate", tone)}>{current || "—"}</strong>
       </div>
     </div>
   );
@@ -168,31 +171,28 @@ export function MonitoringForm({
   const stockPath = `/stocks/${stock.marketCode.toLowerCase()}/${encodeURIComponent(stock.ticker)}`;
 
   return (
-    <div className="flex min-h-[1048px] flex-col gap-4 p-6">
+    <div className="page-frame flex flex-col gap-5">
       <PageHeader
         compact
         description="This record becomes part of the permanent analytical history."
         title={`New monitoring · ${stock.name}`}
       >
-        <Link
-          className="flex h-8 items-center rounded-[5px] px-3 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]"
-          href={stockPath}
-        >
-          Cancel
+        <Link href={stockPath}>
+          <ActionButton variant="ghost">Cancel</ActionButton>
         </Link>
-        <button
-          className="h-8 w-[118px] rounded-[5px] bg-[var(--accent-primary)] px-3 text-xs font-semibold text-[var(--bg-primary)] disabled:opacity-50"
+        <ActionButton
           disabled={pending}
           form="monitoring-form"
           type="submit"
+          variant="primary"
         >
           {pending ? "Saving…" : "Save monitoring"}
-        </button>
+        </ActionButton>
       </PageHeader>
 
       <form
         action={action}
-        className="grid min-h-[930px] grid-cols-[minmax(700px,850px)_318px] gap-4 max-xl:grid-cols-1"
+        className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]"
         id="monitoring-form"
       >
         <input name="stockId" type="hidden" value={stock.id} />
@@ -212,10 +212,15 @@ export function MonitoringForm({
         <input name="sourceReference" type="hidden" value="" />
         <input name="supersedesId" type="hidden" value={supersedesId ?? ""} />
 
-        <div className="flex flex-col gap-3">
+        <div className="flex min-w-0 flex-col gap-3">
           <FormSection title="Analysis metadata">
             <div
-              className={`grid gap-[10px] ${stock.currency === "USD" ? "grid-cols-5" : "grid-cols-4"}`}
+              className={cn(
+                "grid gap-3",
+                stock.currency === "USD"
+                  ? "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
+                  : "sm:grid-cols-2 lg:grid-cols-4",
+              )}
             >
               <Field label="Analyzed at">
                 <input
@@ -266,7 +271,7 @@ export function MonitoringForm({
                     step="0.000001"
                     type="number"
                   />
-                  <span className="text-[9px] leading-3 text-[var(--text-muted)]">
+                  <span className="ui-meta">
                     {fxRate
                       ? `NBP reference · effective ${fxRate.effectiveDate}`
                       : "No stored NBP reference · enter manually"}
@@ -279,7 +284,7 @@ export function MonitoringForm({
           </FormSection>
 
           <FormSection title="Scores · 0–100">
-            <div className="grid grid-cols-5 gap-[10px]">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
               {scoreDefinitions.map((definition) => (
                 <Field key={definition.name} label={definition.label}>
                   <input
@@ -300,13 +305,13 @@ export function MonitoringForm({
                 </Field>
               ))}
             </div>
-            <p className="text-[9px] leading-3 text-[var(--text-muted)]">
+            <p className="ui-meta">
               Empty means not analyzed. A numerical zero remains a valid score.
             </p>
           </FormSection>
 
           <FormSection title="Classification">
-            <div className="grid grid-cols-2 gap-[10px]">
+            <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Status">
                 <select
                   className={controlClass}
@@ -334,7 +339,7 @@ export function MonitoringForm({
           </FormSection>
 
           <FormSection title="Analysis">
-            <div className="grid grid-cols-3 gap-[10px]">
+            <div className="grid gap-3 lg:grid-cols-3">
               <Field label="Summary">
                 <textarea
                   className={textareaClass}
@@ -367,7 +372,7 @@ export function MonitoringForm({
           </FormSection>
 
           <FormSection title="Thesis">
-            <div className="grid grid-cols-2 gap-[10px]">
+            <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Thesis summary">
                 <textarea
                   className={textareaClass}
@@ -386,7 +391,7 @@ export function MonitoringForm({
                 />
               </Field>
             </div>
-            <div className="grid grid-cols-4 gap-[10px]">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Field label="Bull case">
                 <textarea
                   className={textareaClass}
@@ -425,7 +430,7 @@ export function MonitoringForm({
 
           {state.message ? (
             <p
-              className="rounded-[5px] border border-[var(--negative)] bg-[var(--negative-subtle)] px-3 py-2 text-[11px] text-[var(--negative)]"
+              className="rounded-[var(--radius-md)] border border-negative bg-[var(--negative-subtle)] px-3 py-2 text-sm text-negative"
               role="alert"
             >
               {state.message}
@@ -433,24 +438,24 @@ export function MonitoringForm({
           ) : null}
         </div>
 
-        <Surface className="min-h-[540px]">
-          <header className="flex h-[60px] flex-col gap-1 border-b border-[var(--border-subtle)] bg-[var(--bg-tertiary)] p-[14px]">
-            <h2 className="text-xs leading-4 font-semibold">Previous → new</h2>
-            <span className="font-mono text-[9px] leading-3 text-[var(--text-muted)]">
-              {previous
-                ? `Previous record · ${new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeZone: "Europe/Warsaw" }).format(new Date(previous.analyzedAt))}`
-                : "No previous monitoring"}
-            </span>
-          </header>
-          <ComparisonRow
-            label="STATUS"
-            previous={previous?.status.label ?? "—"}
-            current={selectedStatus.label}
+        <Surface className="min-h-[20rem] self-start">
+          <SectionHeader
+            meta={
+              previous
+                ? `Previous · ${new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeZone: "Europe/Warsaw" }).format(new Date(previous.analyzedAt))}`
+                : "No previous monitoring"
+            }
+            title="Previous → new"
           />
           <ComparisonRow
+            current={selectedStatus.label}
+            label="STATUS"
+            previous={previous?.status.label ?? "—"}
+          />
+          <ComparisonRow
+            current={price || "—"}
             label="PRICE"
             previous={previous?.price ?? "—"}
-            current={price || "—"}
           />
           {scoreDefinitions.map((definition) => (
             <ComparisonRow
@@ -464,11 +469,9 @@ export function MonitoringForm({
               }
             />
           ))}
-          <aside className="flex h-[72px] flex-col gap-1.5 bg-[var(--accent-subtle)] p-[14px]">
-            <strong className="text-[9px] leading-3 text-[var(--accent-primary)]">
-              HISTORICAL RECORD
-            </strong>
-            <p className="text-[10px] leading-[13px] text-[var(--text-secondary)]">
+          <aside className="flex flex-col gap-1.5 border-t border-[var(--border-subtle)] bg-[var(--accent-subtle)] p-4">
+            <strong className="ui-eyebrow">Historical record</strong>
+            <p className="text-sm leading-relaxed text-secondary-foreground">
               Saving creates a new immutable monitoring entry. The previous
               analysis remains available.
             </p>

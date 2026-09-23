@@ -17,6 +17,7 @@ import {
 } from "@/application/watchlist/schemas";
 import { syncMarketQuotes } from "@/application/sync/sync-market-quotes";
 import { InvalidTickerError } from "@/domain/stocks/ticker";
+import { getServerTranslator } from "@/i18n/get-locale";
 import { MassiveError } from "@/infrastructure/market-data/massive/massive-errors";
 import { createMassiveProvider } from "@/infrastructure/market-data/massive/massive-provider";
 import { createSupabaseMarketDataSyncRepository } from "@/infrastructure/supabase/queries/market-data-sync";
@@ -34,18 +35,25 @@ export async function addProviderStockAction(
   formData: FormData,
 ): Promise<AddStockActionState> {
   const user = await requireAllowedUser();
+  const { t } = await getServerTranslator();
   const parsed = addProviderStockSchema.safeParse({
     marketCode: formData.get("marketCode"),
     providerSymbol: formData.get("providerSymbol"),
     initialStatusId: formData.get("initialStatusId"),
   });
   if (!parsed.success) {
-    return { status: "error", message: "Choose a valid provider instrument." };
+    return {
+      status: "error",
+      message: t("watchlist.errorChooseProviderInstrument"),
+    };
   }
 
   const apiKey = getServerEnv().MASSIVE_API_KEY;
   if (!apiKey) {
-    return { status: "error", message: "Massive is not configured." };
+    return {
+      status: "error",
+      message: t("watchlist.errorMassiveNotConfigured"),
+    };
   }
 
   try {
@@ -64,7 +72,9 @@ export async function addProviderStockAction(
     if (!candidate) {
       return {
         status: "error",
-        message: `No active USA stock exists with ticker ${parsed.data.providerSymbol.toUpperCase()}.`,
+        message: t("watchlist.errorNoUsaTicker", {
+          ticker: parsed.data.providerSymbol.toUpperCase(),
+        }),
       };
     }
 
@@ -107,35 +117,35 @@ export async function addProviderStockAction(
 
       const baseMessage =
         result.status === "restored"
-          ? "Archived USA stock restored."
+          ? t("watchlist.successUsaRestored")
           : result.status === "already_active"
-            ? "Existing USA stock connected to Massive."
-            : "USA stock added with company details.";
+            ? t("watchlist.successUsaConnected")
+            : t("watchlist.successUsaAdded");
       return {
         status: "success",
         message: initialPriceAvailable
-          ? `${baseMessage} The latest EOD price was fetched.`
-          : `${baseMessage} The initial price is temporarily unavailable; daily synchronization will retry.`,
+          ? `${baseMessage} ${t("watchlist.successPriceFetched")}`
+          : `${baseMessage} ${t("watchlist.successPriceUnavailable")}`,
       };
     }
 
     const messages = {
-      invalid_market: "Choose a supported market.",
-      invalid_status: "Choose an active status that belongs to your account.",
-      invalid_candidate: "The provider candidate is invalid.",
-      mapping_conflict: "This provider symbol is mapped to another stock.",
-      conflict: "The stock could not be added. Please try again.",
+      invalid_market: t("watchlist.errorInvalidMarket"),
+      invalid_status: t("watchlist.errorInvalidStatus"),
+      invalid_candidate: t("watchlist.errorInvalidCandidate"),
+      mapping_conflict: t("watchlist.errorMappingConflict"),
+      conflict: t("watchlist.errorConflict"),
     } as const;
     return { status: "error", message: messages[result.status] };
   } catch (error) {
     if (error instanceof MassiveError) {
       return {
         status: "error",
-        message: "The ticker could not be verified with Massive right now.",
+        message: t("watchlist.errorMassiveVerify"),
       };
     }
     if (error instanceof WatchlistInfrastructureError) {
-      return { status: "error", message: "The stock could not be saved." };
+      return { status: "error", message: t("watchlist.errorSaveFailed") };
     }
     throw error;
   }
@@ -146,6 +156,7 @@ export async function addStockAction(
   formData: FormData,
 ): Promise<AddStockActionState> {
   const user = await requireAllowedUser();
+  const { t } = await getServerTranslator();
   const parsed = addStockSchema.safeParse({
     marketCode: formData.get("marketCode"),
     ticker: formData.get("ticker"),
@@ -156,7 +167,7 @@ export async function addStockAction(
   if (!parsed.success) {
     return {
       status: "error",
-      message: "Check the highlighted fields.",
+      message: t("watchlist.errorCheckFields"),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -176,18 +187,18 @@ export async function addStockAction(
         status: "success",
         message:
           result.status === "restored"
-            ? "Archived stock restored."
-            : "Stock added to the watchlist.",
+            ? t("watchlist.successStockRestored")
+            : t("watchlist.successStockAdded"),
       };
     }
 
     const messages = {
-      already_active: "This stock is already on your active watchlist.",
-      invalid_market: "Choose a supported market.",
-      invalid_status: "Choose an active status that belongs to your account.",
-      invalid_candidate: "The provider candidate is invalid.",
-      mapping_conflict: "This provider symbol is mapped to another stock.",
-      conflict: "The stock could not be added. Please try again.",
+      already_active: t("watchlist.errorAlreadyActive"),
+      invalid_market: t("watchlist.errorInvalidMarket"),
+      invalid_status: t("watchlist.errorInvalidStatus"),
+      invalid_candidate: t("watchlist.errorInvalidCandidate"),
+      mapping_conflict: t("watchlist.errorMappingConflict"),
+      conflict: t("watchlist.errorConflict"),
     } as const;
 
     return { status: "error", message: messages[result.status] };
@@ -202,7 +213,7 @@ export async function addStockAction(
     if (error instanceof WatchlistInfrastructureError) {
       return {
         status: "error",
-        message: "The stock could not be saved. Please try again.",
+        message: t("watchlist.errorSaveFailedRetry"),
       };
     }
     throw error;

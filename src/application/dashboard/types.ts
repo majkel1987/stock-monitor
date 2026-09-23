@@ -132,6 +132,30 @@ export type RecentMonitoringRow = {
   currency: string;
 };
 
+export type DashboardKpis = {
+  monitored: number;
+  gpw: number;
+  usa: number;
+  buyCandidates: number;
+  deepDive: number;
+  portfolio: number;
+  needsAttention: number;
+  lastAnalysisAt: string | null;
+};
+
+export type DashboardStatusCount = {
+  status: DashboardStatus;
+  count: number;
+};
+
+export type DashboardQuoteFreshnessStatus =
+  "current" | "delayed" | "stale" | "unavailable";
+
+export type DashboardQuoteFreshness = {
+  status: DashboardQuoteFreshnessStatus;
+  lastQuoteAsOf: string | null;
+};
+
 export type DashboardData = {
   marketOverview: {
     all: number;
@@ -143,10 +167,14 @@ export type DashboardData = {
     gpw: number;
     usa: number;
   };
+  kpis: DashboardKpis;
+  statusOverview: DashboardStatusCount[];
   opportunities: OpportunityRow[];
+  currentOpportunities: OpportunityRow[];
   nearBuyZone: NearBuyRow[];
   needsAttention: NeedsAttentionRow[];
   recentMonitoring: RecentMonitoringRow[];
+  quoteFreshness: DashboardQuoteFreshness;
   metadata: {
     generatedAt: string;
     lastQuoteAsOf: string | null;
