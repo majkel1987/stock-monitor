@@ -2,13 +2,17 @@ import {
   calculatePriceLevelDistance,
   isPriceLevelReached,
 } from "@/domain/price-levels/calculations";
+import type { MarketDataFreshness } from "@/domain/markets/freshness";
 import { classifyMarketDataFreshness } from "@/domain/markets/freshness";
+import type { MarketCode } from "@/domain/markets/market";
 import type {
   AttentionReason,
   DashboardBuyLevel,
   DashboardBuyLevelSource,
   DashboardData,
+  DashboardQuoteFreshness,
   DashboardSourceData,
+  DashboardStatusCount,
   DashboardStockSource,
   OpportunityRow,
 } from "./types";
@@ -16,6 +20,31 @@ import type {
 export const DEFAULT_NEAR_BUY_THRESHOLD_PCT = 10;
 export const DEFAULT_MONITORING_STALE_DAYS = 30;
 export const RECENT_MONITORING_LIMIT = 5;
+export const CURRENT_OPPORTUNITIES_LIMIT = 5;
+export const STATUS_OVERVIEW_LIMIT = 8;
+export const CURRENT_OPPORTUNITY_SLUGS = new Set([
+  "BUY_CANDIDATE",
+  "DEEP_DIVE",
+  "WAIT_FOR_CORRECTION",
+]);
+
+export function filterDashboardSourceByMarket(
+  source: DashboardSourceData,
+  market?: MarketCode,
+): DashboardSourceData {
+  if (!market) return source;
+
+  const stocks = source.stocks.filter((stock) => stock.marketCode === market);
+  const stockIds = new Set(stocks.map((stock) => stock.id));
+
+  return {
+    ...source,
+    stocks,
+    recentMonitoring: source.recentMonitoring.filter((row) =>
+      stockIds.has(row.stockId),
+    ),
+  };
+}
 
 function compareNullableNumberDescending(
   left: number | null,
@@ -349,34 +378,125 @@ export function buildDashboardData(
       : latest;
   }, null);
 
+  const lastAnalysisAt = stocks.reduce<string | null>((latest, stock) => {
+    const current = stock.latestMonitoring?.analyzedAt ?? null;
+    if (!current) return latest;
+    return latest === null || Date.parse(current) > Date.parse(latest)
+      ? current
+      : latest;
+  }, null);
+
+  const marketOverview = {
+    all: stocks.length,
+    opportunity: stocks.filter(
+      (stock) => stock.status.dashboardGroup === "opportunity",
+    ).length,
+    watch: stocks.filter((stock) => stock.status.dashboardGroup === "watch")
+      .length,
+    research: stocks.filter(
+      (stock) => stock.status.dashboardGroup === "research",
+    ).length,
+    portfolio: stocks.filter(
+      (stock) => stock.status.dashboardGroup === "portfolio",
+    ).length,
+    stale: stocks.filter(
+      (stock) => stock.quote?.qualityStatus.trim().toLowerCase() === "stale",
+    ).length,
+    gpw: stocks.filter((stock) => stock.marketCode === "GPW").length,
+    usa: stocks.filter((stock) => stock.marketCode === "USA").length,
+  };
+
   return {
-    marketOverview: {
-      all: stocks.length,
-      opportunity: stocks.filter(
-        (stock) => stock.status.dashboardGroup === "opportunity",
-      ).length,
-      watch: stocks.filter((stock) => stock.status.dashboardGroup === "watch")
-        .length,
-      research: stocks.filter(
-        (stock) => stock.status.dashboardGroup === "research",
-      ).length,
-      portfolio: stocks.filter(
-        (stock) => stock.status.dashboardGroup === "portfolio",
-      ).length,
-      stale: stocks.filter(
-        (stock) => stock.quote?.qualityStatus.trim().toLowerCase() === "stale",
-      ).length,
-      gpw: stocks.filter((stock) => stock.marketCode === "GPW").length,
-      usa: stocks.filter((stock) => stock.marketCode === "USA").length,
+    marketOverview,
+    kpis: {
+      monitored: marketOverview.all,
+      gpw: marketOverview.gpw,
+      usa: marketOverview.usa,
+      buyCandidates: countBySlugOrGroup(stocks, "BUY_CANDIDATE", "opportunity"),
+      deepDive: countBySlugOrGroup(stocks, "DEEP_DIVE", "research"),
+      portfolio: countBySlugOrGroup(stocks, "PORTFOLIO", "portfolio"),
+      needsAttention: needsAttention.length,
+      lastAnalysisAt,
     },
+    statusOverview: buildStatusOverview(stocks),
     opportunities,
+    currentOpportunities: opportunities
+      .filter((row) => CURRENT_OPPORTUNITY_SLUGS.has(row.status.slug))
+      .slice(0, CURRENT_OPPORTUNITIES_LIMIT),
     nearBuyZone,
     needsAttention,
     recentMonitoring,
+    quoteFreshness: summarizeQuoteFreshness(stocks, latestQuoteAsOf),
     metadata: {
       generatedAt: now.toISOString(),
       lastQuoteAsOf: latestQuoteAsOf,
       lastSuccessfulSyncAt: source.lastSuccessfulSyncAt,
     },
   };
+}
+
+function countBySlugOrGroup(
+  stocks: DashboardStockSource[],
+  slug: string,
+  group: DashboardStockSource["status"]["dashboardGroup"],
+) {
+  return stocks.filter(
+    (stock) =>
+      stock.status.slug === slug || stock.status.dashboardGroup === group,
+  ).length;
+}
+
+function buildStatusOverview(
+  stocks: DashboardStockSource[],
+): DashboardStatusCount[] {
+  const counts = new Map<string, DashboardStatusCount>();
+
+  for (const stock of stocks) {
+    const existing = counts.get(stock.status.id);
+    if (existing) {
+      existing.count += 1;
+      continue;
+    }
+    counts.set(stock.status.id, { status: stock.status, count: 1 });
+  }
+
+  return [...counts.values()]
+    .filter((row) => row.count > 0)
+    .sort(
+      (left, right) =>
+        left.status.sortOrder - right.status.sortOrder ||
+        left.status.label.localeCompare(right.status.label),
+    )
+    .slice(0, STATUS_OVERVIEW_LIMIT);
+}
+
+function freshnessRank(status: MarketDataFreshness) {
+  if (status === "stale") return 0;
+  if (status === "unknown") return 1;
+  if (status === "delayed") return 2;
+  if (status === "closed") return 3;
+  return 4;
+}
+
+function summarizeQuoteFreshness(
+  stocks: DashboardStockSource[],
+  lastQuoteAsOf: string | null,
+): DashboardQuoteFreshness {
+  const quotes = stocks.flatMap((stock) => (stock.quote ? [stock.quote] : []));
+  if (!quotes.length) {
+    return { status: "unavailable", lastQuoteAsOf };
+  }
+
+  const worst = quotes.reduce((current, quote) =>
+    freshnessRank(quote.qualityStatus) < freshnessRank(current.qualityStatus)
+      ? quote
+      : current,
+  ).qualityStatus;
+
+  if (worst === "stale") return { status: "stale", lastQuoteAsOf };
+  if (worst === "unknown") return { status: "unavailable", lastQuoteAsOf };
+  if (worst === "delayed" || worst === "closed") {
+    return { status: "delayed", lastQuoteAsOf };
+  }
+  return { status: "current", lastQuoteAsOf };
 }

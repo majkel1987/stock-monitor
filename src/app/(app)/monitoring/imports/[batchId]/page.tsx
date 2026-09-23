@@ -21,7 +21,7 @@ export default async function ImportReviewPage({
   if (!batch) notFound();
 
   return (
-    <div className="flex min-h-[1028px] flex-col gap-[14px] p-6">
+    <div className="page-frame flex flex-col gap-5">
       <PageHeader
         description={`${batch.fileName} · schema 1.0 · ${batch.externalId}`}
         title={`Review import · ${batch.analysisDate}`}

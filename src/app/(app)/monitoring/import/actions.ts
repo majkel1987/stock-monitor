@@ -6,6 +6,7 @@ import { createGpwMonitoringImportDraft } from "@/application/imports/create-imp
 import { createUsaMonitoringImportDraft } from "@/application/imports/create-usa-import-draft";
 import { detectMonitoringImportKind } from "@/application/imports/detect-monitoring-import";
 import { GPW_IMPORT_MAX_BYTES } from "@/application/imports/gpw-monitoring-schema";
+import { getServerTranslator } from "@/i18n/get-locale";
 import {
   createSupabaseMonitoringImportRepository,
   MonitoringImportInfrastructureError,
@@ -23,17 +24,24 @@ export async function createImportDraftAction(
   _previous: ImportUploadState,
   formData: FormData,
 ): Promise<ImportUploadState> {
+  const { t } = await getServerTranslator();
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) {
-    return { status: "error", message: "Select a JSON file to continue." };
+    return {
+      status: "error",
+      message: t("monitoring.import.errorSelectFile"),
+    };
   }
   if (!file.name.toLowerCase().endsWith(".json")) {
-    return { status: "error", message: "Only JSON files are accepted." };
+    return {
+      status: "error",
+      message: t("monitoring.import.errorJsonOnly"),
+    };
   }
   if (file.size > GPW_IMPORT_MAX_BYTES) {
     return {
       status: "error",
-      message: "The file exceeds the 1 MB import limit.",
+      message: t("monitoring.import.errorFileTooLarge"),
     };
   }
 
@@ -65,7 +73,7 @@ export async function createImportDraftAction(
     if (error instanceof MonitoringImportInfrastructureError) {
       return {
         status: "error",
-        message: "The draft could not be saved. No monitoring was committed.",
+        message: t("monitoring.import.errorDraftSaveFailed"),
       };
     }
     throw error;
@@ -74,7 +82,9 @@ export async function createImportDraftAction(
   if (result.status === "invalid_file") {
     return {
       status: "error",
-      message: `The file does not match the ${importKind} monitoring contract.`,
+      message: t("monitoring.import.errorContractMismatch", {
+        kind: importKind,
+      }),
       issues: result.issues.slice(0, 20),
     };
   }

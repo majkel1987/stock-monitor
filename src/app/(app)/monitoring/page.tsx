@@ -1,24 +1,74 @@
-import { FileJson2 } from "lucide-react";
+import { FileUp } from "lucide-react";
 import Link from "next/link";
 
+import { MonitoringMobileList } from "@/components/monitoring/monitoring-mobile-list";
+import { MonitoringTable } from "@/components/monitoring/monitoring-table";
+import { FlashToast } from "@/components/ui/flash-toast";
 import {
-  ActionButton,
+  EmptyState,
   PageHeader,
-  StatusBadge,
+  Surface,
 } from "@/components/ui/terminal";
-import { readMonitoringTimeline } from "@/infrastructure/supabase/queries/monitoring-history";
+import { getServerTranslator } from "@/i18n/get-locale";
+import type { Translator } from "@/i18n/translate";
+import {
+  MonitoringHistoryInfrastructureError,
+  readMonitoringTimeline,
+} from "@/infrastructure/supabase/queries/monitoring-history";
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
 import { createClient } from "@/infrastructure/supabase/server/create-client";
 
-const columns =
-  "grid-cols-[112px_70px_160px_60px_100px_138px_62px_170px_minmax(180px,1fr)_62px]";
+function ImportJsonLink({
+  className,
+  label,
+}: {
+  className?: string;
+  label: string;
+}) {
+  return (
+    <Link
+      className={
+        className ??
+        "ui-button ui-button-primary inline-flex w-full min-h-11 sm:w-auto"
+      }
+      href="/monitoring/import"
+    >
+      <FileUp aria-hidden="true" className="mr-2 size-4" />
+      {label}
+    </Link>
+  );
+}
 
-const formatter = new Intl.DateTimeFormat("en-GB", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  timeZone: "Europe/Warsaw",
-});
+async function DataError() {
+  const { t } = await getServerTranslator();
+  return (
+    <div className="page-frame flex flex-col gap-4">
+      <PageHeader
+        description={t("monitoring.subtitle")}
+        index
+        title={t("monitoring.title")}
+      />
+      <Surface className="border-negative bg-[var(--negative-subtle)]" padded>
+        <h2 className="text-card-title">{t("monitoring.unavailableTitle")}</h2>
+        <p className="mt-2 text-sm text-secondary-foreground">
+          {t("monitoring.unavailableDescription")}
+        </p>
+      </Surface>
+    </div>
+  );
+}
+
+function MonitoringEmpty({ t }: { t: Translator }) {
+  return (
+    <Surface>
+      <EmptyState
+        action={<ImportJsonLink label={t("monitoring.importJson")} />}
+        description={t("monitoring.emptyDescription")}
+        title={t("monitoring.emptyTitle")}
+      />
+    </Surface>
+  );
+}
 
 export default async function MonitoringPage({
   searchParams,
@@ -26,104 +76,53 @@ export default async function MonitoringPage({
   searchParams: Promise<{ imported?: string }>;
 }) {
   const user = await requireAllowedUser();
-  const records = await readMonitoringTimeline(await createClient(), user.id);
+  const { t } = await getServerTranslator();
   const imported = (await searchParams).imported === "1";
 
+  let records: Awaited<ReturnType<typeof readMonitoringTimeline>>;
+  try {
+    records = await readMonitoringTimeline(await createClient(), user.id);
+  } catch (error) {
+    if (error instanceof MonitoringHistoryInfrastructureError) {
+      return <DataError />;
+    }
+    throw error;
+  }
+
   return (
-    <div className="flex min-h-[1028px] flex-col gap-[18px] p-6">
+    <div className="page-frame flex flex-col gap-4">
       <PageHeader
-        description="Chronological research log across every monitored company"
-        title="Monitoring history"
+        description={t("monitoring.subtitle")}
+        index
+        title={t("monitoring.title")}
       >
-        <span className="font-mono text-[10px] text-[var(--text-muted)]">
-          {records.length} records
-        </span>
-        <Link href="/monitoring/import">
-          <ActionButton variant="primary">
-            <FileJson2 className="mr-2 size-3.5" /> Import JSON
-          </ActionButton>
-        </Link>
+        <ImportJsonLink label={t("monitoring.importJson")} />
       </PageHeader>
+
       {imported ? (
-        <p className="rounded-[5px] border border-[var(--positive)] bg-[var(--positive-subtle)] px-3 py-2 text-[10px] text-[var(--positive)]">
-          Selected monitoring snapshots were committed successfully.
-        </p>
+        <FlashToast
+          clearParams={["imported"]}
+          description={t("monitoring.toastImportedDescription")}
+          title={t("monitoring.toastImportedTitle")}
+          variant="success"
+        />
       ) : null}
-      <div className="overflow-hidden rounded-[7px] border border-[var(--border-default)] bg-[var(--surface-default)]">
-        <div
-          className={`grid h-[34px] items-center border-b border-[var(--border-subtle)] bg-[var(--bg-tertiary)] ${columns}`}
-        >
-          {[
-            "Date",
-            "Ticker",
-            "Company",
-            "Market",
-            "Price",
-            "Status",
-            "Score",
-            "Decision",
-            "Summary",
-            "Source",
-          ].map((label) => (
-            <span
-              className="px-2 text-[9px] font-semibold text-[var(--text-muted)]"
-              key={label}
-            >
-              {label}
-            </span>
-          ))}
-        </div>
-        {records.length === 0 ? (
-          <div className="grid h-48 place-items-center text-center">
-            <div>
-              <p className="text-sm font-semibold">No monitoring history yet</p>
-              <p className="mt-1 text-[10px] text-[var(--text-muted)]">
-                Create one manually or import a validated JSON export.
-              </p>
-            </div>
-          </div>
-        ) : (
-          records.map((record) => (
-            <Link
-              className={`grid h-[52px] items-center border-b border-[var(--border-subtle)] text-[10px] hover:bg-[var(--surface-hover)] ${columns}`}
-              href={`/monitoring/${record.id}`}
-              key={record.id}
-            >
-              <time className="px-2 font-mono">
-                {formatter.format(new Date(record.analyzedAt)).toUpperCase()}
-              </time>
-              <strong className="px-2">{record.ticker}</strong>
-              <span className="truncate px-2">{record.companyName}</span>
-              <span className="px-2">{record.marketCode}</span>
-              <span className="px-2 font-mono">
-                {record.price ?? "—"} {record.currency}
-              </span>
-              <span className="truncate px-2">
-                <StatusBadge>{record.statusLabel.toUpperCase()}</StatusBadge>
-              </span>
-              <span className="px-2 font-mono text-[var(--accent-primary)]">
-                {record.investmentScore ?? "—"}
-              </span>
-              <span className="truncate px-2">
-                {record.decisionAction?.replaceAll("_", " ") ?? "—"}
-              </span>
-              <span className="truncate px-2 text-[var(--text-secondary)]">
-                {record.summary ?? "—"}
-              </span>
-              <span className="truncate px-2 font-mono text-[9px] text-[var(--text-muted)]">
-                {record.sourceType.replaceAll("_", " ")}
-              </span>
-            </Link>
-          ))
-        )}
-        {records.length ? (
-          <footer className="flex h-[38px] items-center justify-between bg-[var(--bg-tertiary)] px-3">
-            <span className="font-mono text-[9px] text-[var(--text-muted)]">
-              Showing 1–{records.length} of {records.length} records
-            </span>
-          </footer>
-        ) : null}
-      </div>
+
+      {records.length ? (
+        <>
+          <MonitoringTable records={records} />
+          <MonitoringMobileList records={records} />
+          <p className="ui-meta md:hidden">
+            {t("monitoring.recordsRange", {
+              count: records.length,
+              from: 1,
+              to: records.length,
+            })}
+          </p>
+        </>
+      ) : (
+        <MonitoringEmpty t={t} />
+      )}
     </div>
   );
 }

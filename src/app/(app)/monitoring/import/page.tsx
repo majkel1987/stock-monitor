@@ -2,36 +2,54 @@ import Link from "next/link";
 
 import { ImportUploadForm } from "@/components/monitoring/import-upload-form";
 import { ActionButton, PageHeader } from "@/components/ui/terminal";
+import { getServerTranslator } from "@/i18n/get-locale";
 
-const stages = ["SELECT FILE", "VALIDATE", "REVIEW", "COMMIT"];
+export default async function MonitoringImportPage() {
+  const { t } = await getServerTranslator();
+  const stages = [
+    t("monitoring.import.stageSelectFile"),
+    t("monitoring.import.stageValidate"),
+    t("monitoring.import.stageReview"),
+    t("monitoring.import.stageCommit"),
+  ];
 
-export default function MonitoringImportPage() {
   return (
-    <div className="flex min-h-[848px] flex-col gap-4 p-6">
+    <div className="page-frame flex flex-col gap-5">
       <PageHeader
-        compact
-        description="Create a reviewable draft from a Monitoruj GPW Okazje export. Nothing is committed yet."
-        title="Import monitoring JSON"
+        description={t("monitoring.import.subtitle")}
+        title={t("monitoring.import.title")}
       >
         <Link href="/monitoring">
-          <ActionButton variant="ghost">Back to monitoring</ActionButton>
+          <ActionButton variant="secondary">
+            {t("monitoring.import.back")}
+          </ActionButton>
         </Link>
       </PageHeader>
-      <ol className="grid h-10 grid-cols-4 overflow-hidden rounded-[7px] border border-[var(--border-default)] bg-[var(--surface-default)]">
+
+      <ol className="grid grid-cols-2 overflow-hidden rounded-[var(--radius-surface)] border border-border bg-card sm:grid-cols-4">
         {stages.map((stage, index) => (
           <li
-            className={`flex items-center justify-center gap-2 border-b text-[10px] font-semibold ${index === 0 ? "border-[var(--accent-primary)] bg-[var(--accent-subtle)] text-[var(--text-primary)]" : "border-[var(--border-subtle)] bg-[var(--bg-tertiary)] text-[var(--text-muted)]"}`}
+            className={`flex min-h-11 items-center justify-center gap-2 border-b px-2 text-xs font-semibold sm:border-b-0 sm:border-r sm:last:border-r-0 sm:text-sm ${
+              index === 0
+                ? "border-primary bg-[var(--accent-subtle)] text-foreground"
+                : "border-[var(--border-subtle)] bg-muted text-muted-foreground"
+            }`}
             key={stage}
           >
             <span
-              className={`grid size-5 place-items-center rounded-full font-mono text-[9px] font-bold ${index === 0 ? "bg-[var(--accent-primary)] text-[var(--bg-primary)]" : "bg-[var(--surface-elevated)]"}`}
+              className={`grid size-6 place-items-center rounded-full font-mono text-[0.6875rem] font-bold ${
+                index === 0
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card text-muted-foreground"
+              }`}
             >
               {index + 1}
             </span>
-            {stage}
+            <span className="truncate">{stage}</span>
           </li>
         ))}
       </ol>
+
       <ImportUploadForm />
     </div>
   );

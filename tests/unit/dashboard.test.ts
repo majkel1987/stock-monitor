@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildDashboardData,
+  filterDashboardSourceByMarket,
   selectNearBuyLevel,
 } from "@/application/dashboard/rules";
 import type {
@@ -278,5 +279,82 @@ describe("dashboard attention and monitoring aggregation", () => {
       gpw: 1,
       usa: 1,
     });
+    expect(data.kpis).toMatchObject({
+      monitored: 2,
+      gpw: 1,
+      usa: 1,
+      buyCandidates: 1,
+      deepDive: 0,
+      portfolio: 0,
+      needsAttention: 1,
+    });
+    expect(
+      data.statusOverview.map((row) => [row.status.slug, row.count]),
+    ).toEqual([
+      ["BUY_CANDIDATE", 1],
+      ["WATCH", 1],
+    ]);
+    expect(data.quoteFreshness.status).toBe("stale");
+  });
+
+  it("filters dashboard source by market before aggregation", () => {
+    const gpw = stock("gpw", {
+      marketCode: "GPW",
+      currency: "PLN",
+      status: watchStatus,
+    });
+    const usa = stock("usa");
+    const filtered = filterDashboardSourceByMarket(
+      source(
+        [gpw, usa],
+        [
+          monitoring("gpw", "2026-09-05T12:00:00.000Z", 70, "gpw-m"),
+          monitoring("usa", "2026-09-06T12:00:00.000Z", 80, "usa-m"),
+        ],
+      ),
+      "GPW",
+    );
+
+    expect(filtered.stocks.map((row) => row.id)).toEqual(["gpw"]);
+    expect(filtered.recentMonitoring.map((row) => row.id)).toEqual(["gpw-m"]);
+
+    const data = buildDashboardData(filtered, now);
+    expect(data.kpis.monitored).toBe(1);
+    expect(data.kpis.gpw).toBe(1);
+    expect(data.kpis.usa).toBe(0);
+    expect(data.currentOpportunities).toEqual([]);
+  });
+
+  it("selects current opportunities only from decision-relevant statuses", () => {
+    const deepDive: DashboardStatus = {
+      id: "deep-dive",
+      slug: "DEEP_DIVE",
+      label: "Deep Dive",
+      colorToken: "accent",
+      dashboardGroup: "research",
+      sortOrder: 40,
+    };
+    const avoid: DashboardStatus = {
+      id: "avoid",
+      slug: "AVOID",
+      label: "Avoid",
+      colorToken: "negative",
+      dashboardGroup: "negative",
+      sortOrder: 70,
+    };
+    const candidate = stock("apt");
+    const research = stock("dcr", { status: deepDive });
+    const skipped = stock("bad", { status: avoid });
+
+    const data = buildDashboardData(
+      source([skipped, research, candidate]),
+      now,
+    );
+
+    expect(data.currentOpportunities.map((row) => row.ticker)).toEqual([
+      "APT",
+      "DCR",
+    ]);
+    expect(data.kpis.deepDive).toBe(1);
   });
 });

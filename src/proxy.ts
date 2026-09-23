@@ -79,6 +79,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Exclude actual public asset namespaces, never arbitrary extensions on private routes.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico$).*)"],
+  // Exclude Next internals and public asset namespaces, never arbitrary extensions on private routes.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico$|images/|patterns/).*)",
+  ],
 };
