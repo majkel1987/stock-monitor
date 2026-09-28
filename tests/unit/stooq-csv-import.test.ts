@@ -14,6 +14,7 @@ function repository(
   overrides: Partial<StooqCsvImportRepository> = {},
 ): StooqCsvImportRepository {
   return {
+    loadActiveGpwImportInstruments: vi.fn().mockResolvedValue([]),
     findActiveGpwInstrument: vi.fn().mockResolvedValue({
       stockId: "11111111-1111-4111-8111-111111111111",
       provider: "STOOQ",

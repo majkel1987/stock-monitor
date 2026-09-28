@@ -109,6 +109,29 @@ export function parseStooqDailyCsv(
   payload: string,
   providerSymbol?: string,
 ): StooqDailyRow[] {
+  return parseRows(payload, providerSymbol ? [providerSymbol] : undefined).map(
+    (row) => row.data,
+  );
+}
+
+export function parseStooqBulkCsv(
+  payload: string,
+  providerSymbols: string[],
+): Map<string, StooqDailyRow[]> {
+  const grouped = new Map<string, StooqDailyRow[]>();
+  for (const row of parseRows(payload, providerSymbols, true)) {
+    const rows = grouped.get(row.ticker) ?? [];
+    rows.push(row.data);
+    grouped.set(row.ticker, rows);
+  }
+  return grouped;
+}
+
+function parseRows(
+  payload: string,
+  providerSymbols?: string[],
+  requireTicker = false,
+): { ticker: string; data: StooqDailyRow }[] {
   const trimmed = payload.trim().replace(/^\uFEFF/, "");
   if (
     !trimmed ||
@@ -133,12 +156,19 @@ export function parseStooqDailyCsv(
   );
   const containsTicker = canonicalHeader.includes("Ticker");
 
-  if (containsTicker && !providerSymbol?.trim()) {
+  if (
+    (containsTicker && !providerSymbols?.length) ||
+    (requireTicker && !containsTicker)
+  ) {
     throw new StooqError(
       "provider_invalid_response",
       "A ticker is required to import a Stooq bulk CSV file.",
     );
   }
+
+  const symbols = new Set(
+    providerSymbols?.map((symbol) => symbol.trim().toUpperCase()),
+  );
 
   if (
     required.some(
@@ -167,8 +197,7 @@ export function parseStooqDailyCsv(
 
     if (
       containsTicker &&
-      (row.Ticker ?? "").trim().toUpperCase() !==
-        providerSymbol?.trim().toUpperCase()
+      !symbols.has((row.Ticker ?? "").trim().toUpperCase())
     ) {
       return [];
     }
@@ -183,10 +212,12 @@ export function parseStooqDailyCsv(
         "The Stooq CSV contains an invalid daily price row.",
       );
     }
-    return [parsed.data];
+    return [
+      { ticker: (row.Ticker ?? "").trim().toUpperCase(), data: parsed.data },
+    ];
   });
 
-  if (rows.length === 0) {
+  if (rows.length === 0 && !requireTicker) {
     throw new StooqError(
       "provider_invalid_response",
       "The Stooq CSV contains no daily prices.",

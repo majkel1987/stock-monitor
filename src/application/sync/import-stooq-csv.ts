@@ -9,6 +9,7 @@ export interface StooqCsvImportRepository extends Pick<
   MarketDataSyncRepository,
   "startRun" | "finishRun"
 > {
+  loadActiveGpwImportInstruments(userId: string): Promise<ProviderInstrument[]>;
   findActiveGpwInstrument(
     userId: string,
     stockId: string,

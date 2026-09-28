@@ -551,7 +551,7 @@ POST /api/v1/monitoring-imports/{id}/commit
 
 ### Rekomendacja
 
-**MVP: lokalny import Stooq EOD CSV dla GPW i mały adapter `MarketDataProvider` Massive Basic EOD dla USA.** EOD odpowiada rytmowi pracy aplikacji i usuwa koszt płatnego wspólnego feedu. Massive Basic zapewnia USA EOD z limitem pięciu wywołań na minutę. Użytkownik pobiera plik Stooq w przeglądarce i przypisuje go w aplikacji do aktywnego waloru GPW; serwer nie wywołuje Stooq bezpośrednio.
+**MVP: lokalny import Stooq EOD CSV dla GPW i mały adapter `MarketDataProvider` Massive Basic EOD dla USA.** EOD odpowiada rytmowi pracy aplikacji i usuwa koszt płatnego wspólnego feedu. Massive Basic zapewnia USA EOD z limitem pięciu wywołań na minutę. Użytkownik pobiera plik Stooq w przeglądarce i importuje go dla wszystkich pasujących aktywnych spółek GPW w obserwowanych na podstawie kolumny `Ticker`. Plik bez tickera przypisuje do jednego aktywnego waloru GPW. Serwer nie wywołuje Stooq bezpośrednio. Import zbiorczy pomija spółki nieobecne w pliku, zachowuje nowsze lub równe kursy i raportuje częściowe powodzenie oraz liczbę dodanych rekordów historii.
 
 ### Porównanie dostawców — stan na 30.08.2026
 
@@ -850,7 +850,7 @@ Server Actions mogą implementować część mutacji UI, ale kontrakty REST dla 
 ### Przepływ danych ceny
 
 1. Dla USA cron wywołuje funkcję z podpisanym sekretem; dla GPW użytkownik wybiera lokalny plik CSV na ekranie Settings → Data.
-2. Funkcja wybiera aktywne tickery USA; import GPW ponownie autoryzuje wybrany walor względem aktywnej watchlisty.
+2. Funkcja wybiera aktywne tickery USA; import GPW ponownie autoryzuje wszystkie dopasowane walory lub wybrany walor względem aktywnej watchlisty użytkownika.
 3. Ticker jest mapowany na symbol dostawcy.
 4. API jest wywoływane batchami z limitem współbieżności.
 5. Odpowiedź przechodzi walidację, normalizację i kontrolę anomalii.
@@ -864,7 +864,7 @@ Server Actions mogą implementować część mutacji UI, ale kontrakty REST dla 
 
 | Job | Harmonogram | Działanie |
 |---|---|---|
-| `import-gpw-stooq-csv` | ręcznie po sesji | waliduj lokalny plik Stooq i warunkowo zapisz najnowszą cenę wybranego waloru GPW |
+| `import-gpw-stooq-csv` | ręcznie po sesji | waliduj lokalny plik Stooq i warunkowo zapisz najnowsze ceny wszystkich pasujących obserwowanych spółek GPW lub wybranego waloru |
 | `sync-us-quotes` | co 30 min, pn–pt, szerokie okno 15:00–23:00 `Europe/Warsaw` | provider/market calendar rozstrzyga DST i święta |
 | `sync-fx-usd-pln` | dni robocze raz po publikacji tabel NBP + retry | zapisz najnowszy kurs |
 | `sync-company-metadata` | niedziela 04:00 | tylko aktywna watchlista; nazwa/giełda/waluta/market cap jeśli dostępne |

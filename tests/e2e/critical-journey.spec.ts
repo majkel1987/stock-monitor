@@ -38,7 +38,7 @@ test("critical MVP journey with provider-unavailable manual fallback", async ({
     name: "Import GPW prices",
   });
   await importDialog
-    .getByLabel("GPW stock")
+    .getByLabel("Zakres importu GPW")
     .selectOption({ label: `${runTicker} · M7 E2E Company` });
   await importDialog.getByLabel("Stooq CSV file").setInputFiles({
     name: `${runTicker}.csv`,
@@ -53,6 +53,23 @@ test("critical MVP journey with provider-unavailable manual fallback", async ({
     page.getByText(
       "2 historical rows imported; the 2020-01-01 quote is now current.",
     ),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Import GPW CSV" }).click();
+  await expect(importDialog.getByLabel("Zakres importu GPW")).toHaveValue(
+    "all",
+  );
+  await importDialog.getByLabel("Stooq CSV file").setInputFiles({
+    name: "bulk.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(
+      `Ticker,Date,Open,High,Low,Close,Volume\n${runTicker},2019-12-31,119,121,118,120,1000\n${runTicker},2020-01-01,121,125,120,124,1200`,
+    ),
+  });
+  await importDialog.getByRole("button", { name: "Import CSV" }).click();
+  await expect(importDialog).not.toBeVisible();
+  await expect(
+    page.getByText(/Zachowano nowsze lub równe kursy: 1/),
   ).toBeVisible();
 
   await page.goto("/watchlist");
