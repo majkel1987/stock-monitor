@@ -33,6 +33,39 @@ export function createSupabaseMarketDataSyncRepository(
   client: SupabaseClient<Database>,
 ): MarketDataSyncRepository & StooqCsvImportRepository {
   return {
+    async loadActiveGpwImportInstruments(userId) {
+      const instruments: import("@/application/sync/market-data-provider").ProviderInstrument[] =
+        [];
+      const { data: market, error: marketError } = await client
+        .from("markets")
+        .select("id")
+        .eq("code", "GPW")
+        .single();
+      if (marketError) throw new MarketDataSyncInfrastructureError();
+      for (let offset = 0; ; offset += 500) {
+        const { data, error } = await client
+          .from("watchlist_items")
+          .select("stocks!inner(id,ticker,currency,market_id)")
+          .eq("user_id", userId)
+          .is("archived_at", null)
+          .eq("stocks.market_id", market.id)
+          .eq("stocks.currency", "PLN")
+          .order("stock_id")
+          .range(offset, offset + 499);
+        if (error) throw new MarketDataSyncInfrastructureError();
+        instruments.push(
+          ...data.map(({ stocks: stock }) => ({
+            stockId: stock.id,
+            provider: "STOOQ" as const,
+            providerSymbol: stock.ticker,
+            market: "GPW" as const,
+            currency: "PLN" as const,
+          })),
+        );
+        if (data.length < 500) break;
+      }
+      return instruments;
+    },
     async latestManualAttemptAt() {
       const { data, error } = await client
         .from("sync_runs")

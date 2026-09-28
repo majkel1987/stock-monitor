@@ -39,13 +39,20 @@ export function StooqCsvImportForm({
     }
     if (!wasPendingRef.current) return;
     wasPendingRef.current = false;
-    if (state.status !== "success") return;
+    if (state.status !== "success" && state.status !== "partial") return;
 
     formRef.current?.reset();
-    toast.success("CSV imported", {
-      description: state.message,
-      duration: 3500,
-    });
+    const showToast =
+      state.status === "partial" ? toast.warning : toast.success;
+    showToast(
+      state.status === "partial"
+        ? "Import częściowo zakończony"
+        : "CSV imported",
+      {
+        description: state.message,
+        duration: 3500,
+      },
+    );
     dialogRef.current?.close();
   }, [pending, state.message, state.status]);
 
@@ -77,8 +84,9 @@ export function StooqCsvImportForm({
                 Import GPW prices
               </h2>
               <p className="pt-1 text-sm leading-relaxed text-muted-foreground">
-                Select an active GPW stock and a Stooq CSV file with daily
-                OHLCV data. Maximum file size is 5 MB.
+                Zbiorczy plik Stooq z kolumną Ticker aktualizuje wszystkie
+                pasujące spółki GPW w obserwowanych. Dla pliku bez Ticker
+                wybierz jedną spółkę. Maksymalny rozmiar pliku: 5 MB.
               </p>
             </div>
             <button
@@ -92,13 +100,17 @@ export function StooqCsvImportForm({
           </div>
 
           <div className="flex flex-col gap-5 p-4 sm:p-5">
-            <Field label="GPW stock">
+            <Field label="Zakres importu GPW">
               <select
                 className={controlClass}
                 disabled={disabled}
                 name="stockId"
+                defaultValue="all"
                 required
               >
+                {targets.length > 0 && (
+                  <option value="all">Wszystkie obserwowane spółki GPW</option>
+                )}
                 {targets.length ? (
                   targets.map((target) => (
                     <option key={target.stockId} value={target.stockId}>

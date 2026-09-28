@@ -4,10 +4,14 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { importStooqCsv } from "@/application/sync/import-stooq-csv";
+import { importStooqWatchlistCsv } from "@/application/sync/import-stooq-watchlist-csv";
 import { runManualMarketSync } from "@/application/sync/run-manual-market-sync";
 import { createNbpProvider } from "@/infrastructure/fx/nbp/nbp-provider";
 import { createMarketDataProviders } from "@/infrastructure/market-data/providers";
-import { parseStooqCsvImport } from "@/infrastructure/market-data/stooq/stooq-csv-adapter";
+import {
+  parseStooqBulkImport,
+  parseStooqCsvImport,
+} from "@/infrastructure/market-data/stooq/stooq-csv-adapter";
 import { createSupabaseMarketDataSyncRepository } from "@/infrastructure/supabase/queries/market-data-sync";
 import { requireAllowedUser } from "@/infrastructure/supabase/server/auth";
 import { createServiceClient } from "@/infrastructure/supabase/server/create-service-client";
@@ -19,13 +23,13 @@ export type RefreshMarketDataActionState = {
 };
 
 export type ImportStooqCsvActionState = {
-  status: "idle" | "success" | "error";
+  status: "idle" | "success" | "partial" | "error";
   message?: string;
 };
 
 const MAX_STOOQ_CSV_BYTES = 5 * 1024 * 1024;
 const stooqCsvUploadSchema = z.object({
-  stockId: z.uuid(),
+  stockId: z.union([z.literal("all"), z.uuid()]),
   file: z
     .custom<File>(
       (value) =>
@@ -87,6 +91,37 @@ export async function importStooqCsvAction(
   }
 
   try {
+    if (parsed.data.stockId === "all") {
+      const result = await importStooqWatchlistCsv({
+        repository: createSupabaseMarketDataSyncRepository(serviceClient),
+        parseFile: parseStooqBulkImport,
+        userId: user.id,
+        payload: await parsed.data.file.text(),
+        fileName: parsed.data.file.name.slice(0, 160),
+      });
+      if (result.status === "invalid_stock")
+        return {
+          status: "error",
+          message: "Brak aktywnych spółek GPW w obserwowanych.",
+        };
+      if (result.status === "invalid_csv")
+        return {
+          status: "error",
+          message:
+            "Import wszystkich spółek wymaga zbiorczego CSV Stooq z kolumnami Ticker, Date, Open, High, Low, Close i Volume. Dla pliku bez Ticker wybierz jedną spółkę.",
+        };
+      if (result.status === "no_matches")
+        return {
+          status: "error",
+          message:
+            "Plik nie zawiera tickerów pasujących do obserwowanych spółek GPW.",
+        };
+      revalidateMarketDataViews();
+      return {
+        status: result.status === "failed" ? "error" : result.status,
+        message: `Zaktualizowano kursy: ${result.updatedCount}. Zachowano nowsze lub równe kursy: ${result.unchangedCount}. Spółki nieobecne w pliku: ${result.missingCount}. Błędy: ${result.failureCount}. Dodano rekordów historii: ${result.historyInsertedCount}.`,
+      };
+    }
     const result = await importStooqCsv({
       repository: createSupabaseMarketDataSyncRepository(serviceClient),
       parseQuote: parseStooqCsvImport,
@@ -129,7 +164,8 @@ export async function importStooqCsvAction(
   } catch {
     return {
       status: "error",
-      message: "The Stooq CSV could not be imported. Stored data was kept.",
+      message:
+        "Nie udało się zakończyć importu CSV Stooq. Sprawdź stan kursów i historię importów przed ponowieniem.",
     };
   }
 }

@@ -9,16 +9,30 @@ import {
   MARKET_SESSIONS,
   zonedSessionTimestamp,
 } from "@/domain/markets/market-session";
-import { parseStooqDailyCsv } from "./stooq-parser";
+import {
+  parseStooqBulkCsv,
+  parseStooqDailyCsv,
+  type StooqDailyRow,
+} from "./stooq-parser";
 
 export function parseStooqCsvQuote(
   payload: string,
   instrument: ProviderInstrument,
   receivedAt: Date,
 ): NormalizedQuote {
-  const rows = parseStooqDailyCsv(payload, instrument.providerSymbol).sort(
-    (left, right) => left.Date.localeCompare(right.Date),
+  return quoteFromRows(
+    parseStooqDailyCsv(payload, instrument.providerSymbol),
+    instrument,
+    receivedAt,
   );
+}
+
+function quoteFromRows(
+  rows: StooqDailyRow[],
+  instrument: ProviderInstrument,
+  receivedAt: Date,
+): NormalizedQuote {
+  rows = [...rows].sort((left, right) => left.Date.localeCompare(right.Date));
   const latest = rows.at(-1)!;
   const previousClose = rows.at(-2)?.Close ?? null;
   const session = MARKET_SESSIONS.GPW;
@@ -61,9 +75,34 @@ export function parseStooqCsvImport(
   instrument: ProviderInstrument,
   receivedAt: Date,
 ): StooqCsvParsedData {
-  const rows = parseStooqDailyCsv(payload, instrument.providerSymbol).sort(
-    (left, right) => left.Date.localeCompare(right.Date),
+  return importFromRows(
+    parseStooqDailyCsv(payload, instrument.providerSymbol),
+    instrument,
+    receivedAt,
   );
+}
+
+export function parseStooqBulkImport(
+  payload: string,
+  instruments: ProviderInstrument[],
+  receivedAt: Date,
+): StooqCsvParsedData[] {
+  const grouped = parseStooqBulkCsv(
+    payload,
+    instruments.map((instrument) => instrument.providerSymbol),
+  );
+  return instruments.flatMap((instrument) => {
+    const rows = grouped.get(instrument.providerSymbol.trim().toUpperCase());
+    return rows ? [importFromRows(rows, instrument, receivedAt)] : [];
+  });
+}
+
+function importFromRows(
+  rows: StooqDailyRow[],
+  instrument: ProviderInstrument,
+  receivedAt: Date,
+): StooqCsvParsedData {
+  rows = [...rows].sort((left, right) => left.Date.localeCompare(right.Date));
 
   return {
     prices: rows.map((row) => ({
@@ -77,6 +116,6 @@ export function parseStooqCsvImport(
       currency: "PLN",
       provider: "Stooq CSV",
     })),
-    latestQuote: parseStooqCsvQuote(payload, instrument, receivedAt),
+    latestQuote: quoteFromRows(rows, instrument, receivedAt),
   };
 }
